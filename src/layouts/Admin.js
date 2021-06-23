@@ -11,7 +11,7 @@ import Footer from 'components/Footer/Footer.js';
 import Sidebar from 'components/Sidebar/Sidebar.js';
 import FixedPlugin from 'components/FixedPlugin/FixedPlugin.js';
 
-import routes from 'routes.js';
+import { routes, navMenu } from 'routes.js';
 
 import styles from 'assets/jss/material-dashboard-react/layouts/adminStyle.js';
 
@@ -20,35 +20,12 @@ import logo from 'assets/img/reactlogo.png';
 
 let ps;
 
-const flatRoutes = routesList => {
-  let routes = [];
-
-  routesList.forEach(route => {
-    if (route.hasOwnProperty('children')) {
-      routes = [...routes, ...flatRoutes(route.children)];
-    } else {
-      routes = [...routes, route];
-    }
-  });
-  return routes;
-};
-
-console.log(flatRoutes(routes));
-
 const switchRoutes = (
   <Switch>
-    {flatRoutes(routes).map((prop, key) => {
-      if (prop.layout === '/admin') {
-        return (
-          <Route
-            path={prop.layout + prop.path}
-            component={prop.component}
-            key={key}
-          />
-        );
-      }
-      return null;
+    {routes.map((prop, key) => {
+      return <Route path={'/admin' + prop.path} component={prop.component} key={key} />;
     })}
+
     <Redirect from="/admin" to="/admin/dashboard" />
   </Switch>
 );
@@ -110,7 +87,7 @@ export default function Admin({ ...rest }) {
   return (
     <div className={classes.wrapper}>
       <Sidebar
-        routes={routes}
+        routes={navMenu}
         logoText={'Creative Tim'}
         logo={logo}
         image={image}
@@ -120,11 +97,7 @@ export default function Admin({ ...rest }) {
         {...rest}
       />
       <div className={classes.mainPanel} ref={mainPanel}>
-        <Navbar
-          routes={routes}
-          handleDrawerToggle={handleDrawerToggle}
-          {...rest}
-        />
+        <Navbar routes={navMenu} handleDrawerToggle={handleDrawerToggle} {...rest} />
         {/* On the /maps route we want the map to be on full screen - this is not possible if the content and conatiner classes are present because they have some paddings which would make the map smaller */}
         {getRoute() ? (
           <div className={classes.content}>

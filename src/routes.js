@@ -34,8 +34,47 @@ import Maps from 'views/Maps/Maps.js';
 import NotificationsPage from 'views/Notifications/Notifications.js';
 import UpgradeToPro from 'views/UpgradeToPro/UpgradeToPro.js';
 import Users from 'views/Users/Users';
+import Test from 'views/Test/Test';
 
-const dashboardRoutes = [
+export const routes = [
+  {
+    path: '/dashboard',
+    component: DashboardPage
+  },
+  {
+    path: '/user',
+    component: UserProfile
+  },
+  {
+    path: '/users',
+    component: Users
+  },
+  {
+    path: '/typography',
+    component: Typography
+  },
+  {
+    path: '/icons',
+    component: Icons
+  },
+  {
+    path: '/maps',
+    component: Maps
+  },
+  {
+    path: '/table',
+    component: TableList
+  },
+  {
+    path: '/notifications',
+    component: NotificationsPage
+  },
+  {
+    path: '/test',
+    component: Test
+  }
+];
+export const navMenu = [
   {
     path: '/dashboard',
     name: 'Dashboard',
@@ -85,13 +124,6 @@ const dashboardRoutes = [
     component: TableList,
     layout: '/admin'
   },
-  // {
-  //   path: '/notifications',
-  //   component: NotificationsPage,
-  //   layout: '/admin',
-  //   name: 'Notifications',
-  //   icon: Notifications
-  // },
   {
     name: 'Multi Level',
     icon: Notifications,
@@ -106,5 +138,3 @@ const dashboardRoutes = [
     ]
   }
 ];
-
-export default dashboardRoutes;
