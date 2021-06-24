@@ -7,8 +7,13 @@ import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
 import MaterialTable from 'material-table';
 import axios from 'axios';
+import Parse from 'parse';
+import Avatar from '../../components/Avatar/Avatar';
+import { Grid } from '@material-ui/core';
+import ListAltIcon from '@material-ui/icons/ListAlt';
+import { useHistory } from 'react-router';
 
-const styles = {
+const useStyles = makeStyles(theme => ({
   cardCategoryWhite: {
     '&,& a,& a:hover,& a:focus': {
       color: 'rgba(255,255,255,.62)',
@@ -36,11 +41,11 @@ const styles = {
       lineHeight: '1'
     }
   }
-};
-
-const useStyles = makeStyles(styles);
+}));
 const Users = props => {
   const classes = useStyles();
+
+  const history = useHistory();
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,38 +53,75 @@ const Users = props => {
   const [flag, setflag] = useState(false);
 
   const columns = [
-    {
-      title: 'Id',
-      field: 'id',
-      width: '1%',
-      cellStyle: {
-        width: '1%'
-      },
-      sorting: false,
-      searchable: false
-    },
+    // {
+    //   title: 'Id',
+    //   field: 'id',
+    //   width: '1%',
+    //   cellStyle: {
+    //     width: '1%'
+    //   },
+    //   sorting: false,
+    //   searchable: false
+    // },
     {
       title: 'Name',
-      field: 'name'
+      field: 'name',
+      render: rowData => (
+        <Grid container alignItems="center" spacing={0}>
+          <Avatar size="small" src={rowData.profilePicture} />
+          <p style={{ margin: '0 0 0 8px' }}>
+            {rowData.firstName} {rowData.lastName}
+          </p>
+        </Grid>
+      )
     },
     {
       title: 'Email',
-      field: 'email'
+      field: 'customEmail'
     },
     {
-      title: 'Website',
-      field: 'website'
+      title: 'Phone',
+      field: 'phone'
     },
     {
-      title: 'Company',
-      field: 'company.name'
+      title: 'Address',
+      field: 'city',
+      render: rowData => `${rowData.city},${rowData.country}`
     }
   ];
 
   useEffect(async () => {
-    const res = await axios.get('https://jsonplaceholder.typicode.com/users');
-    console.log(users);
-    setUsers(res.data);
+    const roleQuery = new Parse.Query(Parse.Role);
+    roleQuery.containedIn('name', ['Pharmacist', 'pharmacyOwner']);
+
+    const roles = await roleQuery.find();
+
+    const roleUsers = await roles.reduce(async (acc, role) => {
+      acc = await acc;
+      const usersQuery = role.relation('users').query();
+      const allUsers = await usersQuery.find();
+      return [...acc, ...allUsers];
+    }, Promise.resolve([]));
+
+    console.log({ roleUsers });
+
+    const getData = user =>
+      ['firstName', 'lastName', 'customEmail', 'profilePicture', 'phone', 'city', 'country'].reduce(
+        (acc, val) => {
+          return {
+            ...acc,
+            id: user.id,
+            [val]: user.get(val)
+          };
+        },
+        {}
+      );
+
+    const data = roleUsers.map(getData);
+
+    console.log({ data });
+
+    setUsers(data);
     setLoading(false);
   }, []);
 
@@ -98,10 +140,18 @@ const Users = props => {
           isLoading={loading}
           actions={[
             {
-              icon: 'edit',
-              tooltip: 'Edit',
+              icon: 'chat',
+              tooltip: 'Message',
               onClick: (event, rowData) => {
                 console.log(rowData);
+              },
+              position: 'row'
+            },
+            {
+              icon: 'list_alt',
+              tooltip: 'Details',
+              onClick: (event, rowData) => {
+                history.push(`/admin/users/${rowData.id}`);
               },
               position: 'row'
             },

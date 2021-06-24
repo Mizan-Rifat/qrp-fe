@@ -35,6 +35,7 @@ import NotificationsPage from 'views/Notifications/Notifications.js';
 import UpgradeToPro from 'views/UpgradeToPro/UpgradeToPro.js';
 import Users from 'views/Users/Users';
 import Test from 'views/Test/Test';
+import UserDetails from 'views/UserDetails/UserDetails';
 
 export const routes = [
   {
@@ -44,6 +45,10 @@ export const routes = [
   {
     path: '/user',
     component: UserProfile
+  },
+  {
+    path: '/users/:id',
+    component: UserDetails
   },
   {
     path: '/users',
