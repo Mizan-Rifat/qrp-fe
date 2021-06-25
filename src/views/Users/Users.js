@@ -12,6 +12,8 @@ import Avatar from '../../components/Avatar/Avatar';
 import { Grid } from '@material-ui/core';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import { useHistory } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers } from 'redux/ducks/usersDuck';
 
 const useStyles = makeStyles(theme => ({
   cardCategoryWhite: {
@@ -42,27 +44,15 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-const Users = props => {
+const Users = () => {
   const classes = useStyles();
+
+  const { users, fetching } = useSelector(state => state.users);
+  const dispatch = useDispatch();
 
   const history = useHistory();
 
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const [flag, setflag] = useState(false);
-
   const columns = [
-    // {
-    //   title: 'Id',
-    //   field: 'id',
-    //   width: '1%',
-    //   cellStyle: {
-    //     width: '1%'
-    //   },
-    //   sorting: false,
-    //   searchable: false
-    // },
     {
       title: 'Name',
       field: 'name',
@@ -91,38 +81,7 @@ const Users = props => {
   ];
 
   useEffect(async () => {
-    const roleQuery = new Parse.Query(Parse.Role);
-    roleQuery.containedIn('name', ['Pharmacist', 'pharmacyOwner']);
-
-    const roles = await roleQuery.find();
-
-    const roleUsers = await roles.reduce(async (acc, role) => {
-      acc = await acc;
-      const usersQuery = role.relation('users').query();
-      const allUsers = await usersQuery.find();
-      return [...acc, ...allUsers];
-    }, Promise.resolve([]));
-
-    console.log({ roleUsers });
-
-    const getData = user =>
-      ['firstName', 'lastName', 'customEmail', 'profilePicture', 'phone', 'city', 'country'].reduce(
-        (acc, val) => {
-          return {
-            ...acc,
-            id: user.id,
-            [val]: user.get(val)
-          };
-        },
-        {}
-      );
-
-    const data = roleUsers.map(getData);
-
-    console.log({ data });
-
-    setUsers(data);
-    setLoading(false);
+    dispatch(fetchUsers());
   }, []);
 
   return (
@@ -137,7 +96,7 @@ const Users = props => {
           title="Simple Action Preview"
           columns={columns}
           data={users}
-          isLoading={loading}
+          isLoading={fetching}
           actions={[
             {
               icon: 'chat',

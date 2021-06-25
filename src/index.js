@@ -23,6 +23,8 @@ import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import Admin from 'layouts/Admin.js';
 import Parse from 'parse';
 import 'assets/css/material-dashboard-react.css?v=1.10.0';
+import { Provider } from 'react-redux';
+import { store } from 'redux/store';
 
 // /**Initialize parse server SDK */
 Parse.initialize('99D9878682A5446B818BC5674A46AF6F88F66C1A');
@@ -30,11 +32,13 @@ Parse.masterKey = '88C2DC1F2055381075ED07CF2E8032A86B4D35FC';
 Parse.serverURL = 'https://qrps.app/parse';
 
 ReactDOM.render(
-  <BrowserRouter>
-    <Switch>
-      <Route path="/admin" component={Admin} />
-      <Redirect from="/" to="/admin/dashboard" />
-    </Switch>
-  </BrowserRouter>,
+  <Provider store={store}>
+    <BrowserRouter>
+      <Switch>
+        <Route path="/admin" component={Admin} />
+        <Redirect from="/" to="/admin/dashboard" />
+      </Switch>
+    </BrowserRouter>
+  </Provider>,
   document.getElementById('root')
 );
