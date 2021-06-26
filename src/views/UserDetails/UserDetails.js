@@ -7,7 +7,7 @@ import Table from 'components/Table/Table.js';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
-import { Button as MButton, makeStyles } from '@material-ui/core';
+import { Box, Button as MButton, Grid, makeStyles } from '@material-ui/core';
 import { ucFirst, sentenceCase } from '../../utils';
 import dayjs from 'dayjs';
 import MaterialTable, { MTableToolbar } from 'material-table';
@@ -16,6 +16,7 @@ import CardFooter from 'components/Card/CardFooter';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { Link } from 'react-router-dom';
 import MLightBox from 'components/Lightbox/MLightBox';
+import image from '../../assets/img/no-image.png';
 
 const styles = {
   cardCategoryWhite: {
@@ -76,16 +77,16 @@ const UserDetails = () => {
       field: 'label',
       cellStyle: {
         fontWeight: 400,
-        width: '20%'
+        width: '200px'
       }
     },
     {
       field: 'value',
       render: rowData => {
-        if (rowData.image) {
+        if (rowData.type === 'image') {
           return (
             <img
-              src={rowData.value}
+              src={rowData.value ? rowData.value : image}
               alt=""
               height="150"
               onClick={() => handleImageClick(rowData.value)}
@@ -94,6 +95,9 @@ const UserDetails = () => {
         }
         if (typeof rowData.value === 'boolean') {
           return ucFirst(rowData.value.toString());
+        }
+        if (!rowData.value) {
+          return 'None';
         }
         return rowData.value;
       }
@@ -105,250 +109,130 @@ const UserDetails = () => {
 
   useEffect(() => {
     if (Object.keys(user).length) {
-      const fieldsssss = [
-        'softwareSystem',
-        'typeOfShifts',
-        'location',
+      const fields = [
         'firstName',
         'lastName',
         'username',
-        'addressOne',
-        'addressTwo',
-        'city',
-        'province',
-        'postalCode',
-        'country',
         'phone',
-        'govPhotoId',
+        'softwareSystem',
+        'typeOfShifts',
         'currentJobTitle',
         'skills',
         'pharmacyExperience',
         'licenseNumber',
         'provinceOfLicense',
         'pharmacyName',
-        'status',
-        'createdAt',
         'smsExpireDateTime',
         'smsNumber',
         'smsVerified',
         'pharmacyType',
         'managerAsOwner',
         'profilePicture',
-        'pharmacyBanner',
-        'language'
+        'govPhotoId',
+        'pharmacyBanner'
       ];
 
-      const fields = [
+      const data = [
+        ...fields.map(field => ({
+          label: sentenceCase(field),
+          value: ['smsExpireDateTime'].includes(field)
+            ? dayjs(user.get(field)).format('MMMM DD, YYYY - hh:MM A')
+            : user.get(field),
+          type: ['profilePicture', 'pharmacyBanner', 'govPhotoId'].includes(field) && 'image'
+        })),
         {
-          field: 'softwareSystem',
-          type: 'string'
+          label: 'Address',
+          value: `${user.get('addressOne')},${user.get('city')},${user.get('country')}`
         },
         {
-          field: 'typeOfShifts',
-          type: 'string'
+          label: 'Joined',
+          value: dayjs(user.get('createdAt')).format('MMMM DD, YYYY - hh:MM A'),
+          type: 'date'
         },
         {
-          field: 'location',
-          type: 'string'
+          label: 'Language',
+          value: user.get('language') ? 'French' : 'English'
         },
         {
-          field: 'firstName',
-          type: 'string'
-        },
-        {
-          field: 'lastName',
-          type: 'string'
-        },
-        {
-          field: 'username',
-          type: 'string'
-        },
-        {
-          field: 'addressOne',
-          type: 'string'
-        },
-        {
-          field: 'addressTwo',
-          type: 'string'
-        },
-        {
-          field: 'city',
-          type: 'string'
-        },
-        {
-          field: 'province',
-          type: 'string'
-        },
-        {
-          field: 'postalCode',
-          type: 'string'
-        },
-        {
-          field: 'country',
-          type: 'string'
-        },
-        {
-          field: 'phone',
-          type: 'string'
-        },
-        {
-          field: 'govPhotoId',
-          type: 'string'
-        },
-        {
-          field: 'currentJobTitle',
-          type: 'string'
-        },
-        {
-          field: 'skills',
-          type: 'string'
-        },
-        {
-          field: 'pharmacyExperience',
-          type: 'string'
-        },
-        {
-          field: 'licenseNumber',
-          type: 'string'
-        },
-        {
-          field: 'provinceOfLicense',
-          type: 'string'
-        },
-        {
-          field: 'pharmacyName',
-          type: 'string'
-        },
-        {
-          field: 'status',
-          type: 'string'
-        },
-        {
-          field: 'createdAt',
-          type: 'string',
-          label: 'Joined'
-        },
-        {
-          field: 'smsExpireDateTime',
-          type: 'string'
-        },
-        {
-          field: 'smsNumber',
-          type: 'string'
-        },
-        {
-          field: 'smsVerified',
-          type: 'string'
-        },
-        {
-          field: 'pharmacyType',
-          type: 'string'
-        },
-        {
-          field: 'managerAsOwner',
-          type: 'string'
-        },
-        {
-          field: 'profilePicture',
-          type: 'string'
-        },
-        {
-          field: 'pharmacyBanner',
-          type: 'string'
-        },
-        {
-          field: 'language',
-          type: 'string'
+          label: 'Approved',
+          value: user.get('status') ? 'Yes' : 'No'
         }
-      ];
+      ].sort((a, b) => (a.type === 'image' ? 1 : 0));
 
-      console.log(
-        fields.map(field => ({
-          field: field,
-          type: 'string'
-        }))
-      );
+      console.log({ data });
 
-      const td = Object.keys(user.attributes).map(item => {
-        const rowObj = value => ({
-          label: sentenceCase(item),
-          value: value ? value : 'None',
-          image: ['profilePicture', 'pharmacyBanner', 'govPhotoId'].includes(item)
-        });
-
-        if (typeof user.get(item) !== 'object') {
-          return rowObj(user.get(item));
-        } else if (Array.isArray(user.get(item))) {
-          return rowObj(user.get(item).join(', '));
-        } else if (dayjs(user.get(item)).isValid()) {
-          return rowObj(dayjs(user.get(item)).format('MMMM DD, YYYY - hh:MM A'));
-        } else {
-          console.log(item, user.get(item));
-          return rowObj(typeof user.get(item));
-        }
-      });
-      setTableData(td);
-
-      console.log({ td });
+      setTableData(data);
     }
   }, [user]);
 
   return (
-    <>
-      <div className="" style={{ textAlign: 'right', marginBottom: 48 }}>
-        <Link to="/admin/users">
-          <MButton
-            variant="contained"
-            color="secondary"
-            className={classes.button}
-            size="small"
-            startIcon={<ArrowBackIcon />}
-            // component={Link}
-          >
-            User list
-          </MButton>
-        </Link>
-      </div>
-      <Card plain>
-        <CardHeader plain color="primary">
-          <h4 className={classes.cardTitleWhite}>User Details</h4>
-          <p className={classes.cardCategoryWhite}>
-            {Object.keys(user).length > 0 && user.get('username')}
-          </p>
-        </CardHeader>
-        <CardBody>
-          <MaterialTable
-            style={{ boxShadow: 'unset', background: 'unset' }}
-            title=""
-            columns={columns}
-            data={tableData}
-            isLoading={fetching}
-            options={{
-              paging: false,
-              header: false,
-              search: false,
-              toolbar: false
-            }}
-            // components={{
-            //   Toolbar: props => (
-            //     <div>
-            //       <MTableToolbar {...props} />
-            //       <div style={{ textAlign: 'right' }}>
-            //         <Button color="primary">Update Profile</Button>
-            //       </div>
-            //     </div>
-            //   )
-            // }}
-          />
+    !fetching && (
+      <>
+        <Box textAlign="right" mb={6}>
+          <Link to="/admin/users">
+            <MButton
+              variant="contained"
+              color="secondary"
+              className={classes.button}
+              size="small"
+              startIcon={<ArrowBackIcon />}
+              // component={Link}
+            >
+              User list
+            </MButton>
+          </Link>
+        </Box>
+        <Card plain>
+          <CardHeader plain color="primary">
+            <h4 className={classes.cardTitleWhite}>User Details</h4>
+            <p className={classes.cardCategoryWhite}>
+              {Object.keys(user).length > 0 && user.get('username')}
+            </p>
+          </CardHeader>
+          <CardBody>
+            <Box display="flex" justifyContent="flex-end" my={5}>
+              <Button color={user.get('status') ? 'danger' : 'success'}>
+                {user.get('status') ? 'Decline' : 'Approve'}
+              </Button>
+            </Box>
+            <Grid container>
+              <Grid item lg={6}>
+                <MaterialTable
+                  style={{ boxShadow: 'unset', background: 'unset' }}
+                  title=""
+                  columns={columns}
+                  data={tableData.slice(0, 16)}
+                  isLoading={fetching}
+                  options={{
+                    paging: false,
+                    header: false,
+                    search: false,
+                    toolbar: false
+                  }}
+                />
+              </Grid>
+              <Grid item lg={6}>
+                <MaterialTable
+                  style={{ boxShadow: 'unset', background: 'unset' }}
+                  title=""
+                  columns={columns}
+                  data={tableData.slice(16, tableData.length)}
+                  isLoading={fetching}
+                  options={{
+                    paging: false,
+                    header: false,
+                    search: false,
+                    toolbar: false
+                  }}
+                />
+              </Grid>
+            </Grid>
 
-          {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
-        </CardBody>
-        <CardFooter style={{ justifyContent: 'flex-end' }}>
-          <Button color="danger">Decline</Button>
-          <Button color="success">Approve</Button>
-        </CardFooter>
-      </Card>
-    </>
+            {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
+          </CardBody>
+        </Card>
+      </>
+    )
   );
 };
 
