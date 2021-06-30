@@ -8,6 +8,7 @@ const USER_LOADING_FALSE = 'pes/user/user_loading_false';
 const USER_FETCHING_TRUE = 'pes/user/user_fetching_true';
 const USER_FETCHING_FALSE = 'pes/user/user_fetching_false';
 const USER_UPDATED = 'pes/user/user_updated';
+const RESET = 'pes/user/reset';
 
 const initState = {
   fetching: true,
@@ -54,6 +55,8 @@ export default (state = initState, action) => {
         ...state,
         fetching: false
       };
+    case RESET:
+      return initState;
 
     default:
       return state;
@@ -73,11 +76,31 @@ export const userUpdated = user => {
     payload: user
   };
 };
+export const resetUserState = () => {
+  return {
+    type: RESET
+  };
+};
 
 export const fetchUser = id => async dispatch => {
   const User = new Parse.User();
   const userQuery = new Parse.Query(User);
   const user = await userQuery.get(id);
-  console.log(user.attributes);
+
+  const roles = await new Parse.Query(Parse.Role).equalTo('users', user).find();
+
+  const isPharmacyOwner = roles.some(role => role.get('name') === 'pharmacyOwner');
+
+  if (!user.get('managerAsOwner') && isPharmacyOwner) {
+    const Manager = Parse.Object.extend('pharmacyManagers');
+    const managerQuery = new Parse.Query(Manager);
+    managerQuery.equalTo('userId', { __type: 'Pointer', className: '_User', objectId: user.id });
+
+    const manager = await managerQuery.first();
+    user.manager = manager;
+  }
+
+  user.roles = roles;
+
   dispatch(userFetched(user));
 };

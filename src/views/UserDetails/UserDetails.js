@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUser } from 'redux/ducks/userDuck';
+import { fetchUser, resetUserState } from 'redux/ducks/userDuck';
 import Table from 'components/Table/Table.js';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
 import { Box, Button as MButton, Grid, makeStyles } from '@material-ui/core';
-import { ucFirst, sentenceCase } from '../../utils';
+import { ucFirst, sentenceCase, getParseObject } from '../../utils';
 import dayjs from 'dayjs';
 import MaterialTable, { MTableToolbar } from 'material-table';
 import Button from 'components/CustomButtons/Button.js';
@@ -17,6 +17,8 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { Link } from 'react-router-dom';
 import MLightBox from 'components/Lightbox/MLightBox';
 import image from '../../assets/img/no-image.png';
+import ManagerDetails from './ManagerDetails';
+import FormDialog from 'components/Dialog/FormDialog';
 
 const styles = {
   cardCategoryWhite: {
@@ -48,12 +50,23 @@ const styles = {
   }
 };
 
+const Picture = ({ label, src, handleImageClick }) => (
+  <>
+    <p style={{ fontWeight: 500 }}>{label} :</p>
+    <img src={src} alt="" width="100%" onClick={() => handleImageClick(src)} />
+  </>
+);
+
 const useStyles = makeStyles(styles);
+
 const UserDetails = () => {
   const classes = useStyles();
   const { id } = useParams();
+  const history = useHistory();
 
   const [tableData, setTableData] = useState([]);
+
+  const [openDialog, setOpenDialog] = useState(false);
 
   const [lightBox, setLightBox] = useState({
     open: false,
@@ -103,15 +116,26 @@ const UserDetails = () => {
       }
     }
   ];
+
+  const Picture = ({ label, src, handleImageClick }) => (
+    <>
+      <p style={{ fontWeight: 500 }}>{label} :</p>
+      <img src={src} alt="" height="150" onClick={() => handleImageClick(src)} />
+    </>
+  );
   useEffect(() => {
     dispatch(fetchUser(id));
+
+    return () => {
+      dispatch(resetUserState());
+    };
   }, [id]);
+
+  // console.log(user);
 
   useEffect(() => {
     if (Object.keys(user).length) {
       const fields = [
-        'firstName',
-        'lastName',
         'username',
         'phone',
         'softwareSystem',
@@ -122,27 +146,37 @@ const UserDetails = () => {
         'licenseNumber',
         'provinceOfLicense',
         'pharmacyName',
-        'smsExpireDateTime',
+        // 'smsExpireDateTime',
         'smsNumber',
         'smsVerified',
         'pharmacyType',
-        'managerAsOwner',
-        'profilePicture',
-        'govPhotoId',
-        'pharmacyBanner'
+        'managerAsOwner'
+        // 'profilePicture',
+        // 'govPhotoId',
+        // 'pharmacyBanner'
       ];
 
       const data = [
+        {
+          label: 'Name',
+          value: `${user.get('firstName')} ${user.get('lastName')}`
+        },
+        {
+          label: 'Type',
+          value: user.roles.map(role => role.get('name'))
+        },
         ...fields.map(field => ({
           label: sentenceCase(field),
-          value: ['smsExpireDateTime'].includes(field)
-            ? dayjs(user.get(field)).format('MMMM DD, YYYY - hh:MM A')
-            : user.get(field),
-          type: ['profilePicture', 'pharmacyBanner', 'govPhotoId'].includes(field) && 'image'
+          value: user.get(field)
+          // type: ['profilePicture', 'pharmacyBanner', 'govPhotoId'].includes(field) && 'image'
         })),
         {
           label: 'Address',
-          value: `${user.get('addressOne')},${user.get('city')},${user.get('country')}`
+          value: `${user.get('addressOne')}${
+            user.get('addressTwo') && ', ' + user.get('addressTwo')
+          }, ${user.get('city')}, ${user.get('province')}, ${user.get('postalCode')}, ${user.get(
+            'country'
+          )}`
         },
         {
           label: 'Joined',
@@ -159,7 +193,7 @@ const UserDetails = () => {
         }
       ].sort((a, b) => (a.type === 'image' ? 1 : 0));
 
-      console.log({ data });
+      // console.log({ data });
 
       setTableData(data);
     }
@@ -168,19 +202,17 @@ const UserDetails = () => {
   return (
     !fetching && (
       <>
-        <Box textAlign="right" mb={6}>
-          <Link to="/admin/users">
-            <MButton
-              variant="contained"
-              color="secondary"
-              className={classes.button}
-              size="small"
-              startIcon={<ArrowBackIcon />}
-              // component={Link}
-            >
-              User list
-            </MButton>
-          </Link>
+        <Box mb={6}>
+          <MButton
+            variant="contained"
+            color="secondary"
+            className={classes.button}
+            size="small"
+            startIcon={<ArrowBackIcon />}
+            onClick={() => history.goBack()}
+          >
+            Back to list
+          </MButton>
         </Box>
         <Card plain>
           <CardHeader plain color="primary">
@@ -191,17 +223,24 @@ const UserDetails = () => {
           </CardHeader>
           <CardBody>
             <Box display="flex" justifyContent="flex-end" my={5}>
+              <Button
+                color="success"
+                onClick={() => setOpenDialog(!openDialog)}
+                style={{ marginRight: 10 }}
+              >
+                Set Commision
+              </Button>
               <Button color={user.get('status') ? 'danger' : 'success'}>
                 {user.get('status') ? 'Decline' : 'Approve'}
               </Button>
             </Box>
             <Grid container>
-              <Grid item lg={6}>
+              <Grid item xs={12} md={6}>
                 <MaterialTable
                   style={{ boxShadow: 'unset', background: 'unset' }}
                   title=""
                   columns={columns}
-                  data={tableData.slice(0, 16)}
+                  data={tableData.slice(0, 10)}
                   isLoading={fetching}
                   options={{
                     paging: false,
@@ -211,12 +250,12 @@ const UserDetails = () => {
                   }}
                 />
               </Grid>
-              <Grid item lg={6}>
+              <Grid item xs={12} md={6}>
                 <MaterialTable
                   style={{ boxShadow: 'unset', background: 'unset' }}
                   title=""
                   columns={columns}
-                  data={tableData.slice(16, tableData.length)}
+                  data={tableData.slice(10, tableData.length)}
                   isLoading={fetching}
                   options={{
                     paging: false,
@@ -228,6 +267,35 @@ const UserDetails = () => {
               </Grid>
             </Grid>
 
+            <Grid container spacing={3} style={{ paddingLeft: 12 }}>
+              <Grid item xs={12} sm={4}>
+                <Picture
+                  label="Profile Picture"
+                  src={user.get('profilePicture') ? user.get('profilePicture') : image}
+                  handleImageClick={handleImageClick}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Picture
+                  label="Govt Photo Id"
+                  src={user.get('govPhotoId') ? user.get('govPhotoId') : image}
+                  handleImageClick={handleImageClick}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Picture
+                  label="Pharmacy Banner"
+                  src={user.get('pharmacyBanner') ? user.get('pharmacyBanner') : image}
+                  handleImageClick={handleImageClick}
+                />
+              </Grid>
+            </Grid>
+
+            {!user.get('managerAsOwner') && (
+              <ManagerDetails fetching={fetching} manager={user.manager} />
+            )}
+
+            <FormDialog open={openDialog} setOpen={setOpenDialog} />
             {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
           </CardBody>
         </Card>

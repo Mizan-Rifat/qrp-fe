@@ -17,6 +17,8 @@ import styles from 'assets/jss/material-dashboard-react/layouts/adminStyle.js';
 
 import bgImage from 'assets/img/sidebar-2.jpg';
 import logo from 'assets/img/reactlogo.png';
+import Users from 'views/Users/Users';
+import Chat from 'views/Chat/Chat';
 
 let ps;
 
@@ -25,6 +27,16 @@ const switchRoutes = (
     {routes.map((prop, key) => {
       return <Route path={'/admin' + prop.path} component={prop.component} key={key} />;
     })}
+
+    <Route
+      path="/admin/staffs"
+      render={props => <Users {...props} type={['Pharmacist', 'Other']} />}
+    />
+    <Route
+      path="/admin/pharmacy-owners"
+      render={props => <Users {...props} type={['pharmacyOwner']} />}
+    />
+    <Route path="/admin/messages" component={Chat} />
 
     <Redirect from="/admin" to="/admin/dashboard" />
   </Switch>

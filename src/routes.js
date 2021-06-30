@@ -81,65 +81,15 @@ export const routes = [
 ];
 export const navMenu = [
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    icon: Dashboard,
-    component: DashboardPage,
-    layout: '/admin'
-  },
-  {
-    path: '/user',
-    name: 'User Profile',
+    path: '/staffs',
+    name: 'Manage Staffs',
     icon: Person,
-    component: UserProfile,
     layout: '/admin'
   },
   {
-    path: '/users',
-    name: 'Users ',
+    path: '/pharmacy-owners',
+    name: 'Pharmacy Owners',
     icon: Person,
-    component: Users,
     layout: '/admin'
-  },
-  {
-    path: '/typography',
-    name: 'Typography',
-    icon: LibraryBooks,
-    component: Typography,
-    layout: '/admin'
-  },
-  {
-    path: '/icons',
-    name: 'Icons',
-    icon: BubbleChart,
-    component: Icons,
-    layout: '/admin'
-  },
-  {
-    path: '/maps',
-    name: 'Maps',
-    icon: LocationOn,
-    component: Maps,
-    layout: '/admin'
-  },
-  {
-    path: '/table',
-    name: 'Table List',
-    icon: 'content_paste',
-    component: TableList,
-    layout: '/admin'
-  },
-  {
-    name: 'Multi Level',
-    icon: Notifications,
-    children: [
-      {
-        path: '/notifications',
-        component: NotificationsPage,
-        layout: '/admin',
-        name: 'Notifications',
-        icon: Notifications
-      }
-    ]
   }
 ];

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import EnhancedTable from 'components/Table/AdvanceTable';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
@@ -14,6 +13,7 @@ import ListAltIcon from '@material-ui/icons/ListAlt';
 import { useHistory } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from 'redux/ducks/usersDuck';
+import { sentenceCase } from 'utils';
 
 const useStyles = makeStyles(theme => ({
   cardCategoryWhite: {
@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-const Users = () => {
+const Users = ({ type }) => {
   const classes = useStyles();
 
   const { users, fetching } = useSelector(state => state.users);
@@ -74,6 +74,11 @@ const Users = () => {
       field: 'phone'
     },
     {
+      title: 'Type',
+      field: 'type',
+      render: rowData => sentenceCase(rowData.type)
+    },
+    {
       title: 'Address',
       field: 'city',
       render: rowData => `${rowData.city},${rowData.country}`
@@ -81,8 +86,9 @@ const Users = () => {
   ];
 
   useEffect(async () => {
-    dispatch(fetchUsers());
-  }, []);
+    dispatch(fetchUsers(type));
+    console.log({ users });
+  }, [type]);
 
   return (
     <Card>

@@ -88,16 +88,24 @@ export const userUpdated = user => {
   };
 };
 
-export const fetchUsers = () => async dispatch => {
+export const fetchUsers = type => async dispatch => {
+  dispatch({ type: USERS_FETCHING_TRUE });
   const roleQuery = new Parse.Query(Parse.Role);
-  roleQuery.containedIn('name', ['Pharmacist', 'pharmacyOwner']);
+  roleQuery.containedIn('name', type);
   const roles = await roleQuery.find();
   const roleUsers = await roles.reduce(async (acc, role) => {
     acc = await acc;
     const usersQuery = role.relation('users').query();
     const allUsers = await usersQuery.find();
+
+    allUsers.forEach(user => {
+      user.roleName = role.get('name');
+    });
+
     return [...acc, ...allUsers];
   }, Promise.resolve([]));
+
+  console.log({ roleUsers });
 
   const dataFields = [
     'firstName',
@@ -108,6 +116,9 @@ export const fetchUsers = () => async dispatch => {
     'city',
     'country'
   ];
-  const data = roleUsers.map(user => getParseObject(user, dataFields));
+  const data = roleUsers.map(user => ({
+    ...getParseObject(user, dataFields),
+    type: user.roleName
+  }));
   dispatch(allUsersFetched(data));
 };
