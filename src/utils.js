@@ -14,3 +14,5 @@ export const ucFirst = str => {
 export const sentenceCase = str => {
   return ucFirst(str.replace(/([A-Z])/g, ' $1'));
 };
+
+export const getChannelName = (uid, rid) => (uid > rid ? `${uid}-${rid}` : `${rid}-${uid}`);

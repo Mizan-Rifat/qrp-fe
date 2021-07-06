@@ -28,6 +28,9 @@ import useReciever from 'hooks/useReceiver';
 import { MessageForm } from './MessageForm';
 import { fetchContacts } from 'redux/ducks/contactsDuck';
 import ContactsList from './ContactsList';
+import Chat from './Chat';
+import { setPresenceStatus } from 'redux/ducks/contactsDuck';
+import usePresence from 'hooks/usePresence';
 
 const useStyles = makeStyles({
   table: {
@@ -49,50 +52,38 @@ const useStyles = makeStyles({
   }
 });
 
-const Chat = ({ rid }) => {
+const Messages = () => {
   const classes = useStyles();
 
-  const messageEndRef = useRef(null);
-  const [currentUser] = useState(Parse.User.current());
+  const [rid, setRid] = useQueryState('rid', '');
 
-  const { messages, fetching } = useSelector(state => state.messages);
-  const dispatch = useDispatch();
-
-  const { receiver, channel, events } = useReciever(rid);
-
-  useEffect(() => {
-    if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
+  const { currentUser } = usePresence();
 
   return (
-    <>
-      {fetching ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          <Scrollbar style={{ height: `calc(100% - 90px)` }}>
-            <List className={classes.messageArea}>
-              {messages.map((message, index) => (
-                <Message message={message} index={index} />
-              ))}
-            </List>
-            <div ref={messageEndRef} />
-          </Scrollbar>
-          <Box pt={3} position="relative">
-            {events.typing && (
-              <Box position="absolute" top={0} left={10} fontWeight={500} clone>
-                <Typography variant="caption">Typing...</Typography>
-              </Box>
-            )}
-            <Divider />
-            <MessageForm receiver={receiver} currentUser={currentUser} channel={channel} />
-          </Box>
-        </>
-      )}
-    </>
+    <div>
+      <Grid container component={Paper} className={classes.chatSection}>
+        <Grid item xs={3} className={classes.borderRight500}>
+          <List>
+            <ListItem button key="RemySharp">
+              <ListItemIcon>
+                <Avatar online={true} src="https://material-ui.com/static/images/avatar/1.jpg" />
+              </ListItemIcon>
+              <ListItemText primary={currentUser.get('username')}></ListItemText>
+            </ListItem>
+          </List>
+          <Divider />
+          <Grid item xs={12} style={{ padding: '10px' }}>
+            <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
+          </Grid>
+          <Divider />
+          <ContactsList setRid={setRid} />
+        </Grid>
+        <Grid item xs={9}>
+          {rid === '' ? <h1>Welcome</h1> : <Chat rid={rid} />}
+        </Grid>
+      </Grid>
+    </div>
   );
 };
 
-export default Chat;
+export default Messages;
