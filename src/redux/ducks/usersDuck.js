@@ -98,6 +98,8 @@ export const fetchUsers = type => async dispatch => {
     const usersQuery = role.relation('users').query();
     const allUsers = await usersQuery.find();
 
+    console.log({ allUsers });
+
     allUsers.forEach(user => {
       user.roleName = role.get('name');
     });

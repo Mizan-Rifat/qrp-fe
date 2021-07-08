@@ -85,6 +85,8 @@ export const fetchContacts = () => async dispatch => {
   const userQuery = new Parse.Query(User);
   const users = await userQuery.find();
 
+  console.log({ users });
+
   const dataFields = ['username', 'online'];
   const data = users.map(user => ({
     ...getParseObject(user, dataFields)

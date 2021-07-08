@@ -6,19 +6,21 @@ const MESSAGES_FETCHED = 'qrp/messages/messages_fetched';
 const MESSAGE_ADDED = 'qrp/messages/messages_added';
 const MESSAGES_DELETED = 'qrp/messages/messages_deleted';
 const MESSAGES_UPDATED = 'qrp/messages/messages_updated';
+const MORE_MESSAGES_LOADED = 'qrp/messages/more_messages_loaded';
 
 const LOADING_TRUE = 'qrp/messages/loading_true';
 const LOADING_FALSE = 'qrp/messages/loading_false';
 const FETCHING_TRUE = 'qrp/messages/fetching_true';
 const FETCHING_FALSE = 'qrp/messages/fetching_false';
 const SET_ERRORS = 'qrp/messages/set_errors';
-
+const RESET = 'qrp/messages/reset';
 // reducers
 
 const initState = {
   fetching: true,
   loading: false,
-  messages: []
+  messages: [],
+  count: 0
 };
 
 export default (state = initState, action) => {
@@ -28,15 +30,25 @@ export default (state = initState, action) => {
         ...state,
         fetching: false,
         loading: false,
-        messages: action.payload
+        messages: action.payload.results,
+        count: action.payload.count
+      };
+    case MORE_MESSAGES_LOADED:
+      return {
+        ...state,
+        loading: false,
+        messages: [...action.payload.results, ...state.messages],
+        count: action.payload.count
       };
 
     case MESSAGE_ADDED:
       return {
         ...state,
         loading: false,
-        messages: [...state.messages, action.payload]
+        messages: [...state.messages, action.payload],
+        count: state.count + 1
       };
+
     case MESSAGES_UPDATED:
       return {
         ...state,
@@ -76,6 +88,8 @@ export default (state = initState, action) => {
         fetching: false,
         error: action.payload
       };
+    case RESET:
+      return initState;
 
     default:
       return state;
@@ -97,11 +111,35 @@ export const receiveMessage = message => {
     payload: message
   };
 };
+export const moreMessageLoaded = data => {
+  return {
+    type: MORE_MESSAGES_LOADED,
+    payload: data
+  };
+};
 
-export const fetchMessages = rid => async dispatch => {
+export const resetMessagesState = () => {
+  return {
+    type: RESET
+  };
+};
+
+export const fetchMessages = (rid, page) => async dispatch => {
   dispatch({ type: FETCHING_TRUE });
   const messages = await Parse.Cloud.run('messages', {
-    rid
+    rid,
+    page,
+    limit: 10
   });
   dispatch(messagesFetched(messages));
+};
+
+export const loadMoreMessages = (rid, page) => async dispatch => {
+  dispatch({ type: LOADING_TRUE });
+  const messages = await Parse.Cloud.run('messages', {
+    rid,
+    page,
+    limit: 10
+  });
+  dispatch(moreMessageLoaded(messages));
 };

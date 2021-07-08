@@ -6,6 +6,8 @@ import { fetchMessages } from 'redux/ducks/messagesDuck';
 import { receiveMessage } from 'redux/ducks/messagesDuck';
 import { contactsUpdated, setPresenceStatus } from 'redux/ducks/contactsDuck';
 import { getChannelName } from 'utils';
+import { resetMessagesState } from 'redux/ducks/messagesDuck';
+import { loadMoreMessages } from 'redux/ducks/messagesDuck';
 
 const useReciever = rid => {
   const currentUser = Parse.User.current();
@@ -32,16 +34,21 @@ const useReciever = rid => {
   const [channel, setChannel] = useState({});
   const [receiver, setReceiver] = useState({});
   const [events, setEvents] = useState({});
+  const [newMessage, setNewMessage] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(async () => {
     if (rid !== '') {
-      dispatch(fetchMessages(rid));
+      dispatch(fetchMessages(rid, 1));
       const cha = await pusher.subscribe(`private-${channelName}`);
       setChannel(cha);
       const rec = await userQuery.get(rid);
       setReceiver(rec);
     }
+  }, [rid]);
+
+  useEffect(() => {
+    dispatch(resetMessagesState());
   }, [rid]);
 
   useEffect(() => {
@@ -51,6 +58,7 @@ const useReciever = rid => {
         if (data.messageFrom.objectId !== uid) {
           const incomingMsg = await new Parse.Query(Messages).get(data.objectId);
           console.log({ incomingMsg });
+          setNewMessage(true);
           dispatch(receiveMessage(incomingMsg));
         }
       });
@@ -73,7 +81,9 @@ const useReciever = rid => {
   return {
     receiver,
     channel,
-    events
+    events,
+    newMessage,
+    setNewMessage
   };
 };
 

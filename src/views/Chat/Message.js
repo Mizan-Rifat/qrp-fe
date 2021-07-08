@@ -14,14 +14,22 @@ import Parse from 'parse';
 
 const useStyles = makeStyles(theme => ({
   listItemText: {
-    maxWidth: 350
+    marginRight: 16,
+    textAlign: ({ isIncoming }) => (isIncoming ? 'right' : 'left')
   },
   listItemTextPrimary: {
+    maxWidth: 350,
+    wordBreak: 'break-word',
+    display: 'inline-block',
     justifyContent: 'flex-end',
     flex: 'unset',
     border: '1px solid',
     padding: 8,
     borderRadius: ({ isIncoming }) => (isIncoming ? '8px 0 8px 8px' : '0 8px 8px 8px')
+  },
+  listItemTextSecondary: {
+    fontSize: 12,
+    marginTop: 5
   },
   image: {
     height: 150,
@@ -51,17 +59,17 @@ const Message = ({ message }) => {
         />
       </ListItemAvatar>
       <ListItemText
-        style={{ marginRight: 16 }}
+        // style={{ marginRight: 16, textAlign: 'right' }}
         // className={classes.listItemText}
         classes={{
           root: classes.listItemText,
-          primary: classes.listItemTextPrimary
+          primary: classes.listItemTextPrimary,
+          secondary: classes.listItemTextSecondary
         }}
         primary={message.get('message')}
-        // primary="Brunch this weekend?"
         secondary={`${message.get('messageFrom').get('username')}, ${dayjs(
           message.get('createdAt')
-        ).format('MMM DD YYYY, hh:mm A')}`}
+        ).format('hh:mm A, MMM DD')}`}
       />
       {/* <img src={imagine1} alt="" className={classes.image} /> */}
     </ListItem>

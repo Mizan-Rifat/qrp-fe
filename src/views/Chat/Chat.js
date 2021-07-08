@@ -19,7 +19,7 @@ import Pusher from 'pusher-js';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
-
+import classNames from 'classnames';
 import Scrollbar from 'react-scrollbars-custom';
 import { useQueryState } from 'react-router-use-location-state';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,6 +28,13 @@ import useReciever from 'hooks/useReceiver';
 import { MessageForm } from './MessageForm';
 import { fetchContacts } from 'redux/ducks/contactsDuck';
 import ContactsList from './ContactsList';
+import { Button, Chip, CircularProgress, LinearProgress } from '@material-ui/core';
+import { loadMoreMessages } from 'redux/ducks/messagesDuck';
+import VisibilitySensor from 'react-visibility-sensor';
+
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 
 const useStyles = makeStyles({
   table: {
@@ -46,6 +53,16 @@ const useStyles = makeStyles({
   messageArea: {
     // height: '75vh'
     // overflowY: 'auto'
+  },
+  disable: {
+    pointerEvents: 'none',
+    opacity: 0.5
+  },
+  progress: {
+    position: 'absolute',
+    left: '42%',
+    top: '5px',
+    zIndex: 5
   }
 });
 
@@ -55,16 +72,40 @@ const Chat = ({ rid }) => {
   const messageEndRef = useRef(null);
   const [currentUser] = useState(Parse.User.current());
 
-  const { messages, fetching } = useSelector(state => state.messages);
+  const [page, setPage] = useState(1);
+  const [visibility, setVisibility] = useState(true);
+
+  const { messages, count, fetching, loading } = useSelector(state => state.messages);
   const dispatch = useDispatch();
 
-  const { receiver, channel, events } = useReciever(rid);
+  const { receiver, channel, events, newMessage, setNewMessage } = useReciever(rid);
+
+  const handleLodMore = () => {
+    setPage(page + 1);
+    dispatch(loadMoreMessages(rid, page + 1));
+  };
+
+  const handleVisibilityChange = isVisible => {
+    console.log({ isVisible });
+    setVisibility(isVisible);
+    if (isVisible) {
+      setNewMessage(false);
+    }
+  };
+  const handleNewMessage = () => {
+    messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    setNewMessage(false);
+  };
 
   useEffect(() => {
-    if (messageEndRef.current) {
+    if (messageEndRef.current && visibility) {
       messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [rid]);
 
   return (
     <>
@@ -74,16 +115,48 @@ const Chat = ({ rid }) => {
         <>
           <Scrollbar style={{ height: `calc(100% - 90px)` }}>
             <List className={classes.messageArea}>
-              {messages.map((message, index) => (
-                <Message message={message} index={index} />
-              ))}
+              {count > messages.length && (
+                <Box display="flex" justifyContent="center" mt={3}>
+                  {/* <Chip color="primary" size="small" label="Load More" onClick={handleLodMore} /> */}
+                  <LoadMoreButton handleLodMore={handleLodMore} />
+                </Box>
+              )}
+              {messages.map((message, index) =>
+                // <Message message={message} index={index} />
+                index == messages.length - 3 ? (
+                  <VisibilitySensor onChange={handleVisibilityChange} offset={{ top: -400 }}>
+                    <Message message={message} index={index} />
+                  </VisibilitySensor>
+                ) : (
+                  <Message message={message} index={index} />
+                )
+              )}
             </List>
+
             <div ref={messageEndRef} />
           </Scrollbar>
           <Box pt={3} position="relative">
             {events.typing && (
               <Box position="absolute" top={0} left={10} fontWeight={500} clone>
                 <Typography variant="caption">Typing...</Typography>
+              </Box>
+            )}
+            {newMessage && !visibility && (
+              <Box
+                position="absolute"
+                top={-30}
+                left={'47%'}
+                fontWeight={500}
+                bgcolor="info.main"
+                clone
+              >
+                <IconButton
+                  aria-label="delete"
+                  className={classes.margin}
+                  onClick={handleNewMessage}
+                >
+                  <ArrowDownwardIcon fontSize="inherit" color="#fff" />
+                </IconButton>
               </Box>
             )}
             <Divider />
@@ -96,3 +169,20 @@ const Chat = ({ rid }) => {
 };
 
 export default Chat;
+
+const LoadMoreButton = ({ loading, handleLodMore }) => {
+  const classes = useStyles();
+
+  return (
+    <Box position="relative">
+      <Chip
+        color="primary"
+        size="small"
+        label="Load More"
+        onClick={handleLodMore}
+        className={classNames({ [classes.disable]: loading })}
+      />
+      {loading && <CircularProgress size={16} className={classes.progress} />}
+    </Box>
+  );
+};

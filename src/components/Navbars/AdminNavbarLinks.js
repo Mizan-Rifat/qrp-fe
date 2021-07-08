@@ -13,6 +13,7 @@ import Divider from '@material-ui/core/Divider';
 // @material-ui/icons
 import Person from '@material-ui/icons/Person';
 import Notifications from '@material-ui/icons/Notifications';
+import EmailIcon from '@material-ui/icons/Email';
 import Dashboard from '@material-ui/icons/Dashboard';
 import Search from '@material-ui/icons/Search';
 // core components
@@ -21,6 +22,8 @@ import Button from 'components/CustomButtons/Button.js';
 import Parse from 'parse';
 import styles from 'assets/jss/material-dashboard-react/components/headerLinksStyle.js';
 import { useHistory } from 'react-router';
+import { IconButton } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(styles);
 
@@ -59,7 +62,7 @@ export default function AdminNavbarLinks() {
   };
   return (
     <div>
-      <div className={classes.searchWrapper}>
+      {/* <div className={classes.searchWrapper}>
         <CustomInput
           formControlProps={{
             className: classes.margin + ' ' + classes.search
@@ -74,8 +77,8 @@ export default function AdminNavbarLinks() {
         <Button color="white" aria-label="edit" justIcon round>
           <Search />
         </Button>
-      </div>
-      <Button
+      </div> */}
+      {/* <Button
         color={window.innerWidth > 959 ? 'transparent' : 'white'}
         justIcon={window.innerWidth > 959}
         simple={!(window.innerWidth > 959)}
@@ -86,8 +89,8 @@ export default function AdminNavbarLinks() {
         <Hidden mdUp implementation="css">
           <p className={classes.linkText}>Dashboard</p>
         </Hidden>
-      </Button>
-      <div className={classes.manager}>
+      </Button> */}
+      {/* <div className={classes.manager}>
         <Button
           color={window.innerWidth > 959 ? 'transparent' : 'white'}
           justIcon={window.innerWidth > 959}
@@ -97,7 +100,7 @@ export default function AdminNavbarLinks() {
           onClick={handleClickNotification}
           className={classes.buttonLink}
         >
-          <Notifications className={classes.icons} />
+          <EmailIcon className={classes.icons} />
           <span className={classes.notifications}>5</span>
           <Hidden mdUp implementation="css">
             <p onClick={handleCloseNotification} className={classes.linkText}>
@@ -146,6 +149,13 @@ export default function AdminNavbarLinks() {
             </Grow>
           )}
         </Poppers>
+      </div> */}
+      <div className={classes.manager}>
+        <Link to="/admin/messages">
+          <IconButton aria-label="messages">
+            <EmailIcon fontSize="small" className={classes.icon} />
+          </IconButton>
+        </Link>
       </div>
       <div className={classes.manager}>
         <Button
