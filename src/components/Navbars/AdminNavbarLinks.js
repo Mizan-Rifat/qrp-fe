@@ -151,7 +151,7 @@ export default function AdminNavbarLinks() {
         </Poppers>
       </div> */}
       <div className={classes.manager}>
-        <Link to="/admin/messages">
+        <Link to="/messages">
           <IconButton aria-label="messages">
             <EmailIcon fontSize="small" className={classes.icon} />
           </IconButton>

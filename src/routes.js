@@ -83,13 +83,11 @@ export const navMenu = [
   {
     path: '/staffs',
     name: 'Manage Staffs',
-    icon: Person,
-    layout: '/admin'
+    icon: Person
   },
   {
     path: '/pharmacy-owners',
     name: 'Pharmacy Owners',
-    icon: Person,
-    layout: '/admin'
+    icon: Person
   }
 ];

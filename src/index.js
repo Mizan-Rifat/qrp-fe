@@ -27,7 +27,7 @@ ReactDOM.render(
         {/* <Route path="/login" component={Login} /> */}
         <GuestProtectedRoute path="/login" component={Login} />
         <AdminProtectedRoute>
-          <Route path="/admin" component={Admin} />
+          <Route path="/" component={Admin} />
         </AdminProtectedRoute>
       </Switch>
     </BrowserRouter>

@@ -23,27 +23,9 @@ import logo from 'assets/img/reactlogo.png';
 import Users from 'views/Users/Users';
 import Chat from 'views/Chat/Chat';
 import Messages from 'views/Chat/Messages';
+import UserDetails from 'views/UserDetails/UserDetails';
 
 let ps;
-
-const switchRoutes = (
-  <Switch>
-    {routes.map((prop, key) => {
-      return <Route path={'/admin' + prop.path} component={prop.component} key={key} />;
-    })}
-
-    <Route
-      path="/admin/staffs"
-      render={props => <Users {...props} type={['Pharmacist', 'Other']} />}
-    />
-    <Route
-      path="/admin/pharmacy-owners"
-      render={props => <Users {...props} type={['pharmacyOwner']} />}
-    />
-    <Route path="/admin/messages" component={Messages} />
-    <Redirect from="/admin" to="/admin/dashboard" />
-  </Switch>
-);
 
 const useStyles = makeStyles(styles);
 
@@ -72,9 +54,6 @@ export default function Admin({ ...rest }) {
   };
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
-  };
-  const getRoute = () => {
-    return window.location.pathname !== '/admin/maps';
   };
   const resizeFunction = () => {
     if (window.innerWidth >= 960) {
@@ -111,20 +90,31 @@ export default function Admin({ ...rest }) {
         color={color}
         {...rest}
       />
-      <PerfectScrollbar>
-        <div className={classes.mainPanel} ref={mainPanel}>
-          <Navbar routes={navMenu} handleDrawerToggle={handleDrawerToggle} {...rest} />
-          {/* On the /maps route we want the map to be on full screen - this is not possible if the content and conatiner classes are present because they have some paddings which would make the map smaller */}
-          {getRoute() ? (
-            <div className={classes.content}>
-              <div className={classes.container}>{switchRoutes}</div>
-            </div>
-          ) : (
-            <div className={classes.map}>{switchRoutes}</div>
-          )}
-          {/* {getRoute() ? <Footer /> : null} */}
+      {/* <PerfectScrollbar> */}
+      <div className={classes.mainPanel} ref={mainPanel}>
+        <Navbar routes={navMenu} handleDrawerToggle={handleDrawerToggle} {...rest} />
+        <div className={classes.content}>
+          <div className={classes.container}>
+            <Switch>
+              <Route
+                exact
+                path="/staffs"
+                render={props => <Users {...props} type={['Pharmacist', 'Other']} />}
+              />
+              <Route exact path="/user/:id" component={UserDetails} />
+              <Route
+                exact
+                path="/pharmacy-owners"
+                render={props => <Users {...props} type={['pharmacyOwner']} />}
+              />
+              <Route exact path="/messages" component={Messages} />
+              <Redirect from="/" to="/dashboard" />
+            </Switch>
+          </div>
         </div>
-      </PerfectScrollbar>
+        {/* {getRoute() ? <Footer /> : null} */}
+      </div>
+      {/* </PerfectScrollbar> */}
     </div>
   );
 }

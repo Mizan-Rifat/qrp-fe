@@ -10,7 +10,7 @@ import Parse from 'parse';
 import Avatar from '../../components/Avatar/Avatar';
 import { Grid } from '@material-ui/core';
 import ListAltIcon from '@material-ui/icons/ListAlt';
-import { useHistory } from 'react-router';
+import { useHistory, useLocation } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from 'redux/ducks/usersDuck';
 import { sentenceCase } from 'utils';
@@ -116,7 +116,7 @@ const Users = ({ type }) => {
               icon: 'list_alt',
               tooltip: 'Details',
               onClick: (event, rowData) => {
-                history.push(`/admin/users/${rowData.id}`);
+                history.push(`/user/${rowData.id}`);
               },
               position: 'row'
             },
