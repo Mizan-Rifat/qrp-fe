@@ -87,7 +87,6 @@ const Users = ({ type }) => {
 
   useEffect(async () => {
     dispatch(fetchUsers(type));
-    console.log({ users });
   }, [type]);
 
   return (
@@ -107,9 +106,7 @@ const Users = ({ type }) => {
             {
               icon: 'chat',
               tooltip: 'Message',
-              onClick: (event, rowData) => {
-                console.log(rowData);
-              },
+              onClick: (event, rowData) => {},
               position: 'row'
             },
             {
@@ -123,9 +120,7 @@ const Users = ({ type }) => {
             {
               icon: 'delete',
               tooltip: 'Delete',
-              onClick: (evt, data) => {
-                console.log({ data });
-              }
+              onClick: (evt, data) => {}
             }
           ]}
           options={{

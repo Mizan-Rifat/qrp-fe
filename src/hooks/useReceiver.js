@@ -16,8 +16,7 @@ const useReciever = rid => {
   const uid = currentUser.id;
 
   const pusher = new Pusher('6e894e9b27c3993c4068', {
-    // authEndpoint: 'https://qrps.app/parse/pusher/auth',
-    authEndpoint: 'http://localhost:1337/pusher/auth',
+    authEndpoint: 'https://qrps.app/parse/pusher/auth',
     cluster: 'mt1',
     auth: {
       headers: {
@@ -39,9 +38,7 @@ const useReciever = rid => {
 
   useEffect(async () => {
     if (rid !== '') {
-      dispatch(fetchMessages(rid, 1)).catch(err => {
-        console.log({ err });
-      });
+      dispatch(fetchMessages(rid, 1)).catch(err => {});
       const cha = await pusher.subscribe(`private-${channelName}`);
       setChannel(cha);
       const rec = await userQuery.get(rid);
@@ -56,16 +53,13 @@ const useReciever = rid => {
   useEffect(() => {
     if (channel.name) {
       channel.bind('incomingMessage', async data => {
-        console.log(data.messageFrom.objectId);
         if (data.messageFrom.objectId !== uid) {
           const incomingMsg = await new Parse.Query(Messages).get(data.objectId);
-          console.log({ incomingMsg });
           setNewMessage(true);
           dispatch(receiveMessage(incomingMsg));
         }
       });
       channel.bind('client-typing', function (data) {
-        console.log({ data });
         setEvents({
           ...events,
           ...data

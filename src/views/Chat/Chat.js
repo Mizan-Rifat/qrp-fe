@@ -86,7 +86,6 @@ const Chat = ({ rid }) => {
   };
 
   const handleVisibilityChange = isVisible => {
-    console.log({ isVisible });
     setVisibility(isVisible);
     if (isVisible) {
       setNewMessage(false);

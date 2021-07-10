@@ -47,7 +47,6 @@ export default function FormDialog({ open, setOpen, uid }) {
       setLoading(false);
       setOpen(false);
       setNotiOpen(true);
-      console.log(res.get('commission'));
       dispatch(
         userUpdated({
           key: 'commission',

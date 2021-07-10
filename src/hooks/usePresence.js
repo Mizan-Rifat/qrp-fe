@@ -9,8 +9,7 @@ const usePresence = () => {
   const uid = currentUser.id;
 
   const pusher = new Pusher('6e894e9b27c3993c4068', {
-    // authEndpoint: 'https://qrps.app/parse/pusher/auth',
-    authEndpoint: 'http://localhost:1337/pusher/auth',
+    authEndpoint: 'https://qrps.app/parse/pusher/auth',
     cluster: 'mt1',
     auth: {
       headers: {
@@ -26,13 +25,11 @@ const usePresence = () => {
     const membersChannel = await pusher.subscribe(`chat-members`);
 
     membersChannel.bind('member_added', data => {
-      console.log({ data });
       if (data.objectId !== uid) {
         dispatch(setPresenceStatus(data.user.objectId, true));
       }
     });
     membersChannel.bind('member_removed', data => {
-      console.log({ data });
       if (data.objectId !== uid) {
         dispatch(setPresenceStatus(data.user.objectId, false));
       }
