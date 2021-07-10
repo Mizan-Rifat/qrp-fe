@@ -85,8 +85,6 @@ export const fetchContacts = () => async dispatch => {
   const userQuery = new Parse.Query(User);
   const users = await userQuery.find();
 
-  console.log({ users });
-
   const dataFields = ['username', 'firstName', 'lastName', 'online', 'profilePicture'];
   const data = users.map(user => ({
     ...getParseObject(user, dataFields)
@@ -96,7 +94,6 @@ export const fetchContacts = () => async dispatch => {
 };
 
 export const setPresenceStatus = (id, status) => (dispatch, getState) => {
-  console.log({ id, status });
   const contact = getState().contacts.contacts.find(contact => contact.id === id);
   if (contact) {
     dispatch({ type: CONTACTS_UPDATED, payload: { ...contact, online: status } });

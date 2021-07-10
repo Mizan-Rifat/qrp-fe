@@ -102,7 +102,6 @@ export default function Login() {
 
   useEffect(() => {
     const currentUser = Parse.User.current();
-    console.log(currentUser);
   }, []);
 
   const handleSubmit = e => {
@@ -116,7 +115,6 @@ export default function Login() {
       .catch(err => {
         setLoading(false);
         setError(err.message);
-        console.log({ err });
       });
   };
 

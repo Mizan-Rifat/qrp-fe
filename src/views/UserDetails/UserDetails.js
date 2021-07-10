@@ -150,8 +150,6 @@ const UserDetails = () => {
     };
   }, [id]);
 
-  // console.log(user);
-
   useEffect(() => {
     if (Object.keys(user).length) {
       const fields = [

@@ -52,7 +52,6 @@ const Message = ({ message }) => {
   const isIncoming = currentUser.id !== message.get('messageFrom').id;
 
   const classes = useStyles({ isIncoming, badgeColor: online ? 'warning' : 'secondary' });
-  console.log(message.get('messageFrom'));
   return (
     <ListItem
       alignItems="flex-start"

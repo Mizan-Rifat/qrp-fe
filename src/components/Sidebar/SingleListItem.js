@@ -22,7 +22,6 @@ export default function SingleListItem({ route, color, label = 1 }) {
   const classes = useStyles({ label });
   let location = useLocation();
 
-  console.log({ location });
   const [open, setOpen] = useState(false);
   // // verifies if routeName is the one active (in browser input)
   function activeRoute(routeName) {

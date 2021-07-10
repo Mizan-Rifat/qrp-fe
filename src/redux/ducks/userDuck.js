@@ -122,13 +122,6 @@ export const fetchUser = id => async dispatch => {
 
   user.roles = roles;
 
-  console.log('asd', parseUser.attributes);
-
-  console.log('user', {
-    ...user,
-    ...parseUser.attributes
-  });
-
   const dataFields = [
     'addressOne',
     'addressTwo',
@@ -168,8 +161,6 @@ export const fetchUser = id => async dispatch => {
   ];
 
   // const data = getParseObject(user, dataFields);
-
-  // console.log({ data });
 
   dispatch(
     userFetched({
