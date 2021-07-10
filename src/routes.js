@@ -35,6 +35,7 @@ import NotificationsPage from 'views/Notifications/Notifications.js';
 import UpgradeToPro from 'views/UpgradeToPro/UpgradeToPro.js';
 import Users from 'views/Users/Users';
 import Test from 'views/Test/Test';
+import UserDetails from 'views/UserDetails/UserDetails';
 
 export const routes = [
   {
@@ -44,6 +45,10 @@ export const routes = [
   {
     path: '/user',
     component: UserProfile
+  },
+  {
+    path: '/users/:id',
+    component: UserDetails
   },
   {
     path: '/users',
@@ -76,65 +81,13 @@ export const routes = [
 ];
 export const navMenu = [
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    icon: Dashboard,
-    component: DashboardPage,
-    layout: '/admin'
+    path: '/staffs',
+    name: 'Manage Staffs',
+    icon: Person
   },
   {
-    path: '/user',
-    name: 'User Profile',
-    icon: Person,
-    component: UserProfile,
-    layout: '/admin'
-  },
-  {
-    path: '/users',
-    name: 'Users ',
-    icon: Person,
-    component: Users,
-    layout: '/admin'
-  },
-  {
-    path: '/typography',
-    name: 'Typography',
-    icon: LibraryBooks,
-    component: Typography,
-    layout: '/admin'
-  },
-  {
-    path: '/icons',
-    name: 'Icons',
-    icon: BubbleChart,
-    component: Icons,
-    layout: '/admin'
-  },
-  {
-    path: '/maps',
-    name: 'Maps',
-    icon: LocationOn,
-    component: Maps,
-    layout: '/admin'
-  },
-  {
-    path: '/table',
-    name: 'Table List',
-    icon: 'content_paste',
-    component: TableList,
-    layout: '/admin'
-  },
-  {
-    name: 'Multi Level',
-    icon: Notifications,
-    children: [
-      {
-        path: '/notifications',
-        component: NotificationsPage,
-        layout: '/admin',
-        name: 'Notifications',
-        icon: Notifications
-      }
-    ]
+    path: '/pharmacy-owners',
+    name: 'Pharmacy Owners',
+    icon: Person
   }
 ];

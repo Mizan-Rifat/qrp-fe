@@ -21,17 +21,19 @@ const useStyles = makeStyles(styles);
 export default function SingleListItem({ route, color, label = 1 }) {
   const classes = useStyles({ label });
   let location = useLocation();
+
+  console.log({ location });
   const [open, setOpen] = useState(false);
   // // verifies if routeName is the one active (in browser input)
   function activeRoute(routeName) {
-    return location.pathname === routeName;
+    return location.pathname.includes(routeName);
   }
 
   const listItemClasses = classNames({
-    [' ' + classes[color]]: activeRoute(route.layout + route.path)
+    [' ' + classes[color]]: activeRoute(route.path)
   });
   const whiteFontClasses = classNames({
-    [' ' + classes.whiteFont]: activeRoute(route.layout + route.path)
+    [' ' + classes.whiteFont]: activeRoute(route.path)
   });
 
   const show = routes => {
@@ -39,7 +41,7 @@ export default function SingleListItem({ route, color, label = 1 }) {
       if (item.hasOwnProperty('children')) {
         return show(item.children);
       } else {
-        return item.layout + item.path === location.pathname;
+        return item.path === location.pathname;
       }
     });
   };
@@ -52,11 +54,7 @@ export default function SingleListItem({ route, color, label = 1 }) {
 
   return (
     <>
-      <NavLink
-        to={route.layout + route.path}
-        className={classNames(classes.item)}
-        activeClassName="active"
-      >
+      <NavLink to={route.path} className={classNames(classes.item)} activeClassName="active">
         <ListItem
           button
           onClick={() => setOpen(!open)}
@@ -65,44 +63,23 @@ export default function SingleListItem({ route, color, label = 1 }) {
           })}
         >
           {typeof route.icon === 'string' ? (
-            <Icon className={classNames(classes.itemIcon, whiteFontClasses)}>
-              {route.icon}
-            </Icon>
+            <Icon className={classNames(classes.itemIcon, whiteFontClasses)}>{route.icon}</Icon>
           ) : (
-            <route.icon
-              className={classNames(classes.itemIcon, whiteFontClasses)}
-            />
+            <route.icon className={classNames(classes.itemIcon, whiteFontClasses)} />
           )}
 
           <ListItemText
             primary={route.name}
             className={classNames(classes.itemText, whiteFontClasses)}
           />
-          {route.hasOwnProperty('children') ? (
-            open ? (
-              <ExpandLess />
-            ) : (
-              <ExpandMore />
-            )
-          ) : (
-            ''
-          )}
+          {route.hasOwnProperty('children') ? open ? <ExpandLess /> : <ExpandMore /> : ''}
         </ListItem>
       </NavLink>
       {route.hasOwnProperty('children') && (
         <Collapse in={open} timeout="auto" unmountOnExit>
           {route.children.map(children => (
-            <List
-              key={children.name}
-              component="div"
-              disablePadding
-              className={classes.listItem}
-            >
-              <SingleListItem
-                route={children}
-                color={color}
-                label={label + 1}
-              />
+            <List key={children.name} component="div" disablePadding className={classes.listItem}>
+              <SingleListItem route={children} color={color} label={label + 1} />
             </List>
           ))}
         </Collapse>
