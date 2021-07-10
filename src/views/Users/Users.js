@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import EnhancedTable from 'components/Table/AdvanceTable';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
 import MaterialTable from 'material-table';
 import axios from 'axios';
+import Parse from 'parse';
+import Avatar from '../../components/Avatar/Avatar';
+import { Grid } from '@material-ui/core';
+import ListAltIcon from '@material-ui/icons/ListAlt';
+import { useHistory, useLocation } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers } from 'redux/ducks/usersDuck';
+import { sentenceCase } from 'utils';
 
-const styles = {
+const useStyles = makeStyles(theme => ({
   cardCategoryWhite: {
     '&,& a,& a:hover,& a:focus': {
       color: 'rgba(255,255,255,.62)',
@@ -36,52 +43,51 @@ const styles = {
       lineHeight: '1'
     }
   }
-};
-
-const useStyles = makeStyles(styles);
-const Users = props => {
+}));
+const Users = ({ type }) => {
   const classes = useStyles();
 
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { users, fetching } = useSelector(state => state.users);
+  const dispatch = useDispatch();
 
-  const [flag, setflag] = useState(false);
+  const history = useHistory();
 
   const columns = [
     {
-      title: 'Id',
-      field: 'id',
-      width: '1%',
-      cellStyle: {
-        width: '1%'
-      },
-      sorting: false,
-      searchable: false
-    },
-    {
       title: 'Name',
-      field: 'name'
+      field: 'name',
+      render: rowData => (
+        <Grid container alignItems="center" spacing={0}>
+          <Avatar size="small" src={rowData.profilePicture} />
+          <p style={{ margin: '0 0 0 8px' }}>
+            {rowData.firstName} {rowData.lastName}
+          </p>
+        </Grid>
+      )
     },
     {
       title: 'Email',
-      field: 'email'
+      field: 'customEmail'
     },
     {
-      title: 'Website',
-      field: 'website'
+      title: 'Phone',
+      field: 'phone'
     },
     {
-      title: 'Company',
-      field: 'company.name'
+      title: 'Type',
+      field: 'type',
+      render: rowData => sentenceCase(rowData.type)
+    },
+    {
+      title: 'Address',
+      field: 'city',
+      render: rowData => `${rowData.city},${rowData.country}`
     }
   ];
 
   useEffect(async () => {
-    const res = await axios.get('https://jsonplaceholder.typicode.com/users');
-    console.log(users);
-    setUsers(res.data);
-    setLoading(false);
-  }, []);
+    dispatch(fetchUsers(type));
+  }, [type]);
 
   return (
     <Card>
@@ -95,22 +101,26 @@ const Users = props => {
           title="Simple Action Preview"
           columns={columns}
           data={users}
-          isLoading={loading}
+          isLoading={fetching}
           actions={[
             {
-              icon: 'edit',
-              tooltip: 'Edit',
+              icon: 'chat',
+              tooltip: 'Message',
+              onClick: (event, rowData) => {},
+              position: 'row'
+            },
+            {
+              icon: 'list_alt',
+              tooltip: 'Details',
               onClick: (event, rowData) => {
-                console.log(rowData);
+                history.push(`/user/${rowData.id}`);
               },
               position: 'row'
             },
             {
               icon: 'delete',
               tooltip: 'Delete',
-              onClick: (evt, data) => {
-                console.log({ data });
-              }
+              onClick: (evt, data) => {}
             }
           ]}
           options={{
