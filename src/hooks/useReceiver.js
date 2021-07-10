@@ -16,8 +16,8 @@ const useReciever = rid => {
   const uid = currentUser.id;
 
   const pusher = new Pusher('6e894e9b27c3993c4068', {
-    authEndpoint: 'https://qrps.app/parse/pusher/auth',
-    authEndpoint: 'http://127.0.0.1:1337/pusher/auth',
+    // authEndpoint: 'https://qrps.app/parse/pusher/auth',
+    authEndpoint: 'http://localhost:1337/pusher/auth',
     cluster: 'mt1',
     auth: {
       headers: {
@@ -39,7 +39,9 @@ const useReciever = rid => {
 
   useEffect(async () => {
     if (rid !== '') {
-      dispatch(fetchMessages(rid, 1));
+      dispatch(fetchMessages(rid, 1)).catch(err => {
+        console.log({ err });
+      });
       const cha = await pusher.subscribe(`private-${channelName}`);
       setChannel(cha);
       const rec = await userQuery.get(rid);

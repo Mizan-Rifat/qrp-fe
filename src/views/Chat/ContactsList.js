@@ -43,10 +43,9 @@ const Chat = ({ setRid }) => {
       {contacts.map(user => (
         <ListItem button key={user.username} onClick={() => setRid(user.id)}>
           <ListItemIcon>
-            <Avatar online={user.online} src="https://material-ui.com/static/images/avatar/1.jpg" />
+            <Avatar online={user.online} src={user.profilePicture} />
           </ListItemIcon>
-          <ListItemText primary={user.username}></ListItemText>
-          {/* <ListItemText align="right"></ListItemText> */}
+          <ListItemText primary={user.firstName}></ListItemText>
         </ListItem>
       ))}
     </List>

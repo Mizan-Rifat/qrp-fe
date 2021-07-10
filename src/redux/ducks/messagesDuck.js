@@ -20,7 +20,8 @@ const initState = {
   fetching: true,
   loading: false,
   messages: [],
-  count: 0
+  count: 0,
+  error: false
 };
 
 export default (state = initState, action) => {
@@ -31,14 +32,16 @@ export default (state = initState, action) => {
         fetching: false,
         loading: false,
         messages: action.payload.results,
-        count: action.payload.count
+        count: action.payload.count,
+        error: false
       };
     case MORE_MESSAGES_LOADED:
       return {
         ...state,
         loading: false,
         messages: [...action.payload.results, ...state.messages],
-        count: action.payload.count
+        count: action.payload.count,
+        error: false
       };
 
     case MESSAGE_ADDED:
@@ -46,20 +49,25 @@ export default (state = initState, action) => {
         ...state,
         loading: false,
         messages: [...state.messages, action.payload],
-        count: state.count + 1
+        count: state.count + 1,
+        error: false
       };
 
     case MESSAGES_UPDATED:
       return {
         ...state,
         loading: false,
-        messages: state.messages.map(item => (item.id == action.payload.id ? action.payload : item))
+        messages: state.messages.map(item =>
+          item.id == action.payload.id ? action.payload : item
+        ),
+        error: false
       };
     case MESSAGES_DELETED:
       return {
         ...state,
         loading: false,
-        messages: state.messages.filter(item => item.id != action.payload)
+        messages: state.messages.filter(item => item.id != action.payload),
+        error: false
       };
     case LOADING_TRUE:
       return {
@@ -117,6 +125,12 @@ export const moreMessageLoaded = data => {
     payload: data
   };
 };
+export const setErrors = error => {
+  return {
+    type: SET_ERRORS,
+    payload: error
+  };
+};
 
 export const resetMessagesState = () => {
   return {
@@ -126,12 +140,16 @@ export const resetMessagesState = () => {
 
 export const fetchMessages = (rid, page) => async dispatch => {
   dispatch({ type: FETCHING_TRUE });
-  const messages = await Parse.Cloud.run('messages', {
-    rid,
-    page,
-    limit: 10
-  });
-  dispatch(messagesFetched(messages));
+  try {
+    const messages = await Parse.Cloud.run('messages', {
+      rid,
+      page,
+      limit: 5
+    });
+    dispatch(messagesFetched(messages));
+  } catch (err) {
+    dispatch(setErrors(err));
+  }
 };
 
 export const loadMoreMessages = (rid, page) => async dispatch => {
@@ -139,7 +157,7 @@ export const loadMoreMessages = (rid, page) => async dispatch => {
   const messages = await Parse.Cloud.run('messages', {
     rid,
     page,
-    limit: 10
+    limit: 5
   });
   dispatch(moreMessageLoaded(messages));
 };

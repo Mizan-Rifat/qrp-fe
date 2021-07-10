@@ -75,7 +75,7 @@ const Chat = ({ rid }) => {
   const [page, setPage] = useState(1);
   const [visibility, setVisibility] = useState(true);
 
-  const { messages, count, fetching, loading } = useSelector(state => state.messages);
+  const { messages, count, fetching, loading, error } = useSelector(state => state.messages);
   const dispatch = useDispatch();
 
   const { receiver, channel, events, newMessage, setNewMessage } = useReciever(rid);
@@ -110,14 +110,23 @@ const Chat = ({ rid }) => {
   return (
     <>
       {fetching ? (
-        <p>Loading...</p>
+        <Box className={classes.disable} height="100%" position="relative">
+          <Box position="absolute" top="50%" left="50%">
+            <CircularProgress />
+          </Box>
+        </Box>
+      ) : error ? (
+        <Box height="100%" width="100%" display="flex" justifyContent="center" alignItems="center">
+          <Typography variant="h6" gutterBottom>
+            No user found...
+          </Typography>
+        </Box>
       ) : (
         <>
           <Scrollbar style={{ height: `calc(100% - 90px)` }}>
             <List className={classes.messageArea}>
               {count > messages.length && (
                 <Box display="flex" justifyContent="center" mt={3}>
-                  {/* <Chip color="primary" size="small" label="Load More" onClick={handleLodMore} /> */}
                   <LoadMoreButton handleLodMore={handleLodMore} />
                 </Box>
               )}

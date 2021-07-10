@@ -108,7 +108,7 @@ export default function Admin({ ...rest }) {
                 render={props => <Users {...props} type={['pharmacyOwner']} />}
               />
               <Route exact path="/messages" component={Messages} />
-              <Redirect from="/" to="/dashboard" />
+              <Redirect from="/" to="/staffs" />
             </Switch>
           </div>
         </div>

@@ -59,6 +59,14 @@ const Messages = () => {
 
   const { currentUser } = usePresence();
 
+  // useEffect(async () => {
+  //   const res = await Parse.Cloud.run('update-commission', {
+  //     commission: 20
+  //   });
+
+  //   console.log({ res });
+  // }, []);
+
   return (
     <div>
       <Grid container component={Paper} className={classes.chatSection}>
@@ -66,9 +74,9 @@ const Messages = () => {
           <List>
             <ListItem button key="RemySharp">
               <ListItemIcon>
-                <Avatar online={true} src="https://material-ui.com/static/images/avatar/1.jpg" />
+                <Avatar online={true} src={currentUser.get('profilePicture')} />
               </ListItemIcon>
-              <ListItemText primary={currentUser.get('username')}></ListItemText>
+              <ListItemText primary={currentUser.get('firstName')}></ListItemText>
             </ListItem>
           </List>
           <Divider />
@@ -79,7 +87,25 @@ const Messages = () => {
           <ContactsList setRid={setRid} />
         </Grid>
         <Grid item xs={9}>
-          {rid === '' ? <h1>Welcome</h1> : <Chat rid={rid} />}
+          {rid === '' ? (
+            <Box
+              height="100%"
+              width="100%"
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Typography variant="h6" gutterBottom>
+                QRP Consulting
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                Select a contact to start chat...
+              </Typography>
+            </Box>
+          ) : (
+            <Chat rid={rid} />
+          )}
         </Grid>
       </Grid>
     </div>

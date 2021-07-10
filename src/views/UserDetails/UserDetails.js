@@ -7,7 +7,7 @@ import Table from 'components/Table/Table.js';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
-import { Box, Button as MButton, Grid, makeStyles } from '@material-ui/core';
+import { Box, Button as MButton, CircularProgress, Grid, makeStyles } from '@material-ui/core';
 import { ucFirst, sentenceCase, getParseObject } from '../../utils';
 import dayjs from 'dayjs';
 import MaterialTable, { MTableToolbar } from 'material-table';
@@ -19,6 +19,14 @@ import MLightBox from 'components/Lightbox/MLightBox';
 import image from '../../assets/img/no-image.png';
 import ManagerDetails from './ManagerDetails';
 import FormDialog from 'components/Dialog/FormDialog';
+import { Loading } from 'components/Loading/Loading';
+import { setUserLoadingTrue } from 'redux/ducks/userDuck';
+import { userUpdated } from 'redux/ducks/userDuck';
+import Parse from 'parse';
+import { setUserLoadingFalse } from 'redux/ducks/userDuck';
+import AlertDialog from 'components/Alert/Alert';
+
+import Snackbar from 'components/Snackbar/Snackbar.js';
 
 const styles = {
   cardCategoryWhite: {
@@ -50,13 +58,6 @@ const styles = {
   }
 };
 
-const Picture = ({ label, src, handleImageClick }) => (
-  <>
-    <p style={{ fontWeight: 500 }}>{label} :</p>
-    <img src={src} alt="" width="100%" onClick={() => handleImageClick(src)} />
-  </>
-);
-
 const useStyles = makeStyles(styles);
 
 const UserDetails = () => {
@@ -67,14 +68,15 @@ const UserDetails = () => {
   const [tableData, setTableData] = useState([]);
 
   const [openDialog, setOpenDialog] = useState(false);
-
+  const [statusAlertOpen, setStatusAlertOpen] = useState(false);
+  const [notiOpen, setNotiOpen] = useState(false);
   const [lightBox, setLightBox] = useState({
     open: false,
     images: [],
     selectedindex: ''
   });
 
-  const { fetching, user } = useSelector(state => state.user);
+  const { fetching, user, loading } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const handleImageClick = image => {
@@ -82,6 +84,23 @@ const UserDetails = () => {
       open: true,
       images: [image],
       selectedindex: 0
+    });
+  };
+
+  const handleApprove = () => {
+    dispatch(setUserLoadingTrue());
+    Parse.Cloud.run('user-status', {
+      uid: id,
+      status: !user.status
+    }).then(res => {
+      setUserLoadingFalse(false);
+      setNotiOpen(true);
+      dispatch(
+        userUpdated({
+          key: 'status',
+          value: res.get('status')
+        })
+      );
     });
   };
 
@@ -146,161 +165,184 @@ const UserDetails = () => {
         'licenseNumber',
         'provinceOfLicense',
         'pharmacyName',
-        // 'smsExpireDateTime',
         'smsNumber',
         'smsVerified',
         'pharmacyType',
         'managerAsOwner'
-        // 'profilePicture',
-        // 'govPhotoId',
-        // 'pharmacyBanner'
       ];
 
       const data = [
         {
           label: 'Name',
-          value: `${user.get('firstName')} ${user.get('lastName')}`
+          value: `${user.firstName} ${user.lastName}`
         },
         {
           label: 'Type',
           value: user.roles.map(role => role.get('name'))
         },
+        {
+          label: 'Commission',
+          value: user.commission ? `${user.commission}%` : 'null'
+        },
         ...fields.map(field => ({
           label: sentenceCase(field),
-          value: user.get(field)
-          // type: ['profilePicture', 'pharmacyBanner', 'govPhotoId'].includes(field) && 'image'
+          value: user[field]
         })),
         {
           label: 'Address',
-          value: `${user.get('addressOne')}${
-            user.get('addressTwo') && ', ' + user.get('addressTwo')
-          }, ${user.get('city')}, ${user.get('province')}, ${user.get('postalCode')}, ${user.get(
-            'country'
-          )}`
+          value: `${user.addressOne}${user.addressTwo && ', ' + user.addressTwo}, ${user.city}, ${
+            user.province
+          }, ${user.postalCode}, ${user.country}`
         },
         {
           label: 'Joined',
-          value: dayjs(user.get('createdAt')).format('MMMM DD, YYYY - hh:MM A'),
+          value: dayjs(user.createdAt).format('MMMM DD, YYYY - hh:MM A'),
           type: 'date'
         },
         {
           label: 'Language',
-          value: user.get('language') ? 'French' : 'English'
+          value: user.language ? 'French' : 'English'
         },
         {
           label: 'Approved',
-          value: user.get('status') ? 'Yes' : 'No'
+          value: user.status ? 'Yes' : 'No'
         }
-      ].sort((a, b) => (a.type === 'image' ? 1 : 0));
-
-      // console.log({ data });
+      ];
 
       setTableData(data);
     }
   }, [user]);
 
   return (
-    !fetching && (
-      <>
-        <Box mb={6}>
-          <MButton
-            variant="contained"
-            color="secondary"
-            className={classes.button}
-            size="small"
-            startIcon={<ArrowBackIcon />}
-            onClick={() => history.goBack()}
-          >
-            Back to list
-          </MButton>
-        </Box>
-        <Card plain>
-          <CardHeader plain color="primary">
-            <h4 className={classes.cardTitleWhite}>User Details</h4>
-            <p className={classes.cardCategoryWhite}>
-              {Object.keys(user).length > 0 && user.get('username')}
-            </p>
-          </CardHeader>
-          <CardBody>
-            <Box display="flex" justifyContent="flex-end" my={5}>
-              <Button
+    <Box position="relative">
+      {fetching ? (
+        <Loading />
+      ) : (
+        <>
+          <Box mb={6}>
+            <MButton
+              variant="contained"
+              color="secondary"
+              className={classes.button}
+              size="small"
+              startIcon={<ArrowBackIcon />}
+              onClick={() => history.goBack()}
+            >
+              Back to list
+            </MButton>
+          </Box>
+          <Card plain>
+            <CardHeader plain color="primary">
+              <h4 className={classes.cardTitleWhite}>User Details</h4>
+              <p className={classes.cardCategoryWhite}>
+                {Object.keys(user).length > 0 && user.username}
+              </p>
+            </CardHeader>
+            <CardBody>
+              <Box display="flex" justifyContent="flex-end" my={5}>
+                <Button
+                  color="success"
+                  onClick={() => setOpenDialog(!openDialog)}
+                  style={{ marginRight: 10 }}
+                >
+                  Set Commision
+                </Button>
+                <Box position="relative">
+                  <Button
+                    color={user.status ? 'danger' : 'success'}
+                    onClick={() => setStatusAlertOpen(true)}
+                    disabled={loading}
+                  >
+                    {user.status ? 'Decline' : 'Approve'}
+                  </Button>
+                  {loading && (
+                    <Box position="absolute" top="33%" left="39%">
+                      <CircularProgress size={16} />
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+              <Grid container>
+                <Grid item xs={12} md={6}>
+                  <MaterialTable
+                    style={{ boxShadow: 'unset', background: 'unset' }}
+                    title=""
+                    columns={columns}
+                    data={tableData.slice(0, 11)}
+                    isLoading={fetching}
+                    options={{
+                      paging: false,
+                      header: false,
+                      search: false,
+                      toolbar: false
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <MaterialTable
+                    style={{ boxShadow: 'unset', background: 'unset' }}
+                    title=""
+                    columns={columns}
+                    data={tableData.slice(11, tableData.length)}
+                    isLoading={fetching}
+                    options={{
+                      paging: false,
+                      header: false,
+                      search: false,
+                      toolbar: false
+                    }}
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={3} style={{ paddingLeft: 12 }}>
+                <Grid item xs={12} sm={4}>
+                  <Picture
+                    label="Profile Picture"
+                    src={user.profilePicture ? user.profilePicture : image}
+                    handleImageClick={handleImageClick}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Picture
+                    label="Govt Photo Id"
+                    src={user.govPhotoId ? user.govPhotoId : image}
+                    handleImageClick={handleImageClick}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Picture
+                    label="Pharmacy Banner"
+                    src={user.pharmacyBanner ? user.pharmacyBanner : image}
+                    handleImageClick={handleImageClick}
+                  />
+                </Grid>
+              </Grid>
+
+              {user.hasOwnProperty('manager') && (
+                <ManagerDetails fetching={fetching} manager={user.manager} />
+              )}
+
+              <FormDialog open={openDialog} setOpen={setOpenDialog} uid={id} />
+              {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
+              <AlertDialog
+                open={statusAlertOpen}
+                setOpen={setStatusAlertOpen}
+                handleAgree={handleApprove}
+              />
+              <Snackbar
+                place="tr"
                 color="success"
-                onClick={() => setOpenDialog(!openDialog)}
-                style={{ marginRight: 10 }}
-              >
-                Set Commision
-              </Button>
-              <Button color={user.get('status') ? 'danger' : 'success'}>
-                {user.get('status') ? 'Decline' : 'Approve'}
-              </Button>
-            </Box>
-            <Grid container>
-              <Grid item xs={12} md={6}>
-                <MaterialTable
-                  style={{ boxShadow: 'unset', background: 'unset' }}
-                  title=""
-                  columns={columns}
-                  data={tableData.slice(0, 10)}
-                  isLoading={fetching}
-                  options={{
-                    paging: false,
-                    header: false,
-                    search: false,
-                    toolbar: false
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <MaterialTable
-                  style={{ boxShadow: 'unset', background: 'unset' }}
-                  title=""
-                  columns={columns}
-                  data={tableData.slice(10, tableData.length)}
-                  isLoading={fetching}
-                  options={{
-                    paging: false,
-                    header: false,
-                    search: false,
-                    toolbar: false
-                  }}
-                />
-              </Grid>
-            </Grid>
-
-            <Grid container spacing={3} style={{ paddingLeft: 12 }}>
-              <Grid item xs={12} sm={4}>
-                <Picture
-                  label="Profile Picture"
-                  src={user.get('profilePicture') ? user.get('profilePicture') : image}
-                  handleImageClick={handleImageClick}
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Picture
-                  label="Govt Photo Id"
-                  src={user.get('govPhotoId') ? user.get('govPhotoId') : image}
-                  handleImageClick={handleImageClick}
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Picture
-                  label="Pharmacy Banner"
-                  src={user.get('pharmacyBanner') ? user.get('pharmacyBanner') : image}
-                  handleImageClick={handleImageClick}
-                />
-              </Grid>
-            </Grid>
-
-            {!user.get('managerAsOwner') && (
-              <ManagerDetails fetching={fetching} manager={user.manager} />
-            )}
-
-            <FormDialog open={openDialog} setOpen={setOpenDialog} />
-            {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
-          </CardBody>
-        </Card>
-      </>
-    )
+                message="Successfully updated."
+                open={notiOpen}
+                closeNotification={() => setNotiOpen(false)}
+                close
+              />
+            </CardBody>
+          </Card>
+        </>
+      )}
+    </Box>
   );
 };
 

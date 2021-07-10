@@ -11,6 +11,7 @@ import imagine1 from 'assets/img/sidebar-1.jpg';
 import Avatar from './Avatar';
 import dayjs from 'dayjs';
 import Parse from 'parse';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles(theme => ({
   listItemText: {
@@ -44,9 +45,14 @@ const Message = ({ message }) => {
   const [online, setOnline] = useState(true);
   const [currentUser] = useState(Parse.User.current());
 
+  const { contacts } = useSelector(state => state.contacts);
+
+  const checkOnline = uid => contacts.find(contact => (contact.id = uid)).online;
+
   const isIncoming = currentUser.id !== message.get('messageFrom').id;
 
   const classes = useStyles({ isIncoming, badgeColor: online ? 'warning' : 'secondary' });
+  console.log(message.get('messageFrom'));
   return (
     <ListItem
       alignItems="flex-start"
@@ -54,8 +60,8 @@ const Message = ({ message }) => {
     >
       <ListItemAvatar style={{ order: isIncoming ? 1 : 0 }}>
         <Avatar
-          src="https://material-ui.com/static/images/avatar/3.jpg"
-          online={message.get('messageFrom').get('online')}
+          src={message.get('messageFrom').get('profilePicture')}
+          online={checkOnline(message.get('messageFrom').id)}
         />
       </ListItemAvatar>
       <ListItemText
@@ -67,7 +73,7 @@ const Message = ({ message }) => {
           secondary: classes.listItemTextSecondary
         }}
         primary={message.get('message')}
-        secondary={`${message.get('messageFrom').get('username')}, ${dayjs(
+        secondary={`${message.get('messageFrom').get('firstName')}, ${dayjs(
           message.get('createdAt')
         ).format('hh:mm A, MMM DD')}`}
       />

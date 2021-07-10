@@ -87,7 +87,7 @@ export const fetchContacts = () => async dispatch => {
 
   console.log({ users });
 
-  const dataFields = ['username', 'online'];
+  const dataFields = ['username', 'firstName', 'lastName', 'online', 'profilePicture'];
   const data = users.map(user => ({
     ...getParseObject(user, dataFields)
   }));
