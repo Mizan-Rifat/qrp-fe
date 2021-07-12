@@ -16,11 +16,12 @@ const useReciever = rid => {
   const uid = currentUser.id;
 
   const pusher = new Pusher('6e894e9b27c3993c4068', {
-    authEndpoint: 'https://qrps.app/parse/pusher/auth',
+    authEndpoint: 'https://qrps.app/pusher/auth',
     cluster: 'mt1',
     auth: {
       headers: {
-        sessionToken: currentUser.getSessionToken()
+        sessionToken: currentUser.getSessionToken(),
+        'Content-Type': 'application/x-www-form-urlencoded'
       }
     }
   });

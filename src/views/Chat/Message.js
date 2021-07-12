@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  ListItem,
-  Grid,
-  ListItemText,
-  ListItemAvatar,
-  // Avatar,
-  makeStyles
-} from '@material-ui/core';
-import imagine1 from 'assets/img/sidebar-1.jpg';
+import { ListItem, ListItemText, ListItemAvatar, makeStyles } from '@material-ui/core';
 import Avatar from './Avatar';
 import dayjs from 'dayjs';
 import Parse from 'parse';

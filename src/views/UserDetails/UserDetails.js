@@ -115,15 +115,8 @@ const UserDetails = () => {
     {
       field: 'value',
       render: rowData => {
-        if (rowData.type === 'image') {
-          return (
-            <img
-              src={rowData.value ? rowData.value : image}
-              alt=""
-              height="150"
-              onClick={() => handleImageClick(rowData.value)}
-            />
-          );
+        if (Array.isArray(rowData.value)) {
+          return rowData.value.join(', ');
         }
         if (typeof rowData.value === 'boolean') {
           return ucFirst(rowData.value.toString());
@@ -207,6 +200,10 @@ const UserDetails = () => {
         }
       ];
 
+      console.log({ data });
+
+      console.log(data.find(item => item.label === 'Type'));
+
       setTableData(data);
     }
   }, [user]);
@@ -238,13 +235,16 @@ const UserDetails = () => {
             </CardHeader>
             <CardBody>
               <Box display="flex" justifyContent="flex-end" my={5}>
-                <Button
-                  color="success"
-                  onClick={() => setOpenDialog(!openDialog)}
-                  style={{ marginRight: 10 }}
-                >
-                  Set Commision
-                </Button>
+                {tableData.find(item => item.label === 'Type') &&
+                  tableData.find(item => item.label === 'Type').value.includes('pharmacyOwner') && (
+                    <Button
+                      color="success"
+                      onClick={() => setOpenDialog(!openDialog)}
+                      style={{ marginRight: 10 }}
+                    >
+                      Set Commision
+                    </Button>
+                  )}
                 <Box position="relative">
                   <Button
                     color={user.status ? 'danger' : 'success'}
@@ -308,20 +308,29 @@ const UserDetails = () => {
                     handleImageClick={handleImageClick}
                   />
                 </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Picture
-                    label="Pharmacy Banner"
-                    src={user.pharmacyBanner ? user.pharmacyBanner : image}
-                    handleImageClick={handleImageClick}
-                  />
-                </Grid>
+
+                {tableData.find(item => item.label === 'Type') &&
+                  tableData.find(item => item.label === 'Type').value.includes('pharmacyOwner') && (
+                    <Grid item xs={12} sm={4}>
+                      <Picture
+                        label="Pharmacy Banner"
+                        src={user.pharmacyBanner ? user.pharmacyBanner : image}
+                        handleImageClick={handleImageClick}
+                      />
+                    </Grid>
+                  )}
               </Grid>
 
               {user.hasOwnProperty('manager') && (
                 <ManagerDetails fetching={fetching} manager={user.manager} />
               )}
 
-              <FormDialog open={openDialog} setOpen={setOpenDialog} uid={id} />
+              <FormDialog
+                open={openDialog}
+                setOpen={setOpenDialog}
+                uid={id}
+                value={user.commission}
+              />
               {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
               <AlertDialog
                 open={statusAlertOpen}

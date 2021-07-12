@@ -122,46 +122,6 @@ export const fetchUser = id => async dispatch => {
 
   user.roles = roles;
 
-  const dataFields = [
-    'addressOne',
-    'addressTwo',
-    'availability',
-    'city',
-    'commission',
-    'country',
-    'createdAt',
-    'currentJobTitle',
-    'customEmail',
-    'deviceId',
-    'email',
-    'firstName',
-    'language',
-    'lastName',
-    'licenseNumber',
-    'location',
-    'managerAsOwner',
-    'online',
-    'pharmacyExperience',
-    'pharmacyExperienceDuration',
-    'pharmacyName',
-    'pharmacyType',
-    'phone',
-    'postalCode',
-    'provinceOfLicense',
-    'sessionToken',
-    'skills',
-    'smsExpireDateTime',
-    'smsNumber',
-    'smsVerified',
-    'softwareSystem',
-    'twoFactorOn',
-    'typeOfShifts',
-    'updatedAt',
-    'username'
-  ];
-
-  // const data = getParseObject(user, dataFields);
-
   dispatch(
     userFetched({
       ...user,

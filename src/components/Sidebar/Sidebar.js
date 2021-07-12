@@ -17,18 +17,10 @@ const useStyles = makeStyles(styles);
 export default function Sidebar(props) {
   const classes = useStyles();
   let location = useLocation();
-  // verifies if routeName is the one active (in browser input)
-  function activeRoute(routeName) {
-    return location.pathname === routeName;
-  }
   const { color, logo, image, logoText, routes } = props;
 
   var links = (
-    <List
-      component="nav"
-      aria-labelledby="nested-list-subheader"
-      className={classes.root}
-    >
+    <List component="nav" aria-labelledby="nested-list-subheader" className={classes.root}>
       {routes.map((route, index) => (
         <SingleListItem route={route} key={route.name} color={color} />
       ))}
@@ -36,15 +28,10 @@ export default function Sidebar(props) {
   );
   var brand = (
     <div className={classes.logo}>
-      <a
-        href="https://www.creative-tim.com?ref=mdr-sidebar"
-        className={classNames(classes.logoLink)}
-        target="_blank"
-      >
+      <a href="https://qrps.app/" className={classNames(classes.logoLink)} target="_blank">
         <div className={classes.logoImage}>
           <img src={logo} alt="logo" className={classes.img} />
         </div>
-        {logoText}
       </a>
     </div>
   );
@@ -69,10 +56,7 @@ export default function Sidebar(props) {
             {links}
           </div>
           {image !== undefined ? (
-            <div
-              className={classes.background}
-              style={{ backgroundImage: 'url(' + image + ')' }}
-            />
+            <div className={classes.background} style={{ backgroundImage: 'url(' + image + ')' }} />
           ) : null}
         </Drawer>
       </Hidden>
@@ -88,10 +72,7 @@ export default function Sidebar(props) {
           {brand}
           <div className={classes.sidebarWrapper}>{links}</div>
           {image !== undefined ? (
-            <div
-              className={classes.background}
-              style={{ backgroundImage: 'url(' + image + ')' }}
-            />
+            <div className={classes.background} style={{ backgroundImage: 'url(' + image + ')' }} />
           ) : null}
         </Drawer>
       </Hidden>

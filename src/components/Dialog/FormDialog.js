@@ -21,7 +21,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function FormDialog({ open, setOpen, uid }) {
+export default function FormDialog({ open, setOpen, uid, value }) {
   const classes = useStyles();
   const handleClickOpen = () => {
     setOpen(true);
@@ -31,7 +31,7 @@ export default function FormDialog({ open, setOpen, uid }) {
     setOpen(false);
   };
 
-  const [commission, setCommission] = useState('');
+  const [commission, setCommission] = useState(value);
   const [loading, setLoading] = useState(false);
   const [notiOpen, setNotiOpen] = useState(false);
 
