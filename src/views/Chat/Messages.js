@@ -10,26 +10,10 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Fab from '@material-ui/core/Fab';
-import SendIcon from '@material-ui/icons/Send';
-import Message from './Message';
 import Avatar from './Avatar';
-import Parse from 'parse';
-import Pusher from 'pusher-js';
-
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import 'react-perfect-scrollbar/dist/css/styles.css';
-
-import Scrollbar from 'react-scrollbars-custom';
 import { useQueryState } from 'react-router-use-location-state';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchMessages } from 'redux/ducks/messagesDuck';
-import useReciever from 'hooks/useReceiver';
-import { MessageForm } from './MessageForm';
-import { fetchContacts } from 'redux/ducks/contactsDuck';
 import ContactsList from './ContactsList';
 import Chat from './Chat';
-import { setPresenceStatus } from 'redux/ducks/contactsDuck';
 import usePresence from 'hooks/usePresence';
 
 const useStyles = makeStyles({
@@ -84,7 +68,7 @@ const Messages = () => {
             <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
           </Grid>
           <Divider />
-          <ContactsList setRid={setRid} />
+          <ContactsList rid={rid} setRid={setRid} />
         </Grid>
         <Grid item xs={9}>
           {rid === '' ? (

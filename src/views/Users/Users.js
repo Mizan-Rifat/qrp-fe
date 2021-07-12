@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
 import MaterialTable from 'material-table';
-import axios from 'axios';
-import Parse from 'parse';
 import Avatar from '../../components/Avatar/Avatar';
 import { Grid } from '@material-ui/core';
-import ListAltIcon from '@material-ui/icons/ListAlt';
-import { useHistory, useLocation } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers } from 'redux/ducks/usersDuck';
+import { useHistory } from 'react-router';
 import { sentenceCase } from 'utils';
 
 const useStyles = makeStyles(theme => ({
@@ -44,11 +38,8 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-const Users = ({ type }) => {
+const Users = ({ type, title, users, fetching }) => {
   const classes = useStyles();
-
-  const { users, fetching } = useSelector(state => state.users);
-  const dispatch = useDispatch();
 
   const history = useHistory();
 
@@ -59,9 +50,7 @@ const Users = ({ type }) => {
       render: rowData => (
         <Grid container alignItems="center" spacing={0}>
           <Avatar size="small" src={rowData.profilePicture} />
-          <p style={{ margin: '0 0 0 8px' }}>
-            {rowData.firstName} {rowData.lastName}
-          </p>
+          <p style={{ margin: '0 0 0 8px' }}>{rowData.name}</p>
         </Grid>
       )
     },
@@ -85,20 +74,15 @@ const Users = ({ type }) => {
     }
   ];
 
-  useEffect(async () => {
-    dispatch(fetchUsers(type));
-  }, [type]);
-
   return (
     <Card>
       <CardHeader color="primary">
-        <h4 className={classes.cardTitleWhite}>Table on Plain Background</h4>
-        <p className={classes.cardCategoryWhite}>Here is a subtitle for this table</p>
+        <h4 className={classes.cardTitleWhite}>{title}</h4>
       </CardHeader>
       <CardBody>
         <MaterialTable
           style={{ boxShadow: 'unset', background: 'unset' }}
-          title="Simple Action Preview"
+          title=""
           columns={columns}
           data={users}
           isLoading={fetching}
@@ -106,7 +90,10 @@ const Users = ({ type }) => {
             {
               icon: 'chat',
               tooltip: 'Message',
-              onClick: (event, rowData) => {},
+              onClick: (event, rowData) => {
+                history.push(`/messages?rid=${rowData.id}`);
+                console.log({ rowData });
+              },
               position: 'row'
             },
             {
@@ -116,17 +103,12 @@ const Users = ({ type }) => {
                 history.push(`/user/${rowData.id}`);
               },
               position: 'row'
-            },
-            {
-              icon: 'delete',
-              tooltip: 'Delete',
-              onClick: (evt, data) => {}
             }
           ]}
           options={{
             actionsColumnIndex: -1,
             pageSize: 10,
-            selection: true
+            selection: false
           }}
         />
       </CardBody>

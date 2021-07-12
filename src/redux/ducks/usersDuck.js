@@ -12,9 +12,10 @@ const USER_DELETED = 'pes/users/user_deleted';
 const USER_UPDATED = 'pes/users/user_updated';
 
 const initState = {
-  fetching: true,
+  fetching: false,
   loading: true,
-  users: []
+  staffs: [],
+  pharmacyOwners: []
 };
 
 export default (state = initState, action) => {
@@ -22,7 +23,7 @@ export default (state = initState, action) => {
     case ALL_USERS_FETCHED:
       return {
         ...state,
-        users: action.payload,
+        [action.payload.key]: action.payload.users,
         loading: false,
         fetching: false
       };
@@ -68,10 +69,10 @@ export default (state = initState, action) => {
   }
 };
 
-export const allUsersFetched = users => {
+export const allUsersFetched = (users, key) => {
   return {
     type: ALL_USERS_FETCHED,
-    payload: users
+    payload: { users, key }
   };
 };
 
@@ -88,7 +89,7 @@ export const userUpdated = user => {
   };
 };
 
-export const fetchUsers = type => async dispatch => {
+export const fetchUsers = (type, key) => async dispatch => {
   dispatch({ type: USERS_FETCHING_TRUE });
   const roleQuery = new Parse.Query(Parse.Role);
   roleQuery.containedIn('name', type);
@@ -115,8 +116,10 @@ export const fetchUsers = type => async dispatch => {
     'country'
   ];
   const data = roleUsers.map(user => ({
-    ...getParseObject(user, dataFields),
+    id: user.id,
+    ...user.attributes,
+    name: `${user.get('firstName')} ${user.get('lastName')}`,
     type: user.roleName
   }));
-  dispatch(allUsersFetched(data));
+  dispatch(allUsersFetched(data, key));
 };
