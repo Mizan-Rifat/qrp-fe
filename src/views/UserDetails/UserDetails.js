@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useHistory, useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUser, resetUserState } from 'redux/ducks/userDuck';
-import Table from 'components/Table/Table.js';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
