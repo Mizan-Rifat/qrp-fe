@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect, HashRouter } from 'react-router-dom';
 
 // core components
 import Admin from 'layouts/Admin.js';
@@ -22,7 +22,7 @@ Parse.serverURL = 'https://qrps.app/parse';
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <HashRouter>
       <Switch>
         {/* <Route path="/login" component={Login} /> */}
         <GuestProtectedRoute path="/login" component={Login} />
@@ -30,7 +30,7 @@ ReactDOM.render(
           <Route path="/" component={Admin} />
         </AdminProtectedRoute>
       </Switch>
-    </BrowserRouter>
+    </HashRouter>
   </Provider>,
   document.getElementById('root')
 );
