@@ -199,10 +199,6 @@ const UserDetails = () => {
         }
       ];
 
-      console.log({ data });
-
-      console.log(data.find(item => item.label === 'Type'));
-
       setTableData(data);
     }
   }, [user]);

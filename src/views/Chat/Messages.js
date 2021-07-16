@@ -43,14 +43,6 @@ const Messages = () => {
 
   const { currentUser } = usePresence();
 
-  // useEffect(async () => {
-  //   const res = await Parse.Cloud.run('update-commission', {
-  //     commission: 20
-  //   });
-
-  //   console.log({ res });
-  // }, []);
-
   return (
     <div>
       <Grid container component={Paper} className={classes.chatSection}>
