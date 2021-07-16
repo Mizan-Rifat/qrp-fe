@@ -13,8 +13,7 @@ const usePresence = () => {
     cluster: 'mt1',
     auth: {
       headers: {
-        sessionToken: currentUser.getSessionToken(),
-        'Content-Type': 'application/x-www-form-urlencoded'
+        sessionToken: currentUser.getSessionToken()
       }
     }
   });

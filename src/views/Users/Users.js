@@ -92,7 +92,6 @@ const Users = ({ type, title, users, fetching }) => {
               tooltip: 'Message',
               onClick: (event, rowData) => {
                 history.push(`/messages?rid=${rowData.id}`);
-                console.log({ rowData });
               },
               position: 'row'
             },
