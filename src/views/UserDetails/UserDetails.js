@@ -67,6 +67,7 @@ const UserDetails = () => {
   const [tableData, setTableData] = useState([]);
 
   const [openDialog, setOpenDialog] = useState(false);
+  const [openQADialog, setOpenQADialog] = useState(false);
   const [statusAlertOpen, setStatusAlertOpen] = useState(false);
   const [notiOpen, setNotiOpen] = useState(false);
   const [lightBox, setLightBox] = useState({
@@ -143,6 +144,7 @@ const UserDetails = () => {
   }, [id]);
 
   useEffect(() => {
+    console.log({ user });
     if (Object.keys(user).length) {
       const fields = [
         'username',
@@ -240,6 +242,19 @@ const UserDetails = () => {
                       Set Commision
                     </Button>
                   )}
+
+                {user.roles.some(
+                  role => role.get('name') === 'Other' || role.get('name') === 'Pharmacist'
+                ) && (
+                  <Button
+                    color="primary"
+                    onClick={() => setOpenQADialog(!openQADialog)}
+                    style={{ marginRight: 10 }}
+                  >
+                    QA
+                  </Button>
+                )}
+
                 <Box position="relative">
                   <Button
                     color={user.status ? 'danger' : 'success'}
@@ -248,6 +263,7 @@ const UserDetails = () => {
                   >
                     {user.status ? 'Decline' : 'Approve'}
                   </Button>
+
                   {loading && (
                     <Box position="absolute" top="33%" left="39%">
                       <CircularProgress size={16} />
