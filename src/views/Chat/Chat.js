@@ -79,6 +79,7 @@ const Chat = ({ rid }) => {
   };
 
   useEffect(() => {
+    console.log({ messages });
     if (messageEndRef.current && visibility) {
       messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -108,17 +109,16 @@ const Chat = ({ rid }) => {
             <List className={classes.messageArea}>
               {count > messages.length && (
                 <Box display="flex" justifyContent="center" mt={3}>
-                  <LoadMoreButton handleLodMore={handleLodMore} />
+                  <LoadMoreButton handleLodMore={handleLodMore} loading={loading} />
                 </Box>
               )}
               {messages.map((message, index) =>
-                // <Message message={message} index={index} />
                 index == messages.length - 3 ? (
                   <VisibilitySensor onChange={handleVisibilityChange} offset={{ top: -400 }}>
-                    <Message message={message} index={index} />
+                    <Message message={message} receiver={receiver} />
                   </VisibilitySensor>
                 ) : (
-                  <Message message={message} index={index} />
+                  <Message message={message} receiver={receiver} />
                 )
               )}
             </List>

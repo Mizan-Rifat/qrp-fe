@@ -54,19 +54,22 @@ const useReciever = rid => {
   useEffect(() => {
     if (channel.name) {
       channel.bind('incomingMessage', async data => {
+        console.log({ data });
         if (data.messageFrom.objectId !== uid) {
-          const incomingMsg = await new Parse.Query(Messages).get(data.objectId);
+          // const incomingMsg = await new Parse.Query(Messages).get(data.objectId);
           setNewMessage(true);
-          dispatch(receiveMessage(incomingMsg));
+          dispatch(receiveMessage({ id: data.objectId, ...data }));
         }
       });
       channel.bind('client-typing', function (data) {
+        console.log({ data });
         setEvents({
           ...events,
           ...data
         });
       });
       channel.bind('client-not-typing', function (data) {
+        console.log({ data });
         setEvents({
           ...events,
           ...data

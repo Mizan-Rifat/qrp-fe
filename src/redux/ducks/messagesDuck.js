@@ -31,7 +31,7 @@ export default (state = initState, action) => {
         ...state,
         fetching: false,
         loading: false,
-        messages: action.payload.results,
+        messages: action.payload.messages,
         count: action.payload.count,
         error: false
       };
@@ -39,7 +39,7 @@ export default (state = initState, action) => {
       return {
         ...state,
         loading: false,
-        messages: [...action.payload.results, ...state.messages],
+        messages: [...action.payload.messages, ...state.messages],
         count: action.payload.count,
         error: false
       };
@@ -114,6 +114,7 @@ export const messagesFetched = data => {
 };
 
 export const receiveMessage = message => {
+  console.log({ message });
   return {
     type: MESSAGE_ADDED,
     payload: message
@@ -144,7 +145,7 @@ export const fetchMessages = (rid, page) => async dispatch => {
     const messages = await Parse.Cloud.run('messages', {
       rid,
       page,
-      limit: 5
+      limit: 10
     });
     dispatch(messagesFetched(messages));
   } catch (err) {
@@ -157,7 +158,7 @@ export const loadMoreMessages = (rid, page) => async dispatch => {
   const messages = await Parse.Cloud.run('messages', {
     rid,
     page,
-    limit: 5
+    limit: 10
   });
   dispatch(moreMessageLoaded(messages));
 };

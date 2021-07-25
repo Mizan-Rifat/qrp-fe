@@ -27,9 +27,9 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
       msg.set('seen', false);
       msg.set('channel', channel.name);
 
-      msg.save().then(res => {
+      msg.save().then(data => {
         setMessage('');
-        dispatch(receiveMessage(res));
+        dispatch(receiveMessage({ id: data.id, ...data.attributes }));
       });
     }
   };
