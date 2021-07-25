@@ -26,6 +26,8 @@ import { setUserLoadingFalse } from 'redux/ducks/userDuck';
 import AlertDialog from 'components/Alert/Alert';
 
 import Snackbar from 'components/Snackbar/Snackbar.js';
+import QuestionnaireDialog from 'components/Dialog/QuestionnaireDialog';
+import { resetQuestionnaireState } from 'redux/ducks/questionnaireDuck';
 
 const styles = {
   cardCategoryWhite: {
@@ -69,6 +71,7 @@ const UserDetails = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openQADialog, setOpenQADialog] = useState(false);
   const [statusAlertOpen, setStatusAlertOpen] = useState(false);
+  const [openQuestionnaireDialog, setOpenQuestionnaireDialog] = useState(false);
   const [notiOpen, setNotiOpen] = useState(false);
   const [lightBox, setLightBox] = useState({
     open: false,
@@ -76,7 +79,7 @@ const UserDetails = () => {
     selectedindex: ''
   });
 
-  const { fetching, user, loading } = useSelector(state => state.user);
+  const { fetching, user, parseUser, loading } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const handleImageClick = image => {
@@ -140,11 +143,11 @@ const UserDetails = () => {
 
     return () => {
       dispatch(resetUserState());
+      dispatch(resetQuestionnaireState());
     };
   }, [id]);
 
   useEffect(() => {
-    console.log({ user });
     if (Object.keys(user).length) {
       const fields = [
         'username',
@@ -248,7 +251,7 @@ const UserDetails = () => {
                 ) && (
                   <Button
                     color="primary"
-                    onClick={() => setOpenQADialog(!openQADialog)}
+                    onClick={() => setOpenQuestionnaireDialog(!openQuestionnaireDialog)}
                     style={{ marginRight: 10 }}
                   >
                     QA
@@ -342,6 +345,16 @@ const UserDetails = () => {
                 uid={id}
                 value={user.commission}
               />
+
+              {openQuestionnaireDialog && (
+                <QuestionnaireDialog
+                  open={openQuestionnaireDialog}
+                  setOpen={setOpenQuestionnaireDialog}
+                  user={user}
+                  parseUser={parseUser}
+                  value={user.commission}
+                />
+              )}
               {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
               <AlertDialog
                 open={statusAlertOpen}
