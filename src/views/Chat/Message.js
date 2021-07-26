@@ -11,14 +11,18 @@ const useStyles = makeStyles(theme => ({
     textAlign: ({ isIncoming }) => (isIncoming ? 'left' : 'right')
   },
   listItemTextPrimary: {
-    maxWidth: 350,
+    maxWidth: '65%',
     wordBreak: 'break-word',
     display: 'inline-block',
     justifyContent: 'flex-end',
     flex: 'unset',
-    border: '1px solid',
+    // border: '1px solid',
     padding: 8,
-    borderRadius: ({ isIncoming }) => (isIncoming ? '0 8px 8px 8px' : '8px 0 8px 8px')
+    borderRadius: ({ isIncoming }) => (isIncoming ? '0 8px 8px 8px' : '8px 0 8px 8px'),
+    background: ({ isIncoming }) =>
+      isIncoming ? theme.palette.info.light : theme.palette.primary.main,
+    color: '#fff',
+    textAlign: 'left'
   },
   listItemTextSecondary: {
     fontSize: 12,
@@ -39,23 +43,20 @@ const Message = ({ message, receiver }) => {
 
   const { contacts } = useSelector(state => state.contacts);
 
-  const checkOnline = uid => contacts.find(contact => (contact.id = uid)).online;
+  const checkOnline = uid => contacts.find(contact => contact.id === uid)?.online;
 
   const senderId = message.messageFrom.id ? message.messageFrom.id : message.messageFrom.objectId;
   const isIncoming = currentUser.id !== senderId;
 
   const classes = useStyles({ isIncoming, badgeColor: online ? 'warning' : 'secondary' });
+
   return (
-    <ListItem
-      alignItems="flex-start"
-      // style={{ justifyContent: isIncoming ? 'flex-start' : 'flex-end' }}
-    >
+    <ListItem alignItems="flex-start">
       {isIncoming && (
         <ListItemAvatar>
           <Avatar
-            src={receiver.get('profilePicture')}
-            online={false}
-            // online={checkOnline(message.messageFrom.id)}
+            // src={receiver.get('profilePicture')}
+            online={checkOnline(message.messageFrom.id)}
           />
         </ListItemAvatar>
       )}

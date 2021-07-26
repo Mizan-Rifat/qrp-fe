@@ -15,6 +15,7 @@ import { useQueryState } from 'react-router-use-location-state';
 import ContactsList from './ContactsList';
 import Chat from './Chat';
 import usePresence from 'hooks/usePresence';
+import Parse from 'parse';
 
 const useStyles = makeStyles({
   table: {
@@ -41,7 +42,7 @@ const Messages = () => {
 
   const [rid, setRid] = useQueryState('rid', '');
 
-  const { currentUser } = usePresence();
+  const currentUser = Parse.User.current();
 
   return (
     <div>
@@ -50,7 +51,7 @@ const Messages = () => {
           <List>
             <ListItem button key="RemySharp">
               <ListItemIcon>
-                <Avatar online={true} src={currentUser.get('profilePicture')} />
+                <Avatar online={true} />
               </ListItemIcon>
               <ListItemText primary={currentUser.get('firstName')}></ListItemText>
             </ListItem>

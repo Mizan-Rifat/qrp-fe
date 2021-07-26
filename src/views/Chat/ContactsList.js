@@ -7,34 +7,55 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from './Avatar';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchContacts } from 'redux/ducks/contactsDuck';
+import { Badge, Box, CircularProgress, ListItemSecondaryAction } from '@material-ui/core';
+import { Loading } from 'components/Loading/Loading';
 
-const useStyles = makeStyles({});
+const useStyles = makeStyles(theme => ({
+  secondary: {
+    fontSize: 12,
+    fontWeight: ({ unseenCount }) => (unseenCount ? 700 : 300)
+  }
+}));
 
 const ContactList = ({ rid, setRid }) => {
   const classes = useStyles();
   const { contacts, fetching } = useSelector(state => state.contacts);
 
   const dispatch = useDispatch();
-  useEffect(async () => {
-    dispatch(fetchContacts());
-  }, []);
+
+  // useEffect(async () => {
+  //   dispatch(fetchContacts());
+  // }, []);
+
   return (
-    <List>
-      {contacts.map(user => (
-        <ListItem
-          button
-          selected={user.id === rid}
-          key={user.username}
-          onClick={() => setRid(user.id)}
-        >
-          <ListItemIcon>
-            <Avatar online={user.online} src={user.profilePicture} />
-          </ListItemIcon>
-          <ListItemText primary={user.firstName}></ListItemText>
-        </ListItem>
-      ))}
+    <List style={{ height: '100%', position: 'relative' }}>
+      {fetching ? (
+        <Loading position={{ top: '20%', left: '50%' }} />
+      ) : (
+        contacts.map(user => <SingleListItem user={user} rid={rid} setRid={setRid} />)
+      )}
     </List>
   );
 };
 
 export default ContactList;
+
+export const SingleListItem = ({ user, rid, setRid }) => {
+  const classes = useStyles({ unseenCount: user.unseenCount });
+  return (
+    <ListItem button selected={user.id === rid} key={user.username} onClick={() => setRid(user.id)}>
+      <ListItemIcon>
+        <Avatar online={user.online} src={user.profilePicture} />
+      </ListItemIcon>
+      <ListItemText
+        classes={{ secondary: classes.secondary }}
+        primary={user.firstName}
+        secondary={user.lastMessage?.message}
+      />
+
+      <ListItemSecondaryAction>
+        <Badge badgeContent={user.unseenCount} color="secondary" />
+      </ListItemSecondaryAction>
+    </ListItem>
+  );
+};

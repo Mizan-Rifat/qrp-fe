@@ -17,6 +17,8 @@ import VisibilitySensor from 'react-visibility-sensor';
 
 import IconButton from '@material-ui/core/IconButton';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import { setMessagesState } from 'redux/ducks/messagesDuck';
+import { Loading } from 'components/Loading/Loading';
 
 const useStyles = makeStyles({
   table: {
@@ -57,10 +59,13 @@ const Chat = ({ rid }) => {
   const [page, setPage] = useState(1);
   const [visibility, setVisibility] = useState(true);
 
-  const { messages, count, fetching, loading, error } = useSelector(state => state.messages);
+  const { messages, count, fetching, loading, error, channel, events, recipient } = useSelector(
+    state => state.messages
+  );
+
   const dispatch = useDispatch();
 
-  const { receiver, channel, events, newMessage, setNewMessage } = useReciever(rid);
+  useReciever(rid);
 
   const handleLodMore = () => {
     setPage(page + 1);
@@ -70,16 +75,15 @@ const Chat = ({ rid }) => {
   const handleVisibilityChange = isVisible => {
     setVisibility(isVisible);
     if (isVisible) {
-      setNewMessage(false);
+      dispatch(setMessagesState('events', { ...events, newMessage: false }));
     }
   };
   const handleNewMessage = () => {
     messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    setNewMessage(false);
+    dispatch(setMessagesState('events', { ...events, newMessage: false }));
   };
 
   useEffect(() => {
-    console.log({ messages });
     if (messageEndRef.current && visibility) {
       messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -91,11 +95,9 @@ const Chat = ({ rid }) => {
 
   return (
     <>
-      {fetching ? (
+      {Object.keys(recipient).length === 0 ? (
         <Box className={classes.disable} height="100%" position="relative">
-          <Box position="absolute" top="50%" left="50%">
-            <CircularProgress />
-          </Box>
+          <Loading position={{ top: '50%', left: '50%' }} />
         </Box>
       ) : error ? (
         <Box height="100%" width="100%" display="flex" justifyContent="center" alignItems="center">
@@ -115,10 +117,10 @@ const Chat = ({ rid }) => {
               {messages.map((message, index) =>
                 index == messages.length - 3 ? (
                   <VisibilitySensor onChange={handleVisibilityChange} offset={{ top: -400 }}>
-                    <Message message={message} receiver={receiver} />
+                    <Message message={message} receiver={recipient} />
                   </VisibilitySensor>
                 ) : (
-                  <Message message={message} receiver={receiver} />
+                  <Message message={message} receiver={recipient} />
                 )
               )}
             </List>
@@ -131,7 +133,7 @@ const Chat = ({ rid }) => {
                 <Typography variant="caption">Typing...</Typography>
               </Box>
             )}
-            {newMessage && !visibility && (
+            {events.newMessage && !visibility && (
               <Box
                 position="absolute"
                 top={-30}
@@ -150,7 +152,7 @@ const Chat = ({ rid }) => {
               </Box>
             )}
             <Divider />
-            <MessageForm receiver={receiver} currentUser={currentUser} channel={channel} />
+            <MessageForm receiver={recipient} currentUser={currentUser} channel={channel} />
           </Box>
         </>
       )}

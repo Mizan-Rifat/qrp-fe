@@ -15,12 +15,16 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 
 import styles from 'assets/jss/material-dashboard-react/components/sidebarStyle.js';
+import { Badge, ListItemSecondaryAction } from '@material-ui/core';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles(styles);
 
 export default function SingleListItem({ route, color, label = 1 }) {
   const classes = useStyles({ label });
   let location = useLocation();
+
+  const { unseenMessages, fetching } = useSelector(state => state.contacts);
 
   const [open, setOpen] = useState(false);
   // // verifies if routeName is the one active (in browser input)
@@ -71,6 +75,12 @@ export default function SingleListItem({ route, color, label = 1 }) {
             primary={route.name}
             className={classNames(classes.itemText, whiteFontClasses)}
           />
+
+          {route.badge && (
+            <ListItemSecondaryAction>
+              <Badge badgeContent={unseenMessages} color="secondary" />
+            </ListItemSecondaryAction>
+          )}
           {route.hasOwnProperty('children') ? open ? <ExpandLess /> : <ExpandMore /> : ''}
         </ListItem>
       </NavLink>
