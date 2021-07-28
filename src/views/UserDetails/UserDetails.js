@@ -26,6 +26,8 @@ import { setUserLoadingFalse } from 'redux/ducks/userDuck';
 import AlertDialog from 'components/Alert/Alert';
 
 import Snackbar from 'components/Snackbar/Snackbar.js';
+import QuestionnaireDialog from 'components/Dialog/QuestionnaireDialog';
+import { resetQuestionnaireState } from 'redux/ducks/questionnaireDuck';
 
 const styles = {
   cardCategoryWhite: {
@@ -67,7 +69,9 @@ const UserDetails = () => {
   const [tableData, setTableData] = useState([]);
 
   const [openDialog, setOpenDialog] = useState(false);
+  const [openQADialog, setOpenQADialog] = useState(false);
   const [statusAlertOpen, setStatusAlertOpen] = useState(false);
+  const [openQuestionnaireDialog, setOpenQuestionnaireDialog] = useState(false);
   const [notiOpen, setNotiOpen] = useState(false);
   const [lightBox, setLightBox] = useState({
     open: false,
@@ -75,7 +79,7 @@ const UserDetails = () => {
     selectedindex: ''
   });
 
-  const { fetching, user, loading } = useSelector(state => state.user);
+  const { fetching, user, parseUser, loading } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const handleImageClick = image => {
@@ -92,6 +96,7 @@ const UserDetails = () => {
       uid: id,
       status: !user.status
     }).then(res => {
+      console.log({ res });
       setUserLoadingFalse(false);
       setNotiOpen(true);
       dispatch(
@@ -139,6 +144,7 @@ const UserDetails = () => {
 
     return () => {
       dispatch(resetUserState());
+      dispatch(resetQuestionnaireState());
     };
   }, [id]);
 
@@ -206,7 +212,7 @@ const UserDetails = () => {
   return (
     <Box position="relative">
       {fetching ? (
-        <Loading />
+        <Loading position={{ top: '40%', left: '50%' }} />
       ) : (
         <>
           <Box mb={6}>
@@ -237,9 +243,22 @@ const UserDetails = () => {
                       onClick={() => setOpenDialog(!openDialog)}
                       style={{ marginRight: 10 }}
                     >
-                      Set Commision
+                      Set Commission
                     </Button>
                   )}
+
+                {user.roles.some(
+                  role => role.get('name') === 'Other' || role.get('name') === 'Pharmacist'
+                ) && (
+                  <Button
+                    color="primary"
+                    onClick={() => setOpenQuestionnaireDialog(!openQuestionnaireDialog)}
+                    style={{ marginRight: 10 }}
+                  >
+                    View Questionnaire
+                  </Button>
+                )}
+
                 <Box position="relative">
                   <Button
                     color={user.status ? 'danger' : 'success'}
@@ -248,6 +267,7 @@ const UserDetails = () => {
                   >
                     {user.status ? 'Decline' : 'Approve'}
                   </Button>
+
                   {loading && (
                     <Box position="absolute" top="33%" left="39%">
                       <CircularProgress size={16} />
@@ -326,11 +346,26 @@ const UserDetails = () => {
                 uid={id}
                 value={user.commission}
               />
+
+              {openQuestionnaireDialog && (
+                <QuestionnaireDialog
+                  open={openQuestionnaireDialog}
+                  setOpen={setOpenQuestionnaireDialog}
+                  user={user}
+                  parseUser={parseUser}
+                  value={user.commission}
+                />
+              )}
               {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
               <AlertDialog
                 open={statusAlertOpen}
                 setOpen={setStatusAlertOpen}
                 handleAgree={handleApprove}
+                message={
+                  user.status
+                    ? 'Are you sure to decline this user?'
+                    : 'Are you sure to approve this user?'
+                }
               />
               <Snackbar
                 place="tr"

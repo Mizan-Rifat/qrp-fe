@@ -7,12 +7,12 @@ const MESSAGE_ADDED = 'qrp/messages/messages_added';
 const MESSAGES_DELETED = 'qrp/messages/messages_deleted';
 const MESSAGES_UPDATED = 'qrp/messages/messages_updated';
 const MORE_MESSAGES_LOADED = 'qrp/messages/more_messages_loaded';
+const SET_STATE = 'qrp/messages/set_state';
 
 const LOADING_TRUE = 'qrp/messages/loading_true';
 const LOADING_FALSE = 'qrp/messages/loading_false';
 const FETCHING_TRUE = 'qrp/messages/fetching_true';
 const FETCHING_FALSE = 'qrp/messages/fetching_false';
-const SET_ERRORS = 'qrp/messages/set_errors';
 const RESET = 'qrp/messages/reset';
 // reducers
 
@@ -21,7 +21,11 @@ const initState = {
   loading: false,
   messages: [],
   count: 0,
-  error: false
+  error: false,
+
+  channel: {},
+  recipient: {},
+  events: {}
 };
 
 export default (state = initState, action) => {
@@ -31,7 +35,7 @@ export default (state = initState, action) => {
         ...state,
         fetching: false,
         loading: false,
-        messages: action.payload.results,
+        messages: action.payload.messages,
         count: action.payload.count,
         error: false
       };
@@ -39,7 +43,7 @@ export default (state = initState, action) => {
       return {
         ...state,
         loading: false,
-        messages: [...action.payload.results, ...state.messages],
+        messages: [...action.payload.messages, ...state.messages],
         count: action.payload.count,
         error: false
       };
@@ -62,12 +66,22 @@ export default (state = initState, action) => {
         ),
         error: false
       };
-    case MESSAGES_DELETED:
+
+    case MESSAGES_UPDATED:
       return {
         ...state,
         loading: false,
-        messages: state.messages.filter(item => item.id != action.payload),
+        messages: state.messages.map(item =>
+          item.id == action.payload.id ? action.payload : item
+        ),
         error: false
+      };
+
+    case SET_STATE:
+      return {
+        ...state,
+        bal: 'SD',
+        [action.payload.key]: action.payload.value
       };
     case LOADING_TRUE:
       return {
@@ -88,13 +102,6 @@ export default (state = initState, action) => {
       return {
         ...state,
         fetching: false
-      };
-    case SET_ERRORS:
-      return {
-        ...state,
-        loading: false,
-        fetching: false,
-        error: action.payload
       };
     case RESET:
       return initState;
@@ -125,16 +132,20 @@ export const moreMessageLoaded = data => {
     payload: data
   };
 };
-export const setErrors = error => {
-  return {
-    type: SET_ERRORS,
-    payload: error
-  };
-};
 
 export const resetMessagesState = () => {
   return {
     type: RESET
+  };
+};
+
+export const setMessagesState = (key, value) => {
+  return {
+    type: SET_STATE,
+    payload: {
+      key,
+      value
+    }
   };
 };
 
@@ -144,7 +155,7 @@ export const fetchMessages = (rid, page) => async dispatch => {
     const messages = await Parse.Cloud.run('messages', {
       rid,
       page,
-      limit: 5
+      limit: 10
     });
     dispatch(messagesFetched(messages));
   } catch (err) {
@@ -157,7 +168,7 @@ export const loadMoreMessages = (rid, page) => async dispatch => {
   const messages = await Parse.Cloud.run('messages', {
     rid,
     page,
-    limit: 5
+    limit: 10
   });
   dispatch(moreMessageLoaded(messages));
 };
