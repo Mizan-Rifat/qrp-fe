@@ -19,6 +19,9 @@ import Parse from 'parse';
 import styles from 'assets/jss/material-dashboard-react/components/headerLinksStyle.js';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
+import { Badge } from '@material-ui/core';
+import MailIcon from '@material-ui/icons/Mail';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles(styles);
 
@@ -26,6 +29,8 @@ export default function AdminNavbarLinks() {
   const classes = useStyles();
 
   const history = useHistory();
+
+  const { unseenMessages, fetching } = useSelector(state => state.contacts);
 
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
@@ -57,21 +62,22 @@ export default function AdminNavbarLinks() {
   };
   return (
     <div>
-      <div className={classes.manager}>
-        <Link to="/messages">
-          <Button
-            color={window.innerWidth > 959 ? 'transparent' : 'white'}
-            justIcon={window.innerWidth > 959}
-            simple={!(window.innerWidth > 959)}
-            className={classes.buttonLink}
-          >
-            <EmailIcon fontSize="small" className={classes.icon} />
-            <Hidden mdUp implementation="css">
-              <p className={classes.linkText}>Messages</p>
-            </Hidden>
-          </Button>
-        </Link>
-      </div>
+      <Hidden mdDown>
+        <div className={classes.manager}>
+          <Link to="/messages">
+            <Button
+              color={window.innerWidth > 959 ? 'transparent' : 'white'}
+              justIcon={window.innerWidth > 959}
+              simple={!(window.innerWidth > 959)}
+              className={classes.buttonLink}
+            >
+              <Badge badgeContent={unseenMessages} color="secondary">
+                <MailIcon fontSize="small" className={classes.icon} />
+              </Badge>
+            </Button>
+          </Link>
+        </div>
+      </Hidden>
       <div className={classes.manager}>
         <Button
           color={window.innerWidth > 959 ? 'transparent' : 'white'}
@@ -105,13 +111,6 @@ export default function AdminNavbarLinks() {
               <Paper>
                 <ClickAwayListener onClickAway={handleCloseProfile}>
                   <MenuList role="menu">
-                    <MenuItem onClick={handleCloseProfile} className={classes.dropdownItem}>
-                      Profile
-                    </MenuItem>
-                    <MenuItem onClick={handleCloseProfile} className={classes.dropdownItem}>
-                      Settings
-                    </MenuItem>
-                    <Divider light />
                     <MenuItem onClick={handleLogout} className={classes.dropdownItem}>
                       Logout
                     </MenuItem>

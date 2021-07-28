@@ -12,6 +12,7 @@ import Messages from 'views/Chat/Messages';
 import UserDetails from 'views/UserDetails/UserDetails';
 import Staffs from 'views/Staffs/Staffs';
 import PharmacyOwners from 'views/PharmacyOwners/PharmacyOwners';
+import usePresence from 'hooks/usePresence';
 
 const useStyles = makeStyles(styles);
 
@@ -24,6 +25,9 @@ export default function Admin({ ...rest }) {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  usePresence();
+
   return (
     <div className={classes.wrapper}>
       <Sidebar

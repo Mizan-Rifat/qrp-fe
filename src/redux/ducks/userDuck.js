@@ -15,7 +15,8 @@ const RESET = 'pes/user/reset';
 const initState = {
   fetching: true,
   loading: true,
-  user: {}
+  user: {},
+  parseUser: {}
 };
 
 export default (state = initState, action) => {
@@ -23,7 +24,8 @@ export default (state = initState, action) => {
     case USER_FETCHED:
       return {
         ...state,
-        user: action.payload,
+        user: action.payload.user,
+        parseUser: action.payload.parseUser,
         loading: false,
         fetching: false
       };
@@ -68,12 +70,13 @@ export default (state = initState, action) => {
   }
 };
 
-export const userFetched = user => {
+export const userFetched = (user, parseUser) => {
   return {
     type: USER_FETCHED,
-    payload: user
+    payload: { user, parseUser }
   };
 };
+
 export const setUserLoadingTrue = () => {
   return {
     type: USER_LOADING_TRUE
@@ -123,9 +126,12 @@ export const fetchUser = id => async dispatch => {
   user.roles = roles;
 
   dispatch(
-    userFetched({
-      ...user,
-      ...parseUser.attributes
-    })
+    userFetched(
+      {
+        ...user,
+        ...parseUser.attributes
+      },
+      parseUser
+    )
   );
 };

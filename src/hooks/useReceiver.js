@@ -2,21 +2,25 @@ import { useRef, useEffect, useState } from 'react';
 import Parse from 'parse';
 import Pusher from 'pusher-js';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMessages } from 'redux/ducks/messagesDuck';
-import { receiveMessage } from 'redux/ducks/messagesDuck';
+import {
+  fetchMessages,
+  receiveMessage,
+  resetMessagesState,
+  loadMoreMessages,
+  setMessagesState
+} from 'redux/ducks/messagesDuck';
 import { contactsUpdated, setPresenceStatus } from 'redux/ducks/contactsDuck';
 import { getChannelName } from 'utils';
-import { resetMessagesState } from 'redux/ducks/messagesDuck';
-import { loadMoreMessages } from 'redux/ducks/messagesDuck';
+import { setSeen } from 'redux/ducks/contactsDuck';
 
 const useReciever = rid => {
   const currentUser = Parse.User.current();
-  const Messages = Parse.Object.extend('Messages');
 
   const uid = currentUser.id;
 
   const pusher = new Pusher('6e894e9b27c3993c4068', {
     authEndpoint: 'https://qrps.app/pusher/auth',
+    // authEndpoint: 'http://127.0.0.1:1337/pusher/auth',
     cluster: 'mt1',
     auth: {
       headers: {
@@ -30,57 +34,51 @@ const useReciever = rid => {
 
   const channelName = getChannelName(uid, rid);
 
-  const [channel, setChannel] = useState({});
-  const [receiver, setReceiver] = useState({});
-  const [events, setEvents] = useState({});
-  const [newMessage, setNewMessage] = useState(false);
+  const { channel, events, recipient } = useSelector(state => state.messages);
+
   const dispatch = useDispatch();
 
   useEffect(async () => {
     if (rid !== '') {
       dispatch(fetchMessages(rid, 1)).catch(err => {});
       const cha = await pusher.subscribe(`private-${channelName}`);
-      setChannel(cha);
+      dispatch(setMessagesState('channel', cha));
       const rec = await userQuery.get(rid);
-      setReceiver(rec);
+      dispatch(setMessagesState('recipient', rec));
     }
   }, [rid]);
 
   useEffect(() => {
     dispatch(resetMessagesState());
+    return () => {
+      dispatch(resetMessagesState());
+      pusher.unsubscribe(`private-${channelName}`);
+    };
   }, [rid]);
 
   useEffect(() => {
-    if (channel.name) {
+    if (channel?.name) {
       channel.bind('incomingMessage', async data => {
         if (data.messageFrom.objectId !== uid) {
-          const incomingMsg = await new Parse.Query(Messages).get(data.objectId);
-          setNewMessage(true);
-          dispatch(receiveMessage(incomingMsg));
+          if (data.messageFrom.objectId === rid) {
+            dispatch(setMessagesState('events', { ...events, newMessage: true }));
+            dispatch(setSeen(rid));
+            dispatch(receiveMessage({ id: data.objectId, ...data }));
+          }
         }
       });
       channel.bind('client-typing', function (data) {
-        setEvents({
-          ...events,
-          ...data
-        });
+        dispatch(setMessagesState('events', { ...events, typing: data.typing }));
       });
       channel.bind('client-not-typing', function (data) {
-        setEvents({
-          ...events,
-          ...data
-        });
+        dispatch(setMessagesState('events', { ...events, typing: data.typing }));
       });
     }
   }, [channel]);
 
-  return {
-    receiver,
-    channel,
-    events,
-    newMessage,
-    setNewMessage
-  };
+  useEffect(() => {
+    dispatch(setSeen(rid));
+  }, [rid]);
 };
 
 export default useReciever;
