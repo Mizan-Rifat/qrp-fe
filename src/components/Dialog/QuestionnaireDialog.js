@@ -140,7 +140,7 @@ export default function QuestionnaireDialog({ user, parseUser, open, setOpen }) 
         open={open}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
       >
         <DialogTitle id="customized-dialog-title" onClose={handleClose}>

@@ -45,47 +45,45 @@ const Messages = () => {
   const currentUser = Parse.User.current();
 
   return (
-    <div>
-      <Grid container component={Paper} className={classes.chatSection}>
-        <Grid item xs={3} className={classes.borderRight500}>
-          <List>
-            <ListItem button key="RemySharp">
-              <ListItemIcon>
-                <Avatar online={true} />
-              </ListItemIcon>
-              <ListItemText primary={currentUser.get('firstName')}></ListItemText>
-            </ListItem>
-          </List>
-          <Divider />
-          <Grid item xs={12} style={{ padding: '10px' }}>
-            <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
-          </Grid>
-          <Divider />
-          <ContactsList rid={rid} setRid={setRid} />
+    <Grid container component={Paper} className={classes.chatSection}>
+      <Grid item xs={3} className={classes.borderRight500}>
+        <List>
+          <ListItem button key="RemySharp">
+            <ListItemIcon>
+              <Avatar online={true} />
+            </ListItemIcon>
+            <ListItemText primary={currentUser.get('firstName')}></ListItemText>
+          </ListItem>
+        </List>
+        <Divider />
+        <Grid item xs={12} style={{ padding: '10px' }}>
+          <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
         </Grid>
-        <Grid item xs={9}>
-          {rid === '' ? (
-            <Box
-              height="100%"
-              width="100%"
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Typography variant="h6" gutterBottom>
-                QRP Consulting
-              </Typography>
-              <Typography variant="subtitle1" gutterBottom>
-                Select a contact to start chat...
-              </Typography>
-            </Box>
-          ) : (
-            <Chat rid={rid} />
-          )}
-        </Grid>
+        <Divider />
+        <ContactsList rid={rid} setRid={setRid} />
       </Grid>
-    </div>
+      <Grid item xs={9}>
+        {rid === '' ? (
+          <Box
+            height="100%"
+            width="100%"
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Typography variant="h6" gutterBottom>
+              QRP Consulting
+            </Typography>
+            <Typography variant="subtitle1" gutterBottom>
+              Select a contact to start chat...
+            </Typography>
+          </Box>
+        ) : (
+          <Chat rid={rid} />
+        )}
+      </Grid>
+    </Grid>
   );
 };
 

@@ -43,7 +43,7 @@ export default function FormDialog({ open, setOpen, uid, value }) {
       uid,
       commission
     }).then(res => {
-      setCommission('');
+      setCommission(res.get('commission'));
       setLoading(false);
       setOpen(false);
       setNotiOpen(true);
@@ -68,7 +68,7 @@ export default function FormDialog({ open, setOpen, uid, value }) {
           <TextField
             margin="dense"
             id="name"
-            label="Commision"
+            label="Commission"
             type="text"
             fullWidth
             value={commission}

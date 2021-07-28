@@ -96,6 +96,7 @@ const UserDetails = () => {
       uid: id,
       status: !user.status
     }).then(res => {
+      console.log({ res });
       setUserLoadingFalse(false);
       setNotiOpen(true);
       dispatch(
@@ -211,7 +212,7 @@ const UserDetails = () => {
   return (
     <Box position="relative">
       {fetching ? (
-        <Loading />
+        <Loading position={{ top: '40%', left: '50%' }} />
       ) : (
         <>
           <Box mb={6}>
@@ -242,7 +243,7 @@ const UserDetails = () => {
                       onClick={() => setOpenDialog(!openDialog)}
                       style={{ marginRight: 10 }}
                     >
-                      Set Commision
+                      Set Commission
                     </Button>
                   )}
 
@@ -254,7 +255,7 @@ const UserDetails = () => {
                     onClick={() => setOpenQuestionnaireDialog(!openQuestionnaireDialog)}
                     style={{ marginRight: 10 }}
                   >
-                    QA
+                    View Questionnaire
                   </Button>
                 )}
 
@@ -360,6 +361,11 @@ const UserDetails = () => {
                 open={statusAlertOpen}
                 setOpen={setStatusAlertOpen}
                 handleAgree={handleApprove}
+                message={
+                  user.status
+                    ? 'Are you sure to decline this user?'
+                    : 'Are you sure to approve this user?'
+                }
               />
               <Snackbar
                 place="tr"
