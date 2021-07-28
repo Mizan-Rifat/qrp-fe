@@ -59,7 +59,6 @@ const useReciever = rid => {
   useEffect(() => {
     if (channel?.name) {
       channel.bind('incomingMessage', async data => {
-        console.log({ data });
         if (data.messageFrom.objectId !== uid) {
           if (data.messageFrom.objectId === rid) {
             dispatch(setMessagesState('events', { ...events, newMessage: true }));
@@ -69,11 +68,9 @@ const useReciever = rid => {
         }
       });
       channel.bind('client-typing', function (data) {
-        console.log({ data });
         dispatch(setMessagesState('events', { ...events, typing: data.typing }));
       });
       channel.bind('client-not-typing', function (data) {
-        console.log({ data });
         dispatch(setMessagesState('events', { ...events, typing: data.typing }));
       });
     }

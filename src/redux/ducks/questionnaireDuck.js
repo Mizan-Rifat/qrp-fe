@@ -74,7 +74,6 @@ export const fetchQuestionnaire = user => async dispatch => {
   questionnairesQuery.equalTo('userId', user);
   const questionnaires = await questionnairesQuery.find();
 
-  console.log({ questionnaires });
   dispatch(
     questionnaireFetched(
       questionnaires.map(questionnaire => ({

@@ -7,13 +7,11 @@ import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
 import { Box, Button as MButton, CircularProgress, Grid, makeStyles } from '@material-ui/core';
-import { ucFirst, sentenceCase, getParseObject } from '../../utils';
+import { ucFirst, sentenceCase } from '../../utils';
 import dayjs from 'dayjs';
 import MaterialTable, { MTableToolbar } from 'material-table';
 import Button from 'components/CustomButtons/Button.js';
-import CardFooter from 'components/Card/CardFooter';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { Link } from 'react-router-dom';
 import MLightBox from 'components/Lightbox/MLightBox';
 import image from '../../assets/img/no-image.png';
 import ManagerDetails from './ManagerDetails';
@@ -69,7 +67,6 @@ const UserDetails = () => {
   const [tableData, setTableData] = useState([]);
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [openQADialog, setOpenQADialog] = useState(false);
   const [statusAlertOpen, setStatusAlertOpen] = useState(false);
   const [openQuestionnaireDialog, setOpenQuestionnaireDialog] = useState(false);
   const [notiOpen, setNotiOpen] = useState(false);
@@ -96,7 +93,6 @@ const UserDetails = () => {
       uid: id,
       status: !user.status
     }).then(res => {
-      console.log({ res });
       setUserLoadingFalse(false);
       setNotiOpen(true);
       dispatch(

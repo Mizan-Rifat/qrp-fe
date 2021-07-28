@@ -29,7 +29,6 @@ const usePresence = () => {
     const membersChannel = await pusher.subscribe(`chat-members`);
     dispatch(fetchContacts());
     myChannel.bind('incomingMessage', data => {
-      console.log({ data });
       if (data.messageFrom.objectId !== uid) {
         dispatch(setUnseenCount(data.messageFrom.objectId, data));
       }
