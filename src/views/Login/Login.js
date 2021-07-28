@@ -108,9 +108,16 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     Parse.User.logIn(formData.username, formData.password)
-      .then(res => {
-        setLoading(false);
-        history.push('/admin');
+      .then(async res => {
+        const roles = await new Parse.Query(Parse.Role).equalTo('users', res).find();
+
+        if (roles.some(role => role.get('name') === 'Administrator')) {
+          setLoading(false);
+          history.push('/admin');
+        } else {
+          setLoading(false);
+          setError('Sorry! you are not authorized');
+        }
       })
       .catch(err => {
         setLoading(false);

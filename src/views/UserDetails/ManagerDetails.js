@@ -14,25 +14,6 @@ const ManagerDetails = ({ fetching, manager }) => {
     },
     {
       field: 'value'
-      // render: rowData => {
-      //   if (rowData.type === 'image') {
-      //     return (
-      //       <img
-      //         src={rowData.value ? rowData.value : image}
-      //         alt=""
-      //         height="150"
-      //         onClick={() => handleImageClick(rowData.value)}
-      //       />
-      //     );
-      //   }
-      //   if (typeof rowData.value === 'boolean') {
-      //     return ucFirst(rowData.value.toString());
-      //   }
-      //   if (!rowData.value) {
-      //     return 'None';
-      //   }
-      //   return rowData.value;
-      // }
     }
   ];
 

@@ -1,5 +1,4 @@
 import Parse from 'parse';
-import { getParseObject } from 'utils';
 //actions
 
 const CONTACTS_FETCHED = 'qrp/contacts/contacts_fetched';
@@ -41,7 +40,6 @@ export default (state = initState, action) => {
         contacts: state.contacts.map(item => (item.id == action.payload.id ? action.payload : item))
       };
     case SET_UNSEEN_MESSAGE:
-      console.log({ action });
       return {
         ...state,
         unseenMessages: action.payload
