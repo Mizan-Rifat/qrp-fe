@@ -51,6 +51,7 @@ export const SingleListItem = ({ user, rid, setRid }) => {
         classes={{ secondary: classes.secondary }}
         primary={user.firstName}
         secondary={user.lastMessage?.message}
+        secondaryTypographyProps={{ noWrap: true }}
       />
 
       <ListItemSecondaryAction>

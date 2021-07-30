@@ -8,11 +8,13 @@ import { navMenu } from 'routes.js';
 import styles from 'assets/jss/material-dashboard-react/layouts/adminStyle.js';
 import bgImage from 'assets/img/sidebar-2.jpg';
 import logo from 'assets/img/QRP_logo.png';
-import Messages from 'views/Chat/Messages';
-import UserDetails from 'views/UserDetails/UserDetails';
-import Staffs from 'views/Staffs/Staffs';
-import PharmacyOwners from 'views/PharmacyOwners/PharmacyOwners';
 import usePresence from 'hooks/usePresence';
+import loadable from '@loadable/component';
+
+const Messages = loadable(() => import('views/Chat/Messages'));
+const UserDetails = loadable(() => import('views/UserDetails/UserDetails'));
+const Staffs = loadable(() => import('views/Staffs/Staffs'));
+const PharmacyOwners = loadable(() => import('views/PharmacyOwners/PharmacyOwners'));
 
 const useStyles = makeStyles(styles);
 
