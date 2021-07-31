@@ -7,6 +7,7 @@ import { receiveMessage } from 'redux/ducks/messagesDuck';
 import AttachmentIcon from '@material-ui/icons/Attachment';
 import bgImage from 'assets/img/sidebar-2.jpg';
 import CloseIcon from '@material-ui/icons/Close';
+import useNotify from '../../hooks/useNotify';
 
 const useStyles = makeStyles(theme => ({
   closeButton: {
@@ -20,7 +21,7 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
   const classes = useStyles();
   const [message, setMessage] = useState('');
   const [attachment, setAttachment] = useState(null);
-
+  const toast = useNotify();
   const dispatch = useDispatch();
 
   const ref = useRef();
@@ -46,13 +47,22 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
         name = name.replace(/[ ,]+/g, '-');
         console.log({ name });
         const parseFile = new Parse.File(name, attachment);
-        await parseFile.save();
+
+        try {
+          await parseFile.save();
+        } catch (error) {
+          console.log({ error });
+          toast(error.message, 'error');
+          return;
+        }
 
         console.log(parseFile._url);
         msg.set('attachment', parseFile._url);
       }
 
-      const response = await msg.save();
+      const response = await msg.save().catch(err => {
+        console.log({ err });
+      });
       setMessage('');
       setAttachment(null);
       dispatch(receiveMessage({ id: response.id, ...response.attributes }));
