@@ -87,6 +87,23 @@ export const contactsUpdated = data => {
 };
 
 export const fetchContacts = () => async dispatch => {
+  // const LastMessage = Parse.Object.extend('LastMessage');
+
+  // const msgQuery1 = new Parse.Query(LastMessage);
+  // const msgQuery2 = new Parse.Query(LastMessage);
+
+  // msgQuery1.equalTo('sender', Parse.User.current());
+
+  // msgQuery2.equalTo('receiver', Parse.User.current());
+
+  // const messagesQuery = Parse.Query.or(msgQuery1, msgQuery2);
+
+  // messagesQuery.include('sender', 'receiver');
+
+  // const messages = await messagesQuery.find();
+
+  // console.log({ messages });
+
   dispatch({ type: FETCHING_TRUE });
 
   const contacts = await Parse.Cloud.run('contacts');
