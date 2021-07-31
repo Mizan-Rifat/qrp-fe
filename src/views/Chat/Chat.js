@@ -24,10 +24,6 @@ const useStyles = makeStyles({
   table: {
     minWidth: 650
   },
-  chatSection: {
-    width: '100%',
-    height: '85vh'
-  },
   headBG: {
     backgroundColor: '#e0e0e0'
   },
