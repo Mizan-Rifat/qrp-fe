@@ -42,8 +42,13 @@ const useStyles = makeStyles({
 const Messages = () => {
   const classes = useStyles();
 
+  const [chatState, setChatState] = useState({
+    rid,
+    currentUser,
+    recipient
+  });
+
   const [rid, setRid] = useQueryState('rid', '');
-  const [show, setShow] = useState(false);
 
   const currentUser = Parse.User.current();
 
@@ -53,12 +58,6 @@ const Messages = () => {
 
   return (
     <Grid container component={Paper} className={classes.chatSection}>
-      <Slide direction="right" in={show} mountOnEnter unmountOnExit>
-        <Grid item xs={12} className={classes.borderRight500}>
-          <Contacts currentUser={currentUser} rid={rid} setRid={setRid} setShow={setShow} />
-        </Grid>
-      </Slide>
-
       <Hidden smDown>
         <Grid item xs={3} className={classes.borderRight500}>
           <Contacts currentUser={currentUser} rid={rid} setRid={setRid} setShow={setShow} />
@@ -83,38 +82,36 @@ const Messages = () => {
         </Grid> */}
       </Hidden>
 
-      {!show && (
-        <Grid item xs={12} md={9} style={{ height: '100%', position: 'relative' }}>
-          {rid === '' ? (
-            <Box
-              height="100%"
-              width="100%"
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Typography variant="h6" gutterBottom>
-                QRP Consulting
-              </Typography>
-              <Typography variant="subtitle1" gutterBottom>
-                Select a contact to start chat...
-              </Typography>
-            </Box>
-          ) : (
-            <>
-              <Chat rid={rid} show={show} setShow={setShow} />
-            </>
-          )}
-        </Grid>
-      )}
+      <Grid item xs={12} md={9} style={{ height: '100%', position: 'relative' }}>
+        {rid === '' ? (
+          <Box
+            height="100%"
+            width="100%"
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Typography variant="h6" gutterBottom>
+              QRP Consulting
+            </Typography>
+            <Typography variant="subtitle1" gutterBottom>
+              Select a contact to start chat...
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            <Chat rid={rid} />
+          </>
+        )}
+      </Grid>
     </Grid>
   );
 };
 
 export default Messages;
 
-const Contacts = ({ currentUser, rid, setRid, setShow }) => {
+export const Contacts = ({ currentUser, rid, setRid, setShow }) => {
   const classes = useStyles();
   return (
     <>

@@ -27,6 +27,7 @@ import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import { setMessagesState } from 'redux/ducks/messagesDuck';
 import { Loading } from 'components/Loading/Loading';
+import Test from './Test';
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -105,6 +106,7 @@ const Chat = ({ rid, show, setShow }) => {
 
   return (
     <>
+      <Test />
       {Object.keys(recipient).length === 0 ? (
         <Box className={classes.disable} height="100%" position="relative">
           <Loading position={{ top: '50%', left: '50%' }} />
@@ -137,7 +139,7 @@ const Chat = ({ rid, show, setShow }) => {
             )}
           </Hidden>
           <Scrollbar className={classes.scrollbar}>
-            <List className={classes.messageArea}>
+            <List className={classes.messageArea} id="appContainerDiv">
               {count > messages.length && (
                 <Box display="flex" justifyContent="center" mt={3}>
                   <LoadMoreButton handleLodMore={handleLodMore} loading={loading} />
