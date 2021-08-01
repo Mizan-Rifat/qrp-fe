@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ContactList = ({ rid, setRid }) => {
+const ContactList = ({ rid, setRid, setShow }) => {
   const classes = useStyles();
   const { contacts, fetching } = useSelector(state => state.contacts);
 
@@ -32,7 +32,9 @@ const ContactList = ({ rid, setRid }) => {
       {fetching ? (
         <Loading position={{ top: '20%', left: '50%' }} />
       ) : (
-        contacts.map(user => <SingleListItem user={user} rid={rid} setRid={setRid} />)
+        contacts.map(user => (
+          <SingleListItem user={user} rid={rid} setRid={setRid} setShow={setShow} />
+        ))
       )}
     </List>
   );
@@ -40,10 +42,14 @@ const ContactList = ({ rid, setRid }) => {
 
 export default ContactList;
 
-export const SingleListItem = ({ user, rid, setRid }) => {
+export const SingleListItem = ({ user, rid, setRid, setShow }) => {
   const classes = useStyles({ unseenCount: user.unseenCount });
+  const handleClick = () => {
+    setRid(user.id);
+    setShow(false);
+  };
   return (
-    <ListItem button selected={user.id === rid} key={user.username} onClick={() => setRid(user.id)}>
+    <ListItem button selected={user.id === rid} key={user.username} onClick={handleClick}>
       <ListItemIcon>
         <Avatar online={user.online} src={user.profilePicture} />
       </ListItemIcon>

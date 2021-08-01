@@ -16,6 +16,10 @@ import ContactsList from './ContactsList';
 import Chat from './Chat';
 import usePresence from 'hooks/usePresence';
 import Parse from 'parse';
+import { Hidden, Slide } from '@material-ui/core';
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import { useSelector } from 'react-redux';
+import Scrollbar from 'react-scrollbars-custom';
 
 const useStyles = makeStyles({
   table: {
@@ -23,13 +27,15 @@ const useStyles = makeStyles({
   },
   chatSection: {
     width: '100%',
-    minHeight: '85vh'
+    height: '85vh'
   },
   headBG: {
     backgroundColor: '#e0e0e0'
   },
   borderRight500: {
-    borderRight: '1px solid #e0e0e0'
+    borderRight: '1px solid #e0e0e0',
+    height: '100%'
+    // overflowY: 'scroll'
   }
 });
 
@@ -37,50 +43,97 @@ const Messages = () => {
   const classes = useStyles();
 
   const [rid, setRid] = useQueryState('rid', '');
+  const [show, setShow] = useState(false);
 
   const currentUser = Parse.User.current();
 
+  const { recipient } = useSelector(state => state.messages);
+
+  console.log({ recipient });
+
   return (
     <Grid container component={Paper} className={classes.chatSection}>
-      <Grid item xs={3} className={classes.borderRight500}>
-        <List>
-          <ListItem button key="RemySharp">
-            <ListItemIcon>
-              <Avatar online={true} />
-            </ListItemIcon>
-            <ListItemText primary={currentUser.get('firstName')}></ListItemText>
-          </ListItem>
-        </List>
-        <Divider />
-        <Grid item xs={12} style={{ padding: '10px' }}>
-          <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
+      <Slide direction="right" in={show} mountOnEnter unmountOnExit>
+        <Grid item xs={12} className={classes.borderRight500}>
+          <Contacts currentUser={currentUser} rid={rid} setRid={setRid} setShow={setShow} />
         </Grid>
-        <Divider />
-        <ContactsList rid={rid} setRid={setRid} />
-      </Grid>
-      <Grid item xs={9}>
-        {rid === '' ? (
-          <Box
-            height="100%"
-            width="100%"
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Typography variant="h6" gutterBottom>
-              QRP Consulting
-            </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              Select a contact to start chat...
-            </Typography>
-          </Box>
-        ) : (
-          <Chat rid={rid} />
-        )}
-      </Grid>
+      </Slide>
+
+      <Hidden smDown>
+        <Grid item xs={3} className={classes.borderRight500}>
+          <Contacts currentUser={currentUser} rid={rid} setRid={setRid} setShow={setShow} />
+        </Grid>
+        {/* <Grid item xs={3} className={classes.borderRight500}>
+          <List>
+            <ListItem button key="RemySharp">
+              <ListItemIcon>
+                <Avatar online={true} />
+              </ListItemIcon>
+              <ListItemText primary={currentUser.get('firstName')}></ListItemText>
+            </ListItem>
+          </List>
+          <Divider />
+          <Grid item xs={12} style={{ padding: '10px' }}>
+            <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
+          </Grid>
+          <Divider />
+          <Scrollbar style={{ height: '80%' }}>
+            <ContactsList rid={rid} setRid={setRid} setShow={setShow} />
+          </Scrollbar>
+        </Grid> */}
+      </Hidden>
+
+      {!show && (
+        <Grid item xs={12} md={9} style={{ height: '100%', position: 'relative' }}>
+          {rid === '' ? (
+            <Box
+              height="100%"
+              width="100%"
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Typography variant="h6" gutterBottom>
+                QRP Consulting
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                Select a contact to start chat...
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              <Chat rid={rid} show={show} setShow={setShow} />
+            </>
+          )}
+        </Grid>
+      )}
     </Grid>
   );
 };
 
 export default Messages;
+
+const Contacts = ({ currentUser, rid, setRid, setShow }) => {
+  const classes = useStyles();
+  return (
+    <>
+      <List>
+        <ListItem button key="RemySharp">
+          <ListItemIcon>
+            <Avatar online={true} />
+          </ListItemIcon>
+          <ListItemText primary={currentUser.get('firstName')}></ListItemText>
+        </ListItem>
+      </List>
+      <Divider />
+      <Grid item xs={12} style={{ padding: '10px' }}>
+        <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
+      </Grid>
+      <Divider />
+      <Scrollbar style={{ height: '80%' }}>
+        <ContactsList rid={rid} setRid={setRid} setShow={setShow} />
+      </Scrollbar>
+    </>
+  );
+};

@@ -36,6 +36,8 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
       const Messages = Parse.Object.extend('Messages');
       const msg = new Messages();
 
+      console.log({ currentUser });
+
       msg.set('messageTo', receiver);
       msg.set('messageFrom', currentUser);
       msg.set('message', message);
@@ -63,6 +65,18 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
       const response = await msg.save().catch(err => {
         console.log({ err });
       });
+
+      if (!receiver.get('online') && receiver.get('deviceId')) {
+        const messages = Parse.Cloud.run('sendPush', {
+          include_player_ids: receiver.get('deviceId'),
+          heading: `${currentUser.get('firstName')} ${currentUser.get(
+            'lastName'
+          )} send you a message.`,
+          message,
+          type: 'message'
+        });
+      }
+
       setMessage('');
       setAttachment(null);
       dispatch(receiveMessage({ id: response.id, ...response.attributes }));

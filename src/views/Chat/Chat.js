@@ -11,16 +11,24 @@ import Scrollbar from 'react-scrollbars-custom';
 import { useDispatch, useSelector } from 'react-redux';
 import useReciever from 'hooks/useReceiver';
 import { MessageForm } from './MessageForm';
-import { Chip, CircularProgress } from '@material-ui/core';
+import {
+  Chip,
+  CircularProgress,
+  Hidden,
+  ListItem,
+  ListItemIcon,
+  ListItemText
+} from '@material-ui/core';
 import { loadMoreMessages } from 'redux/ducks/messagesDuck';
 import VisibilitySensor from 'react-visibility-sensor';
 
 import IconButton from '@material-ui/core/IconButton';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import { setMessagesState } from 'redux/ducks/messagesDuck';
 import { Loading } from 'components/Loading/Loading';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   table: {
     minWidth: 650
   },
@@ -43,10 +51,16 @@ const useStyles = makeStyles({
     left: '42%',
     top: '5px',
     zIndex: 5
+  },
+  scrollbar: {
+    height: `calc(100% - 90px) !important`,
+    [theme.breakpoints.down('sm')]: {
+      height: `calc(100% - 155px) !important`
+    }
   }
-});
+}));
 
-const Chat = ({ rid }) => {
+const Chat = ({ rid, show, setShow }) => {
   const classes = useStyles();
 
   const messageEndRef = useRef(null);
@@ -103,7 +117,26 @@ const Chat = ({ rid }) => {
         </Box>
       ) : (
         <>
-          <Scrollbar style={{ height: `calc(100% - 90px)` }}>
+          <Hidden mdUp>
+            {!show && (
+              // <Grid item xs={12}>
+              <List>
+                <ListItem button key="RemySharp" onClick={() => setShow(true)}>
+                  <ListItemIcon>
+                    <ArrowBackIosIcon />
+                  </ListItemIcon>
+                  {recipient.id && (
+                    <ListItemText
+                      primary={`${recipient.get('firstName')} ${recipient.get('firstName')}`}
+                    />
+                  )}
+                </ListItem>
+                <Divider />
+              </List>
+              // </Grid>
+            )}
+          </Hidden>
+          <Scrollbar className={classes.scrollbar}>
             <List className={classes.messageArea}>
               {count > messages.length && (
                 <Box display="flex" justifyContent="center" mt={3}>
