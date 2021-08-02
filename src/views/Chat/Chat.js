@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Divider from '@material-ui/core/Divider';
@@ -14,6 +14,7 @@ import { MessageForm } from './MessageForm';
 import {
   Chip,
   CircularProgress,
+  Grid,
   Hidden,
   ListItem,
   ListItemIcon,
@@ -27,7 +28,7 @@ import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import { setMessagesState } from 'redux/ducks/messagesDuck';
 import { Loading } from 'components/Loading/Loading';
-import Test from './Test';
+import { MessageContext } from './Messages';
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -40,6 +41,7 @@ const useStyles = makeStyles(theme => ({
     borderRight: '1px solid #e0e0e0'
   },
   messageArea: {
+    position: 'relative'
     // height: '75vh'
     // overflowY: 'auto'
   },
@@ -61,9 +63,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Chat = ({ rid, show, setShow }) => {
+const Chat = () => {
   const classes = useStyles();
-
+  const { setOpenDialog, rid } = useContext(MessageContext);
   const messageEndRef = useRef(null);
   const [currentUser] = useState(Parse.User.current());
 
@@ -106,7 +108,6 @@ const Chat = ({ rid, show, setShow }) => {
 
   return (
     <>
-      <Test />
       {Object.keys(recipient).length === 0 ? (
         <Box className={classes.disable} height="100%" position="relative">
           <Loading position={{ top: '50%', left: '50%' }} />
@@ -120,10 +121,9 @@ const Chat = ({ rid, show, setShow }) => {
       ) : (
         <>
           <Hidden mdUp>
-            {!show && (
-              // <Grid item xs={12}>
+            <Grid item xs={12}>
               <List>
-                <ListItem button key="RemySharp" onClick={() => setShow(true)}>
+                <ListItem button key="RemySharp" onClick={() => setOpenDialog(true)}>
                   <ListItemIcon>
                     <ArrowBackIosIcon />
                   </ListItemIcon>
@@ -135,11 +135,10 @@ const Chat = ({ rid, show, setShow }) => {
                 </ListItem>
                 <Divider />
               </List>
-              // </Grid>
-            )}
+            </Grid>
           </Hidden>
           <Scrollbar className={classes.scrollbar}>
-            <List className={classes.messageArea} id="appContainerDiv">
+            <List className={classes.messageArea}>
               {count > messages.length && (
                 <Box display="flex" justifyContent="center" mt={3}>
                   <LoadMoreButton handleLodMore={handleLodMore} loading={loading} />

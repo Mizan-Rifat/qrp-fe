@@ -159,7 +159,7 @@ export const fetchMessages = (rid, page) => async dispatch => {
     });
     dispatch(messagesFetched(messages));
   } catch (err) {
-    dispatch(setErrors(err));
+    return err;
   }
 };
 

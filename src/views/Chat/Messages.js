@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, createContext, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -16,10 +16,12 @@ import ContactsList from './ContactsList';
 import Chat from './Chat';
 import usePresence from 'hooks/usePresence';
 import Parse from 'parse';
-import { Hidden, Slide } from '@material-ui/core';
+import { Button, Hidden, Slide } from '@material-ui/core';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import { useSelector } from 'react-redux';
 import Scrollbar from 'react-scrollbars-custom';
+import Test from './Test';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles({
   table: {
@@ -39,16 +41,13 @@ const useStyles = makeStyles({
   }
 });
 
+export const MessageContext = createContext();
+
 const Messages = () => {
   const classes = useStyles();
 
-  const [chatState, setChatState] = useState({
-    rid,
-    currentUser,
-    recipient
-  });
-
   const [rid, setRid] = useQueryState('rid', '');
+  const [openDialog, setOpenDialog] = useState(false);
 
   const currentUser = Parse.User.current();
 
@@ -57,62 +56,64 @@ const Messages = () => {
   console.log({ recipient });
 
   return (
-    <Grid container component={Paper} className={classes.chatSection}>
-      <Hidden smDown>
-        <Grid item xs={3} className={classes.borderRight500}>
-          <Contacts currentUser={currentUser} rid={rid} setRid={setRid} setShow={setShow} />
-        </Grid>
-        {/* <Grid item xs={3} className={classes.borderRight500}>
-          <List>
-            <ListItem button key="RemySharp">
-              <ListItemIcon>
-                <Avatar online={true} />
-              </ListItemIcon>
-              <ListItemText primary={currentUser.get('firstName')}></ListItemText>
-            </ListItem>
-          </List>
-          <Divider />
-          <Grid item xs={12} style={{ padding: '10px' }}>
-            <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
+    <MessageContext.Provider value={{ rid, setRid, openDialog, setOpenDialog, currentUser }}>
+      <Grid container component={Paper} className={classes.chatSection}>
+        <Hidden smDown>
+          <Grid item xs={3} className={classes.borderRight500}>
+            <Contacts />
           </Grid>
-          <Divider />
-          <Scrollbar style={{ height: '80%' }}>
-            <ContactsList rid={rid} setRid={setRid} setShow={setShow} />
-          </Scrollbar>
-        </Grid> */}
-      </Hidden>
+        </Hidden>
 
-      <Grid item xs={12} md={9} style={{ height: '100%', position: 'relative' }}>
-        {rid === '' ? (
-          <Box
-            height="100%"
-            width="100%"
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Typography variant="h6" gutterBottom>
-              QRP Consulting
-            </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              Select a contact to start chat...
-            </Typography>
-          </Box>
-        ) : (
-          <>
-            <Chat rid={rid} />
-          </>
-        )}
+        <Grid
+          item
+          xs={12}
+          md={9}
+          style={{ height: '100%', position: 'relative' }}
+          id="appContainerDiv"
+        >
+          <Test />
+          {rid === '' ? (
+            <Box
+              height="100%"
+              width="100%"
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Typography variant="h6" gutterBottom>
+                QRP Consulting
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                Select a contact to start chat...
+              </Typography>
+              <Hidden mdUp>
+                <Button variant="outlined" color="primary" onClick={() => setOpenDialog(true)}>
+                  View Contacts
+                </Button>
+              </Hidden>
+            </Box>
+          ) : (
+            <>
+              <Chat currentUser={currentUser} rid={rid} setRid={setRid} />
+            </>
+          )}
+        </Grid>
       </Grid>
-    </Grid>
+    </MessageContext.Provider>
   );
 };
 
 export default Messages;
 
-export const Contacts = ({ currentUser, rid, setRid, setShow }) => {
+export const Contacts = () => {
   const classes = useStyles();
+
+  const { currentUser } = useContext(MessageContext);
+
+  useEffect(() => {
+    console.log('dsgf');
+  }, []);
   return (
     <>
       <List>
@@ -124,12 +125,12 @@ export const Contacts = ({ currentUser, rid, setRid, setShow }) => {
         </ListItem>
       </List>
       <Divider />
-      <Grid item xs={12} style={{ padding: '10px' }}>
+      <Grid item style={{ padding: '10px' }}>
         <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
       </Grid>
       <Divider />
       <Scrollbar style={{ height: '80%' }}>
-        <ContactsList rid={rid} setRid={setRid} setShow={setShow} />
+        <ContactsList />
       </Scrollbar>
     </>
   );

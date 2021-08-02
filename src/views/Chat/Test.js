@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -10,7 +10,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
-import { Contacts } from './Messages';
+import { Contacts, MessageContext } from './Messages';
 
 const useStyles = makeStyles({
   list: {
@@ -27,25 +27,22 @@ const useStyles = makeStyles({
 
 export default function TemporaryDrawer() {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
+  const { openDialog, setOpenDialog } = useContext(MessageContext);
 
   return (
-    <>
-      <Button onClick={() => setOpen(true)}>Click</Button>
-      <Drawer
-        anchor="left"
-        classes={{
-          paper: classes.paper
-        }}
-        open={open}
-        onClose={() => setOpen(false)}
-        ModalProps={{
-          container: document.getElementById('appContainerDiv'),
-          style: { position: 'absolute' }
-        }}
-      >
-        <Contacts />
-      </Drawer>
-    </>
+    <Drawer
+      anchor="left"
+      classes={{
+        paper: classes.paper
+      }}
+      open={openDialog}
+      onClose={() => setOpenDialog(false)}
+      ModalProps={{
+        container: document.getElementById('appContainerDiv'),
+        style: { position: 'absolute' }
+      }}
+    >
+      <Contacts />
+    </Drawer>
   );
 }
