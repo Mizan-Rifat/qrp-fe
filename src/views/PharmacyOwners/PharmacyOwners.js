@@ -14,7 +14,6 @@ const PharmacyOwners = () => {
   useEffect(async () => {
     if (pharmacyOwners.length <= 0) {
       dispatch(fetchUsers(type, 'pharmacyOwners')).catch(err => {
-        console.log({ err });
         toast(err.message, 'error');
       });
     }

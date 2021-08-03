@@ -66,9 +66,6 @@ const useReciever = rid => {
           }
         }
       });
-      channel.bind('bal', async data => {
-        console.log({ data });
-      });
       channel.bind('client-typing', function (data) {
         dispatch(setMessagesState('events', { ...events, typing: data.typing }));
       });

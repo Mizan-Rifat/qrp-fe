@@ -86,7 +86,6 @@ const Chat = () => {
   const handleLodMore = () => {
     setPage(page + 1);
     dispatch(loadMoreMessages(rid, page + 1)).catch(err => {
-      console.log({ err });
       toast(err.message, 'error');
     });
   };
@@ -112,7 +111,6 @@ const Chat = () => {
     setPage(1);
     if (rid !== '') {
       dispatch(fetchMessages(rid, 1)).catch(err => {
-        console.log({ err });
         toast(err.message, 'error');
       });
     }

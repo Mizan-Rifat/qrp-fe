@@ -53,8 +53,6 @@ const Messages = () => {
 
   const { recipient } = useSelector(state => state.messages);
 
-  console.log({ recipient });
-
   return (
     <MessageContext.Provider value={{ rid, setRid, openDialog, setOpenDialog, currentUser }}>
       <Grid container component={Paper} className={classes.chatSection}>
@@ -111,9 +109,6 @@ export const Contacts = () => {
 
   const { currentUser } = useContext(MessageContext);
 
-  useEffect(() => {
-    console.log('dsgf');
-  }, []);
   return (
     <>
       <List>

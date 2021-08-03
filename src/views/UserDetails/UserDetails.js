@@ -139,7 +139,6 @@ const UserDetails = () => {
   );
   useEffect(() => {
     dispatch(fetchUser(id)).catch(err => {
-      console.log({ err });
       toast(err.message, 'error');
     });
 
