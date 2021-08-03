@@ -6,10 +6,11 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from './Avatar';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchContacts } from 'redux/ducks/contactsDuck';
 import { Badge, Box, CircularProgress, ListItemSecondaryAction } from '@material-ui/core';
 import { Loading } from 'components/Loading/Loading';
 import { MessageContext } from './Messages';
+import useNotify from 'hooks/useNotify';
+import { setContactsError } from 'redux/ducks/contactsDuck';
 
 const useStyles = makeStyles(theme => ({
   secondary: {
@@ -20,14 +21,31 @@ const useStyles = makeStyles(theme => ({
 
 const ContactsList = () => {
   const classes = useStyles();
-  const { contacts, fetching } = useSelector(state => state.contacts);
+  const { contacts, fetching, error } = useSelector(state => state.contacts);
+  const dispatch = useDispatch();
+  const toast = useNotify();
+
+  useEffect(() => {
+    if (Object.keys(error).length > 0) {
+      toast(error.message, 'error');
+      dispatch(setContactsError({}));
+    }
+  }, [error]);
 
   return (
     <List style={{ height: '100%', position: 'relative' }}>
       {fetching ? (
         <Loading position={{ top: '20%', left: '50%' }} />
       ) : (
-        contacts.map(user => <SingleListItem user={user} />)
+        <>
+          {contacts.length > 0 ? (
+            contacts.map(user => <SingleListItem user={user} />)
+          ) : (
+            <Box textAlign="center" color="secondary.main">
+              No Contact Available
+            </Box>
+          )}
+        </>
       )}
     </List>
   );
@@ -43,7 +61,7 @@ export const SingleListItem = ({ user }) => {
     setOpenDialog(false);
   };
   return (
-    <ListItem button selected={user.id === rid} key={user.username} onClick={handleClick}>
+    <ListItem button selected={user.id === rid} key={user.username} onClick={handleClick} divider>
       <ListItemIcon>
         <Avatar online={user.online} src={user.profilePicture} />
       </ListItemIcon>

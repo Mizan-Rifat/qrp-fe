@@ -129,7 +129,7 @@ export const Contacts = () => {
         <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
       </Grid>
       <Divider />
-      <Scrollbar style={{ height: '80%' }}>
+      <Scrollbar style={{ height: 'calc(100% - 165px)' }}>
         <ContactsList />
       </Scrollbar>
     </>

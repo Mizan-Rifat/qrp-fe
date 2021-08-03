@@ -17,15 +17,14 @@ import image from '../../assets/img/no-image.png';
 import ManagerDetails from './ManagerDetails';
 import FormDialog from 'components/Dialog/FormDialog';
 import { Loading } from 'components/Loading/Loading';
-import { setUserLoadingTrue } from 'redux/ducks/userDuck';
+import { setUserLoadingTrue, setUserLoadingFalse } from 'redux/ducks/userDuck';
 import { userUpdated } from 'redux/ducks/userDuck';
 import Parse from 'parse';
-import { setUserLoadingFalse } from 'redux/ducks/userDuck';
 import AlertDialog from 'components/Alert/Alert';
 
-import Snackbar from 'components/Snackbar/Snackbar.js';
 import QuestionnaireDialog from 'components/Dialog/QuestionnaireDialog';
 import { resetQuestionnaireState } from 'redux/ducks/questionnaireDuck';
+import useNotify from 'hooks/useNotify';
 
 const styles = {
   cardCategoryWhite: {
@@ -65,11 +64,10 @@ const UserDetails = () => {
   const history = useHistory();
 
   const [tableData, setTableData] = useState([]);
-
+  const toast = useNotify();
   const [openDialog, setOpenDialog] = useState(false);
   const [statusAlertOpen, setStatusAlertOpen] = useState(false);
   const [openQuestionnaireDialog, setOpenQuestionnaireDialog] = useState(false);
-  const [notiOpen, setNotiOpen] = useState(false);
   const [lightBox, setLightBox] = useState({
     open: false,
     images: [],
@@ -87,21 +85,25 @@ const UserDetails = () => {
     });
   };
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
     dispatch(setUserLoadingTrue());
-    Parse.Cloud.run('user-status', {
+    const res = await Parse.Cloud.run('user-status', {
       uid: id,
       status: !user.status
-    }).then(res => {
-      setUserLoadingFalse(false);
-      setNotiOpen(true);
+    }).catch(err => {
+      dispatch(setUserLoadingFalse());
+      toast(err.message, 'error');
+      return;
+    });
+    if (res) {
+      toast('Successfully updated.', 'success');
       dispatch(
         userUpdated({
           key: 'status',
           value: res.get('status')
         })
       );
-    });
+    }
   };
 
   const columns = [
@@ -136,7 +138,10 @@ const UserDetails = () => {
     </>
   );
   useEffect(() => {
-    dispatch(fetchUser(id));
+    dispatch(fetchUser(id)).catch(err => {
+      console.log({ err });
+      toast(err.message, 'error');
+    });
 
     return () => {
       dispatch(resetUserState());
@@ -231,146 +236,150 @@ const UserDetails = () => {
               </p>
             </CardHeader>
             <CardBody>
-              <Box display="flex" justifyContent="flex-end" my={5}>
-                {tableData.find(item => item.label === 'Type') &&
-                  tableData.find(item => item.label === 'Type').value.includes('pharmacyOwner') && (
-                    <Button
-                      color="success"
-                      onClick={() => setOpenDialog(!openDialog)}
-                      style={{ marginRight: 10 }}
-                    >
-                      Set Commission
-                    </Button>
-                  )}
+              {Object.keys(user).length > 0 ? (
+                <>
+                  <Box display="flex" justifyContent="flex-end" my={5}>
+                    {tableData?.find(item => item.label === 'Type') &&
+                      tableData
+                        ?.find(item => item.label === 'Type')
+                        .value.includes('pharmacyOwner') && (
+                        <Button
+                          color="success"
+                          onClick={() => setOpenDialog(!openDialog)}
+                          style={{ marginRight: 10 }}
+                        >
+                          Set Commission
+                        </Button>
+                      )}
 
-                {user.roles.some(
-                  role => role.get('name') === 'Other' || role.get('name') === 'Pharmacist'
-                ) && (
-                  <Button
-                    color="primary"
-                    onClick={() => setOpenQuestionnaireDialog(!openQuestionnaireDialog)}
-                    style={{ marginRight: 10 }}
-                  >
-                    View Questionnaire
-                  </Button>
-                )}
+                    {user?.roles?.some(
+                      role => role.get('name') === 'Other' || role.get('name') === 'Pharmacist'
+                    ) && (
+                      <Button
+                        color="primary"
+                        onClick={() => setOpenQuestionnaireDialog(!openQuestionnaireDialog)}
+                        style={{ marginRight: 10 }}
+                      >
+                        View Questionnaire
+                      </Button>
+                    )}
 
-                <Box position="relative">
-                  <Button
-                    color={user.status ? 'danger' : 'success'}
-                    onClick={() => setStatusAlertOpen(true)}
-                    disabled={loading}
-                  >
-                    {user.status ? 'Decline' : 'Approve'}
-                  </Button>
+                    <Box position="relative">
+                      <Button
+                        color={user.status ? 'danger' : 'success'}
+                        onClick={() => setStatusAlertOpen(true)}
+                        disabled={loading}
+                      >
+                        {user.status ? 'Decline' : 'Approve'}
+                      </Button>
 
-                  {loading && (
-                    <Box position="absolute" top="33%" left="39%">
-                      <CircularProgress size={16} />
+                      {loading && (
+                        <Box position="absolute" top="33%" left="39%">
+                          <CircularProgress size={16} />
+                        </Box>
+                      )}
                     </Box>
-                  )}
-                </Box>
-              </Box>
-              <Grid container>
-                <Grid item xs={12} md={6}>
-                  <MaterialTable
-                    style={{ boxShadow: 'unset', background: 'unset' }}
-                    title=""
-                    columns={columns}
-                    data={tableData.slice(0, 11)}
-                    isLoading={fetching}
-                    options={{
-                      paging: false,
-                      header: false,
-                      search: false,
-                      toolbar: false
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <MaterialTable
-                    style={{ boxShadow: 'unset', background: 'unset' }}
-                    title=""
-                    columns={columns}
-                    data={tableData.slice(11, tableData.length)}
-                    isLoading={fetching}
-                    options={{
-                      paging: false,
-                      header: false,
-                      search: false,
-                      toolbar: false
-                    }}
-                  />
-                </Grid>
-              </Grid>
+                  </Box>
+                  <Grid container>
+                    <Grid item xs={12} md={6}>
+                      <MaterialTable
+                        style={{ boxShadow: 'unset', background: 'unset' }}
+                        title=""
+                        columns={columns}
+                        data={tableData.slice(0, 11)}
+                        isLoading={fetching}
+                        options={{
+                          paging: false,
+                          header: false,
+                          search: false,
+                          toolbar: false
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <MaterialTable
+                        style={{ boxShadow: 'unset', background: 'unset' }}
+                        title=""
+                        columns={columns}
+                        data={tableData.slice(11, tableData.length)}
+                        isLoading={fetching}
+                        options={{
+                          paging: false,
+                          header: false,
+                          search: false,
+                          toolbar: false
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
 
-              <Grid container spacing={3} style={{ paddingLeft: 12 }}>
-                <Grid item xs={12} sm={4}>
-                  <Picture
-                    label="Profile Picture"
-                    src={user.profilePicture ? user.profilePicture : image}
-                    handleImageClick={handleImageClick}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Picture
-                    label="Govt Photo Id"
-                    src={user.govPhotoId ? user.govPhotoId : image}
-                    handleImageClick={handleImageClick}
-                  />
-                </Grid>
-
-                {tableData.find(item => item.label === 'Type') &&
-                  tableData.find(item => item.label === 'Type').value.includes('pharmacyOwner') && (
+                  <Grid container spacing={3} style={{ paddingLeft: 12 }}>
                     <Grid item xs={12} sm={4}>
                       <Picture
-                        label="Pharmacy Banner"
-                        src={user.pharmacyBanner ? user.pharmacyBanner : image}
+                        label="Profile Picture"
+                        src={user.profilePicture ? user.profilePicture : image}
                         handleImageClick={handleImageClick}
                       />
                     </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Picture
+                        label="Govt Photo Id"
+                        src={user.govPhotoId ? user.govPhotoId : image}
+                        handleImageClick={handleImageClick}
+                      />
+                    </Grid>
+
+                    {tableData.find(item => item.label === 'Type') &&
+                      tableData
+                        .find(item => item.label === 'Type')
+                        .value.includes('pharmacyOwner') && (
+                        <Grid item xs={12} sm={4}>
+                          <Picture
+                            label="Pharmacy Banner"
+                            src={user.pharmacyBanner ? user.pharmacyBanner : image}
+                            handleImageClick={handleImageClick}
+                          />
+                        </Grid>
+                      )}
+                  </Grid>
+
+                  {user.hasOwnProperty('manager') && (
+                    <ManagerDetails fetching={fetching} manager={user.manager} />
                   )}
-              </Grid>
 
-              {user.hasOwnProperty('manager') && (
-                <ManagerDetails fetching={fetching} manager={user.manager} />
+                  <FormDialog
+                    open={openDialog}
+                    setOpen={setOpenDialog}
+                    uid={id}
+                    value={user.commission}
+                  />
+
+                  {openQuestionnaireDialog && (
+                    <QuestionnaireDialog
+                      open={openQuestionnaireDialog}
+                      setOpen={setOpenQuestionnaireDialog}
+                      user={user}
+                      parseUser={parseUser}
+                      value={user.commission}
+                    />
+                  )}
+                  {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
+                  <AlertDialog
+                    open={statusAlertOpen}
+                    setOpen={setStatusAlertOpen}
+                    handleAgree={handleApprove}
+                    message={
+                      user.status
+                        ? 'Are you sure to decline this user?'
+                        : 'Are you sure to approve this user?'
+                    }
+                  />
+                </>
+              ) : (
+                <Box textAlign="center">
+                  <h3>No user found</h3>
+                </Box>
               )}
-
-              <FormDialog
-                open={openDialog}
-                setOpen={setOpenDialog}
-                uid={id}
-                value={user.commission}
-              />
-
-              {openQuestionnaireDialog && (
-                <QuestionnaireDialog
-                  open={openQuestionnaireDialog}
-                  setOpen={setOpenQuestionnaireDialog}
-                  user={user}
-                  parseUser={parseUser}
-                  value={user.commission}
-                />
-              )}
-              {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
-              <AlertDialog
-                open={statusAlertOpen}
-                setOpen={setStatusAlertOpen}
-                handleAgree={handleApprove}
-                message={
-                  user.status
-                    ? 'Are you sure to decline this user?'
-                    : 'Are you sure to approve this user?'
-                }
-              />
-              <Snackbar
-                place="tr"
-                color="success"
-                message="Successfully updated."
-                open={notiOpen}
-                closeNotification={() => setNotiOpen(false)}
-                close
-              />
             </CardBody>
           </Card>
         </>

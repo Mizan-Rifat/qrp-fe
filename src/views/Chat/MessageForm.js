@@ -8,78 +8,106 @@ import AttachmentIcon from '@material-ui/icons/Attachment';
 import bgImage from 'assets/img/sidebar-2.jpg';
 import CloseIcon from '@material-ui/icons/Close';
 import useNotify from '../../hooks/useNotify';
+import classNames from 'classnames';
 
 const useStyles = makeStyles(theme => ({
   closeButton: {
     position: 'absolute',
     top: -15,
     right: -15
+  },
+  disable: {
+    pointerEvents: 'none',
+    opacity: 0.5
   }
 }));
 
 export const MessageForm = ({ currentUser, receiver, channel }) => {
   const classes = useStyles();
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   const [attachment, setAttachment] = useState(null);
   const toast = useNotify();
   const dispatch = useDispatch();
 
   const ref = useRef();
 
+  const submitForm = async data => {
+    const { receiver, currentUser, message, channel, attachment } = data;
+
+    const Messages = Parse.Object.extend('Messages');
+    const msg = new Messages();
+
+    msg.set('messageTo', receiver);
+    msg.set('messageFrom', currentUser);
+    msg.set('message', message);
+    msg.set('seen', false);
+    msg.set('channel', channel.name);
+
+    if (attachment) {
+      let name = attachment.name;
+      name = name.replace(/[ ,]+/g, '-');
+      console.log({ name });
+      const parseFile = new Parse.File(name, attachment);
+
+      await parseFile.save().catch(err => {
+        console.log({ err });
+        return Promise.reject(err);
+      });
+      msg.set('attachment', parseFile?._url);
+    }
+
+    const response = await msg.save().catch(err => {
+      console.log({ err });
+      return Promise.reject(err);
+    });
+
+    return Promise.resolve(response);
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
 
     if (message.trim() !== '' || attachment) {
-      console.log('sds');
+      setLoading(true);
       ref.current.blur();
 
-      const Messages = Parse.Object.extend('Messages');
-      const msg = new Messages();
-
-      console.log({ currentUser });
-
-      msg.set('messageTo', receiver);
-      msg.set('messageFrom', currentUser);
-      msg.set('message', message);
-      msg.set('seen', false);
-      msg.set('channel', channel.name);
-
-      if (attachment) {
-        let name = attachment.name;
-        name = name.replace(/[ ,]+/g, '-');
-        console.log({ name });
-        const parseFile = new Parse.File(name, attachment);
-
-        try {
-          await parseFile.save();
-        } catch (error) {
-          console.log({ error });
-          toast(error.message, 'error');
-          return;
-        }
-
-        console.log(parseFile._url);
-        msg.set('attachment', parseFile._url);
-      }
-
-      const response = await msg.save().catch(err => {
+      const response = await submitForm({
+        receiver,
+        currentUser,
+        message,
+        channel,
+        attachment
+      }).catch(err => {
         console.log({ err });
+        if (err.code !== 130) {
+          toast(err.message, 'error');
+        } else {
+          toast(err.message.code, 'error');
+        }
+        setLoading(false);
       });
 
-      if (!receiver.get('online') && receiver.get('deviceId')) {
-        const messages = Parse.Cloud.run('sendPush', {
-          include_player_ids: receiver.get('deviceId'),
-          heading: `${currentUser.get('firstName')} ${currentUser.get(
-            'lastName'
-          )} send you a message.`,
-          message,
-          type: 'message'
-        });
+      console.log({ response });
+
+      if (response) {
+        if (!receiver.get('online') && receiver.get('deviceId')) {
+          const messages = Parse.Cloud.run('sendPush', {
+            include_player_ids: receiver.get('deviceId'),
+            heading: `${currentUser.get('firstName')} ${currentUser.get(
+              'lastName'
+            )} send you a message.`,
+            message,
+            type: 'message'
+          });
+        }
+
+        setMessage('');
+        setAttachment(null);
+        dispatch(receiveMessage({ id: response.id, ...response.attributes }));
       }
 
-      setMessage('');
-      setAttachment(null);
-      dispatch(receiveMessage({ id: response.id, ...response.attributes }));
+      setLoading(false);
     }
   };
 
@@ -124,9 +152,9 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
           </Fab>
         </Box>
       )}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className={classNames({ [classes.disable]: loading })}>
         <Grid container spacing={0} alignItems="center">
-          <Grid xs={1} item container justify="center">
+          <Grid xs={2} sm={1} item container justify="center">
             <input
               accept="image/*"
               className={classes.input}
@@ -136,12 +164,12 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
               onChange={handleUploadChange}
             />
             <label htmlFor="icon-button-file">
-              <IconButton color="primary" component="span">
+              <IconButton color="primary" component="span" size="small">
                 <AttachmentIcon />
               </IconButton>
             </label>
           </Grid>
-          <Grid item xs={10}>
+          <Grid item xs={8} sm={10}>
             <TextField
               id="outlined-basic-email"
               label="Type Something"
@@ -156,7 +184,7 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
               size="small"
             />
           </Grid>
-          <Grid xs={1} item container justify="center">
+          <Grid xs={2} sm={1} item container justify="center">
             <Fab color="primary" aria-label="add" size="small" type="submit">
               <SendIcon />
             </Fab>

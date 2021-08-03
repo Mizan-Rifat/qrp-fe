@@ -29,6 +29,8 @@ import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import { setMessagesState } from 'redux/ducks/messagesDuck';
 import { Loading } from 'components/Loading/Loading';
 import { MessageContext } from './Messages';
+import useNotify from 'hooks/useNotify';
+import { fetchMessages } from 'redux/ducks/messagesDuck';
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -68,6 +70,7 @@ const Chat = () => {
   const { setOpenDialog, rid } = useContext(MessageContext);
   const messageEndRef = useRef(null);
   const [currentUser] = useState(Parse.User.current());
+  const toast = useNotify();
 
   const [page, setPage] = useState(1);
   const [visibility, setVisibility] = useState(true);
@@ -82,7 +85,10 @@ const Chat = () => {
 
   const handleLodMore = () => {
     setPage(page + 1);
-    dispatch(loadMoreMessages(rid, page + 1));
+    dispatch(loadMoreMessages(rid, page + 1)).catch(err => {
+      console.log({ err });
+      toast(err.message, 'error');
+    });
   };
 
   const handleVisibilityChange = isVisible => {
@@ -104,11 +110,17 @@ const Chat = () => {
 
   useEffect(() => {
     setPage(1);
+    if (rid !== '') {
+      dispatch(fetchMessages(rid, 1)).catch(err => {
+        console.log({ err });
+        toast(err.message, 'error');
+      });
+    }
   }, [rid]);
 
   return (
     <>
-      {Object.keys(recipient).length === 0 ? (
+      {fetching ? (
         <Box className={classes.disable} height="100%" position="relative">
           <Loading position={{ top: '50%', left: '50%' }} />
         </Box>
@@ -138,6 +150,11 @@ const Chat = () => {
             </Grid>
           </Hidden>
           <Scrollbar className={classes.scrollbar}>
+            {messages.length === 0 && (
+              <Box textAlign="center" mt={8}>
+                <p style={{ fontWeight: 400 }}>Start New Conversation...</p>
+              </Box>
+            )}
             <List className={classes.messageArea}>
               {count > messages.length && (
                 <Box display="flex" justifyContent="center" mt={3}>
@@ -182,6 +199,7 @@ const Chat = () => {
               </Box>
             )}
             <Divider />
+
             <MessageForm receiver={recipient} currentUser={currentUser} channel={channel} />
           </Box>
         </>
