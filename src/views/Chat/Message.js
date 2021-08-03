@@ -4,10 +4,14 @@ import Avatar from './Avatar';
 import dayjs from 'dayjs';
 import Parse from 'parse';
 import { useSelector } from 'react-redux';
+import classNames from 'classnames';
 
 const useStyles = makeStyles(theme => ({
+  listItem: {
+    justifyContent: 'flex-end'
+  },
   listItemText: {
-    marginRight: 16,
+    // marginRight: 16,
     textAlign: ({ isIncoming }) => (isIncoming ? 'left' : 'right')
   },
   listItemTextPrimary: {
@@ -31,7 +35,7 @@ const useStyles = makeStyles(theme => ({
   image: {
     height: 150,
     width: 250,
-    borderRadius: ({ isIncoming }) => (isIncoming ? '8px 0 8px 8px' : '0 8px 8px 8px'),
+    borderRadius: ({ isIncoming }) => (isIncoming ? '0 8px 8px 8px' : '8px 0 8px 8px'),
     objectFit: 'cover',
     objectPosition: 'center'
   }
@@ -51,7 +55,7 @@ const Message = ({ message, receiver }) => {
   const classes = useStyles({ isIncoming, badgeColor: online ? 'warning' : 'secondary' });
 
   return (
-    <ListItem alignItems="flex-start">
+    <ListItem alignItems="flex-start" className={classNames({ [classes.listItem]: !isIncoming })}>
       {isIncoming && (
         <ListItemAvatar>
           <Avatar
@@ -60,18 +64,23 @@ const Message = ({ message, receiver }) => {
           />
         </ListItemAvatar>
       )}
-      <ListItemText
-        classes={{
-          root: classes.listItemText,
-          primary: classes.listItemTextPrimary,
-          secondary: classes.listItemTextSecondary
-        }}
-        primary={message.message}
-        secondary={`${
-          isIncoming ? receiver.get('firstName') : currentUser.get('firstName')
-        }, ${dayjs(message.createdAt).format('hh:mm A, MMM DD')}`}
-      />
-      {/* <img src={imagine1} alt="" className={classes.image} /> */}
+      <div className="">
+        {message.attachment && <img src={message.attachment} alt="" className={classes.image} />}
+
+        {message.message && (
+          <ListItemText
+            classes={{
+              root: classes.listItemText,
+              primary: classes.listItemTextPrimary,
+              secondary: classes.listItemTextSecondary
+            }}
+            primary={message.message}
+            secondary={`${
+              isIncoming ? receiver.get('firstName') : currentUser.get('firstName')
+            }, ${dayjs(message.createdAt).format('hh:mm A, MMM DD')}`}
+          />
+        )}
+      </div>
     </ListItem>
   );
 };

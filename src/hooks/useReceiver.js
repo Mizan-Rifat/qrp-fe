@@ -40,7 +40,6 @@ const useReciever = rid => {
 
   useEffect(async () => {
     if (rid !== '') {
-      dispatch(fetchMessages(rid, 1)).catch(err => {});
       const cha = await pusher.subscribe(`private-${channelName}`);
       dispatch(setMessagesState('channel', cha));
       const rec = await userQuery.get(rid);
@@ -66,6 +65,9 @@ const useReciever = rid => {
             dispatch(receiveMessage({ id: data.objectId, ...data }));
           }
         }
+      });
+      channel.bind('bal', async data => {
+        console.log({ data });
       });
       channel.bind('client-typing', function (data) {
         dispatch(setMessagesState('events', { ...events, typing: data.typing }));

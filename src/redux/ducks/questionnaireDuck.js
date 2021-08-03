@@ -72,7 +72,10 @@ export const fetchQuestionnaire = user => async dispatch => {
   const questionnairesQuery = new Parse.Query(Questionnaires);
 
   questionnairesQuery.equalTo('userId', user);
-  const questionnaires = await questionnairesQuery.find();
+  const questionnaires = await questionnairesQuery.find().catch(err => {
+    dispatch({ type: FETCHING_FALSE });
+    return Promise.reject(err);
+  });
 
   dispatch(
     questionnaireFetched(

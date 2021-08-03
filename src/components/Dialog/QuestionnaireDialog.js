@@ -103,7 +103,7 @@ export default function QuestionnaireDialog({ user, parseUser, open, setOpen }) 
     setOpen(false);
   };
 
-  const [questions, setQuestions] = useState(null);
+  const [questions, setQuestions] = useState([]);
 
   const { questionnaire, fetching } = useSelector(state => state.questionnaire);
 
@@ -147,23 +147,31 @@ export default function QuestionnaireDialog({ user, parseUser, open, setOpen }) 
           Questionnaire
         </DialogTitle>
         <DialogContent dividers style={{ minHeight: 250 }}>
-          {questions &&
-            questions.map(question => (
-              <Box mb={1}>
-                <h6 style={{ margin: 0, textTransform: 'unset' }}>
-                  <span style={{ fontWeight: 400, textTransform: 'capitalize' }}>Question :</span>{' '}
-                  {question.label}
-                </h6>
-                <p style={{ margin: 0 }}>
-                  <span style={{ fontWeight: 400 }}>Answer : </span>
-                  {question.answer}
-                </p>
-              </Box>
-            ))}
-          {fetching && (
+          {fetching ? (
             <Box position="absolute" top="50%" left="47%">
               <CircularProgress />
             </Box>
+          ) : (
+            <>
+              {questions.length > 0 ? (
+                questions.map(question => (
+                  <Box mb={1}>
+                    <h6 style={{ margin: 0, textTransform: 'unset' }}>
+                      <span style={{ fontWeight: 400, textTransform: 'capitalize' }}>
+                        Question :
+                      </span>{' '}
+                      {question.label}
+                    </h6>
+                    <p style={{ margin: 0 }}>
+                      <span style={{ fontWeight: 400 }}>Answer : </span>
+                      {question.answer}
+                    </p>
+                  </Box>
+                ))
+              ) : (
+                <Box textAlign="center">No questionnaire found.</Box>
+              )}
+            </>
           )}
         </DialogContent>
       </Dialog>

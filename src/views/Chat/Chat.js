@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Divider from '@material-ui/core/Divider';
@@ -11,22 +11,30 @@ import Scrollbar from 'react-scrollbars-custom';
 import { useDispatch, useSelector } from 'react-redux';
 import useReciever from 'hooks/useReceiver';
 import { MessageForm } from './MessageForm';
-import { Chip, CircularProgress } from '@material-ui/core';
+import {
+  Chip,
+  CircularProgress,
+  Grid,
+  Hidden,
+  ListItem,
+  ListItemIcon,
+  ListItemText
+} from '@material-ui/core';
 import { loadMoreMessages } from 'redux/ducks/messagesDuck';
 import VisibilitySensor from 'react-visibility-sensor';
 
 import IconButton from '@material-ui/core/IconButton';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import { setMessagesState } from 'redux/ducks/messagesDuck';
 import { Loading } from 'components/Loading/Loading';
+import { MessageContext } from './Messages';
+import useNotify from 'hooks/useNotify';
+import { fetchMessages } from 'redux/ducks/messagesDuck';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   table: {
     minWidth: 650
-  },
-  chatSection: {
-    width: '100%',
-    height: '85vh'
   },
   headBG: {
     backgroundColor: '#e0e0e0'
@@ -35,6 +43,7 @@ const useStyles = makeStyles({
     borderRight: '1px solid #e0e0e0'
   },
   messageArea: {
+    position: 'relative'
     // height: '75vh'
     // overflowY: 'auto'
   },
@@ -47,14 +56,21 @@ const useStyles = makeStyles({
     left: '42%',
     top: '5px',
     zIndex: 5
+  },
+  scrollbar: {
+    height: `calc(100% - 90px) !important`,
+    [theme.breakpoints.down('sm')]: {
+      height: `calc(100% - 155px) !important`
+    }
   }
-});
+}));
 
-const Chat = ({ rid }) => {
+const Chat = () => {
   const classes = useStyles();
-
+  const { setOpenDialog, rid } = useContext(MessageContext);
   const messageEndRef = useRef(null);
   const [currentUser] = useState(Parse.User.current());
+  const toast = useNotify();
 
   const [page, setPage] = useState(1);
   const [visibility, setVisibility] = useState(true);
@@ -69,7 +85,10 @@ const Chat = ({ rid }) => {
 
   const handleLodMore = () => {
     setPage(page + 1);
-    dispatch(loadMoreMessages(rid, page + 1));
+    dispatch(loadMoreMessages(rid, page + 1)).catch(err => {
+      console.log({ err });
+      toast(err.message, 'error');
+    });
   };
 
   const handleVisibilityChange = isVisible => {
@@ -91,11 +110,17 @@ const Chat = ({ rid }) => {
 
   useEffect(() => {
     setPage(1);
+    if (rid !== '') {
+      dispatch(fetchMessages(rid, 1)).catch(err => {
+        console.log({ err });
+        toast(err.message, 'error');
+      });
+    }
   }, [rid]);
 
   return (
     <>
-      {Object.keys(recipient).length === 0 ? (
+      {fetching ? (
         <Box className={classes.disable} height="100%" position="relative">
           <Loading position={{ top: '50%', left: '50%' }} />
         </Box>
@@ -107,7 +132,29 @@ const Chat = ({ rid }) => {
         </Box>
       ) : (
         <>
-          <Scrollbar style={{ height: `calc(100% - 90px)` }}>
+          <Hidden mdUp>
+            <Grid item xs={12}>
+              <List>
+                <ListItem button key="RemySharp" onClick={() => setOpenDialog(true)}>
+                  <ListItemIcon>
+                    <ArrowBackIosIcon />
+                  </ListItemIcon>
+                  {recipient.id && (
+                    <ListItemText
+                      primary={`${recipient.get('firstName')} ${recipient.get('firstName')}`}
+                    />
+                  )}
+                </ListItem>
+                <Divider />
+              </List>
+            </Grid>
+          </Hidden>
+          <Scrollbar className={classes.scrollbar}>
+            {messages.length === 0 && (
+              <Box textAlign="center" mt={8}>
+                <p style={{ fontWeight: 400 }}>Start New Conversation...</p>
+              </Box>
+            )}
             <List className={classes.messageArea}>
               {count > messages.length && (
                 <Box display="flex" justifyContent="center" mt={3}>
@@ -152,6 +199,7 @@ const Chat = ({ rid }) => {
               </Box>
             )}
             <Divider />
+
             <MessageForm receiver={recipient} currentUser={currentUser} channel={channel} />
           </Box>
         </>

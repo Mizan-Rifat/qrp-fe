@@ -151,16 +151,15 @@ export const setMessagesState = (key, value) => {
 
 export const fetchMessages = (rid, page) => async dispatch => {
   dispatch({ type: FETCHING_TRUE });
-  try {
-    const messages = await Parse.Cloud.run('messages', {
-      rid,
-      page,
-      limit: 10
-    });
-    dispatch(messagesFetched(messages));
-  } catch (err) {
-    dispatch(setErrors(err));
-  }
+  const messages = await Parse.Cloud.run('messages', {
+    rid,
+    page,
+    limit: 10
+  }).catch(err => {
+    dispatch({ type: FETCHING_FALSE });
+    return Promise.reject(err);
+  });
+  dispatch(messagesFetched(messages));
 };
 
 export const loadMoreMessages = (rid, page) => async dispatch => {
@@ -169,6 +168,9 @@ export const loadMoreMessages = (rid, page) => async dispatch => {
     rid,
     page,
     limit: 10
+  }).catch(err => {
+    dispatch({ type: FETCHING_FALSE });
+    return Promise.reject(err);
   });
   dispatch(moreMessageLoaded(messages));
 };
