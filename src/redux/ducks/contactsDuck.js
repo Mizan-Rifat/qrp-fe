@@ -9,6 +9,7 @@ const LOADING_TRUE = 'qrp/contacts/loading_true';
 const LOADING_FALSE = 'qrp/contacts/loading_false';
 const FETCHING_TRUE = 'qrp/contacts/fetching_true';
 const FETCHING_FALSE = 'qrp/contacts/fetching_false';
+const SET_ERROR = 'qrp/contacts/set_error';
 
 // reducers
 
@@ -16,7 +17,8 @@ const initState = {
   fetching: true,
   loading: false,
   contacts: [],
-  unseenMessages: 0
+  unseenMessages: 0,
+  error: {}
 };
 
 export default (state = initState, action) => {
@@ -65,6 +67,13 @@ export default (state = initState, action) => {
         ...state,
         fetching: false
       };
+    case SET_ERROR:
+      return {
+        ...state,
+        fetching: false,
+        loading: false,
+        error: action.payload
+      };
 
     default:
       return state;
@@ -85,11 +94,20 @@ export const contactsUpdated = data => {
     payload: data
   };
 };
+export const setContactsError = error => {
+  return {
+    type: SET_ERROR,
+    payload: error
+  };
+};
 
 export const fetchContacts = () => async dispatch => {
   dispatch({ type: FETCHING_TRUE });
 
-  const contacts = await Parse.Cloud.run('contacts');
+  const contacts = await Parse.Cloud.run('contacts').catch(err => {
+    dispatch(setContactsError(err));
+    return Promise.reject(err);
+  });
 
   dispatch(contactsFetched(contacts));
 };

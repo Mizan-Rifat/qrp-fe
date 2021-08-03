@@ -93,7 +93,10 @@ export const fetchUsers = (type, key) => async dispatch => {
   dispatch({ type: USERS_FETCHING_TRUE });
   const roleQuery = new Parse.Query(Parse.Role);
   roleQuery.containedIn('name', type);
-  const roles = await roleQuery.find();
+  const roles = await roleQuery.find().catch(err => {
+    dispatch({ type: USERS_FETCHING_FALSE });
+    return Promise.reject(err);
+  });
   const roleUsers = await roles.reduce(async (acc, role) => {
     acc = await acc;
     const usersQuery = role.relation('users').query();

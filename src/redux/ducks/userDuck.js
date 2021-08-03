@@ -103,10 +103,19 @@ export const resetUserState = () => {
 export const fetchUser = id => async dispatch => {
   const User = new Parse.User();
   const userQuery = new Parse.Query(User);
-  const parseUser = await userQuery.get(id);
+  const parseUser = await userQuery.get(id).catch(err => {
+    dispatch({ type: USER_FETCHING_FALSE });
+    return Promise.reject(err);
+  });
   let user = {};
 
-  const roles = await new Parse.Query(Parse.Role).equalTo('users', parseUser).find();
+  const roles = await new Parse.Query(Parse.Role)
+    .equalTo('users', parseUser)
+    .find()
+    .catch(err => {
+      dispatch({ type: USER_FETCHING_FALSE });
+      return Promise.reject(err);
+    });
 
   const isPharmacyOwner = roles.some(role => role.get('name') === 'pharmacyOwner');
 
@@ -119,7 +128,10 @@ export const fetchUser = id => async dispatch => {
       objectId: parseUser.id
     });
 
-    const manager = await managerQuery.first();
+    const manager = await managerQuery.first().catch(err => {
+      dispatch({ type: USER_FETCHING_FALSE });
+      return Promise.reject(err);
+    });
     user.manager = manager;
   }
 

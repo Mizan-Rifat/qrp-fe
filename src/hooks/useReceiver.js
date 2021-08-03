@@ -40,7 +40,6 @@ const useReciever = rid => {
 
   useEffect(async () => {
     if (rid !== '') {
-      dispatch(fetchMessages(rid, 1)).catch(err => {});
       const cha = await pusher.subscribe(`private-${channelName}`);
       dispatch(setMessagesState('channel', cha));
       const rec = await userQuery.get(rid);

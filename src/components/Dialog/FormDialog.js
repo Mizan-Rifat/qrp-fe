@@ -10,9 +10,9 @@ import { Box, CircularProgress, InputAdornment } from '@material-ui/core';
 import Parse from 'parse';
 import { makeStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
-import Snackbar from 'components/Snackbar/Snackbar.js';
 import { useDispatch } from 'react-redux';
 import { userUpdated } from 'redux/ducks/userDuck';
+import useNotify from 'hooks/useNotify';
 
 const useStyles = makeStyles({
   disable: {
@@ -33,27 +33,32 @@ export default function FormDialog({ open, setOpen, uid, value }) {
 
   const [commission, setCommission] = useState(value);
   const [loading, setLoading] = useState(false);
-  const [notiOpen, setNotiOpen] = useState(false);
 
   const dispatch = useDispatch();
+  const toast = useNotify();
 
   const handleSetCommission = async () => {
     setLoading(true);
-    Parse.Cloud.run('update-commission', {
+    const res = await Parse.Cloud.run('update-commission', {
       uid,
       commission
-    }).then(res => {
+    }).catch(err => {
+      setLoading(false);
+      toast(err.message, 'error');
+    });
+
+    if (res) {
       setCommission(res.get('commission'));
       setLoading(false);
       setOpen(false);
-      setNotiOpen(true);
       dispatch(
         userUpdated({
           key: 'commission',
           value: res.get('commission')
         })
       );
-    });
+      toast('Commission set successfully.', 'success');
+    }
   };
 
   return (
@@ -93,14 +98,6 @@ export default function FormDialog({ open, setOpen, uid, value }) {
           </Button>
         </DialogActions>
       </Dialog>
-      <Snackbar
-        place="tr"
-        color="success"
-        message="Commission set successfully."
-        open={notiOpen}
-        closeNotification={() => setNotiOpen(false)}
-        close
-      />
     </>
   );
 }
