@@ -47,18 +47,15 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
     if (attachment) {
       let name = attachment.name;
       name = name.replace(/[ ,]+/g, '-');
-      console.log({ name });
       const parseFile = new Parse.File(name, attachment);
 
       await parseFile.save().catch(err => {
-        console.log({ err });
         return Promise.reject(err);
       });
       msg.set('attachment', parseFile?._url);
     }
 
     const response = await msg.save().catch(err => {
-      console.log({ err });
       return Promise.reject(err);
     });
 
@@ -79,7 +76,6 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
         channel,
         attachment
       }).catch(err => {
-        console.log({ err });
         if (err.code !== 130) {
           toast(err.message, 'error');
         } else {
@@ -87,8 +83,6 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
         }
         setLoading(false);
       });
-
-      console.log({ response });
 
       if (response) {
         if (!receiver.get('online') && receiver.get('deviceId')) {

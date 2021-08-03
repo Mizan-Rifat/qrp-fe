@@ -14,7 +14,6 @@ const Staffs = () => {
   useEffect(async () => {
     if (staffs.length <= 0) {
       dispatch(fetchUsers(type, 'staffs')).catch(err => {
-        console.log({ err });
         toast(err.message, 'error');
       });
     }
