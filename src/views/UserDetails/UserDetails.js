@@ -180,6 +180,10 @@ const UserDetails = () => {
           label: 'Commission',
           value: user.commission ? `${user.commission}%` : 'null'
         },
+        {
+          label: 'Avg Ratings',
+          value: user.avgRatings ? user.avgRatings : '0'
+        },
         ...fields.map(field => ({
           label: sentenceCase(field),
           value: user[field]
