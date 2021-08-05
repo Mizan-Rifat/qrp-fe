@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
@@ -71,6 +71,12 @@ const Users = ({ type, title, users, fetching }) => {
       title: 'Address',
       field: 'city',
       render: rowData => `${rowData.city},${rowData.country}`
+    },
+    {
+      title: 'Avg Ratings',
+      field: 'avgRatings',
+      align: 'center',
+      render: rowData => (rowData.avgRatings ? rowData.avgRatings : 0)
     }
   ];
 

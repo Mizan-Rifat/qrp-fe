@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -14,14 +14,11 @@ import Avatar from './Avatar';
 import { useQueryState } from 'react-router-use-location-state';
 import ContactsList from './ContactsList';
 import Chat from './Chat';
-import usePresence from 'hooks/usePresence';
 import Parse from 'parse';
 import { Button, Hidden, Slide } from '@material-ui/core';
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import { useSelector } from 'react-redux';
 import Scrollbar from 'react-scrollbars-custom';
-import Test from './Test';
-import { Link } from 'react-router-dom';
+import ContactListDrawer from './ContactListDrawer';
 
 const useStyles = makeStyles({
   table: {
@@ -69,7 +66,7 @@ const Messages = () => {
           style={{ height: '100%', position: 'relative' }}
           id="appContainerDiv"
         >
-          <Test />
+          <ContactListDrawer />
           {rid === '' ? (
             <Box
               height="100%"

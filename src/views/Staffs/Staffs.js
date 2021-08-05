@@ -3,6 +3,7 @@ import Users from 'views/Users/Users';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from 'redux/ducks/usersDuck';
 import useNotify from 'hooks/useNotify';
+import { fetchEmergencyshifts } from 'redux/ducks/emergencyShiftsDuck';
 
 const Staffs = () => {
   const type = ['Pharmacist', 'Other'];
@@ -12,6 +13,7 @@ const Staffs = () => {
   const dispatch = useDispatch();
 
   useEffect(async () => {
+    dispatch(fetchEmergencyshifts());
     if (staffs.length <= 0) {
       dispatch(fetchUsers(type, 'staffs')).catch(err => {
         toast(err.message, 'error');
