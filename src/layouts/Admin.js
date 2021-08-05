@@ -10,6 +10,7 @@ import bgImage from 'assets/img/sidebar-2.jpg';
 import logo from 'assets/img/QRP_logo.png';
 import usePresence from 'hooks/usePresence';
 import loadable from '@loadable/component';
+import EmergencyShifts from 'views/EmergencyShifts/EmergencyShifts';
 
 const Messages = loadable(() => import('views/Chat/Messages'));
 const UserDetails = loadable(() => import('views/UserDetails/UserDetails'));
@@ -51,6 +52,7 @@ export default function Admin({ ...rest }) {
               <Route exact path="/user/:id" component={UserDetails} />
               <Route exact path="/pharmacy-owners" component={PharmacyOwners} />
               <Route exact path="/messages" component={Messages} />
+              <Route exact path="/emergency-shift-requests" component={EmergencyShifts} />
               <Redirect from="/" to="/staffs" />
             </Switch>
           </div>

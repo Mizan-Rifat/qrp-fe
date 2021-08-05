@@ -9,7 +9,7 @@ import CardBody from 'components/Card/CardBody.js';
 import { Box, Button as MButton, CircularProgress, Grid, makeStyles } from '@material-ui/core';
 import { ucFirst, sentenceCase } from '../../utils';
 import dayjs from 'dayjs';
-import MaterialTable, { MTableToolbar } from 'material-table';
+import MaterialTable from 'material-table';
 import Button from 'components/CustomButtons/Button.js';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import MLightBox from 'components/Lightbox/MLightBox';
@@ -103,6 +103,13 @@ const UserDetails = () => {
           value: res.get('status')
         })
       );
+
+      //send email to user
+      Parse.Cloud.run('statusUpdateByQRP', {
+        email: user.username,
+        name: user.firstName,
+        status: res.get('status') ? 'Approved' : 'Declined'
+      });
     }
   };
 
@@ -179,6 +186,10 @@ const UserDetails = () => {
         {
           label: 'Commission',
           value: user.commission ? `${user.commission}%` : 'null'
+        },
+        {
+          label: 'Avg Ratings',
+          value: user.avgRatings ? user.avgRatings : '0'
         },
         ...fields.map(field => ({
           label: sentenceCase(field),
