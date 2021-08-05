@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ListItem, ListItemText, ListItemAvatar, makeStyles, Typography } from '@material-ui/core';
+import { ListItem, ListItemText, ListItemAvatar, makeStyles } from '@material-ui/core';
 import Avatar from './Avatar';
 import dayjs from 'dayjs';
 import Parse from 'parse';

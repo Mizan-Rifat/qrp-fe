@@ -1,11 +1,8 @@
-export const getParseObject = (object, fields) =>
-  fields.reduce((acc, val) => {
-    return {
-      ...acc,
-      id: object.id,
-      [val]: object.get(val)
-    };
-  }, {});
+export const getParseObject = object => ({
+  id: object.id,
+  ...object.attributes
+});
+export const getParseObjects = objects => objects.map(object => getParseObject(object));
 
 export const ucFirst = str => {
   return str.charAt(0).toUpperCase() + str.slice(1);
