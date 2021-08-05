@@ -71,6 +71,12 @@ const Users = ({ type, title, users, fetching }) => {
       title: 'Address',
       field: 'city',
       render: rowData => `${rowData.city},${rowData.country}`
+    },
+    {
+      title: 'Avg Ratings',
+      field: 'avgRatings',
+      align: 'center',
+      render: rowData => (rowData.avgRatings ? rowData.avgRatings : 0)
     }
   ];
 
