@@ -103,6 +103,13 @@ const UserDetails = () => {
           value: res.get('status')
         })
       );
+
+      //send email to user
+      Parse.Cloud.run('statusUpdateByQRP', {
+        email: user.username,
+        name: user.firstName,
+        status: res.get('status') ? 'Approved' : 'Declined'
+      });
     }
   };
 
