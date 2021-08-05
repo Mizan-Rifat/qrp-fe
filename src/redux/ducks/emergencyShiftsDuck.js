@@ -1,5 +1,4 @@
 import Parse from 'parse';
-import { getParseObjects } from 'utils';
 //actions
 
 const EMERGENCYSHIFTS_FETCHED = 'qrp/emergencyShifts/emergencyShifts_fetched';
@@ -132,19 +131,7 @@ export const fetchEmergencyshifts = () => async dispatch => {
     return Promise.reject(err);
   });
 
-  // dispatch(
-  //   emergencyShiftsFetched(
-  //     shifts.map(shift => ({
-  //       id: shift.id,
-  //       ...shift.attributes
-  //     }))
-  //   )
-  // );
-
   dispatch(emergencyShiftsFetched(shifts));
-
-  console.log({ shifts });
-  console.log(getParseObjects(shifts));
 };
 
 export const updateEmergencyshifts = (id, status) => async (dispatch, getState) => {
