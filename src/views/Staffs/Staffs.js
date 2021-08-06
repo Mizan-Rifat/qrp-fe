@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from 'redux/ducks/usersDuck';
 import useNotify from 'hooks/useNotify';
 import { fetchEmergencyshifts } from 'redux/ducks/emergencyShiftsDuck';
+import { ConfirmationServiceProvider } from 'components/Modal/ConfirmationService';
+import { DeleteBurrito } from 'components/Modal/DeleteBurrito';
 
 const Staffs = () => {
   const type = ['Pharmacist', 'Other'];
@@ -20,7 +22,14 @@ const Staffs = () => {
       });
     }
   }, []);
-  return <Users type={type} title="Manage Staffs" users={staffs} fetching={fetching} />;
+  return (
+    <>
+      <ConfirmationServiceProvider>
+        <DeleteBurrito />
+      </ConfirmationServiceProvider>
+      <Users type={type} title="Manage Staffs" users={staffs} fetching={fetching} />
+    </>
+  );
 };
 
 export default Staffs;
