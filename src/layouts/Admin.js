@@ -12,6 +12,7 @@ import usePresence from 'hooks/usePresence';
 import loadable from '@loadable/component';
 import EmergencyShifts from 'views/EmergencyShifts/EmergencyShifts';
 import PushNotifications from 'views/PushNotifications/PushNotifications';
+import Test from 'views/Test';
 
 const Messages = loadable(() => import('views/Chat/Messages'));
 const UserDetails = loadable(() => import('views/UserDetails/UserDetails'));
@@ -55,6 +56,7 @@ export default function Admin({ ...rest }) {
               <Route exact path="/messages" component={Messages} />
               <Route exact path="/emergency-shift-requests" component={EmergencyShifts} />
               <Route exact path="/push-notification" component={PushNotifications} />
+              <Route exact path="/test" component={Test} />
               <Redirect from="/" to="/staffs" />
             </Switch>
           </div>

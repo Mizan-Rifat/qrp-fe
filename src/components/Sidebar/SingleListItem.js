@@ -81,7 +81,7 @@ export default function SingleListItem({ route, color, label = 1 }) {
               <Badge badgeContent={unseenMessages} color="secondary" />
             </ListItemSecondaryAction>
           )}
-          {route.hasOwnProperty('children') ? open ? <ExpandLess /> : <ExpandMore /> : ''}
+          {/* {route.hasOwnProperty('children') ? open ? <ExpandLess /> : <ExpandMore /> : ''} */}
         </ListItem>
       </NavLink>
       {route.hasOwnProperty('children') && (

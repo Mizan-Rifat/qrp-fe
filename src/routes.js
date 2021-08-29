@@ -30,5 +30,10 @@ export const navMenu = [
     path: '/push-notification',
     name: 'Push Notification',
     icon: NotificationsIcon
+  },
+  {
+    path: '/test',
+    name: 'Test',
+    icon: EmailIcon
   }
 ];
