@@ -24,5 +24,10 @@ export const navMenu = [
     name: 'Messages',
     icon: EmailIcon,
     badge: true
+  },
+  {
+    path: '/push-notification',
+    name: 'Push Notification',
+    icon: EmailIcon
   }
 ];
