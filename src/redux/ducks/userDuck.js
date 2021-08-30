@@ -1,5 +1,4 @@
 import Parse from 'parse';
-import { getParseObject } from 'utils';
 
 //Actions
 
@@ -109,17 +108,7 @@ export const fetchUser = id => async dispatch => {
   });
   let user = {};
 
-  const roles = await new Parse.Query(Parse.Role)
-    .equalTo('users', parseUser)
-    .find()
-    .catch(err => {
-      dispatch({ type: USER_FETCHING_FALSE });
-      return Promise.reject(err);
-    });
-
-  const isPharmacyOwner = roles.some(role => role.get('name') === 'pharmacyOwner');
-
-  if (!parseUser.get('managerAsOwner') && isPharmacyOwner) {
+  if (!parseUser.get('managerAsOwner') && parseUser.get('userType') === 'pharmacyOwner') {
     const Manager = Parse.Object.extend('pharmacyManagers');
     const managerQuery = new Parse.Query(Manager);
     managerQuery.equalTo('userId', {
@@ -134,8 +123,6 @@ export const fetchUser = id => async dispatch => {
     });
     user.manager = manager;
   }
-
-  user.roles = roles;
 
   dispatch(
     userFetched(

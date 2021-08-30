@@ -180,8 +180,8 @@ const UserDetails = () => {
           value: `${user.firstName} ${user.lastName}`
         },
         {
-          label: 'Type',
-          value: user.roles.map(role => role.get('name'))
+          label: 'User Type',
+          value: sentenceCase(user.userType)
         },
         {
           label: 'Commission',
@@ -249,22 +249,15 @@ const UserDetails = () => {
               {Object.keys(user).length > 0 ? (
                 <>
                   <Box display="flex" justifyContent="flex-end" my={5}>
-                    {tableData?.find(item => item.label === 'Type') &&
-                      tableData
-                        ?.find(item => item.label === 'Type')
-                        .value.includes('pharmacyOwner') && (
-                        <Button
-                          color="success"
-                          onClick={() => setOpenDialog(!openDialog)}
-                          style={{ marginRight: 10 }}
-                        >
-                          Set Commission
-                        </Button>
-                      )}
-
-                    {user?.roles?.some(
-                      role => role.get('name') === 'Other' || role.get('name') === 'Pharmacist'
-                    ) && (
+                    {user.userType === 'pharmacyOwner' ? (
+                      <Button
+                        color="success"
+                        onClick={() => setOpenDialog(!openDialog)}
+                        style={{ marginRight: 10 }}
+                      >
+                        Set Commission
+                      </Button>
+                    ) : (
                       <Button
                         color="primary"
                         onClick={() => setOpenQuestionnaireDialog(!openQuestionnaireDialog)}
@@ -339,18 +332,15 @@ const UserDetails = () => {
                       />
                     </Grid>
 
-                    {tableData.find(item => item.label === 'Type') &&
-                      tableData
-                        .find(item => item.label === 'Type')
-                        .value.includes('pharmacyOwner') && (
-                        <Grid item xs={12} sm={4}>
-                          <Picture
-                            label="Pharmacy Banner"
-                            src={user.pharmacyBanner ? user.pharmacyBanner : image}
-                            handleImageClick={handleImageClick}
-                          />
-                        </Grid>
-                      )}
+                    {user.userType === 'pharmacyOwner' && (
+                      <Grid item xs={12} sm={4}>
+                        <Picture
+                          label="Pharmacy Banner"
+                          src={user.pharmacyBanner ? user.pharmacyBanner : image}
+                          handleImageClick={handleImageClick}
+                        />
+                      </Grid>
+                    )}
                   </Grid>
 
                   {user.hasOwnProperty('manager') && (

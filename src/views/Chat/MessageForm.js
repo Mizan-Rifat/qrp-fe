@@ -118,7 +118,6 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
   };
 
   const handleUploadChange = e => {
-    // setAttachment(URL.createObjectURL(e.target.files[0]));
     setAttachment(e.target.files[0]);
   };
 

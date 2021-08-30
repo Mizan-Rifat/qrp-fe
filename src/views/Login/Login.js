@@ -15,19 +15,6 @@ import { CircularProgress, IconButton, InputAdornment } from '@material-ui/core'
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import classNames from 'classnames';
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
 const useStyles = makeStyles(theme => ({
   root: {
     marginTop: 150,
@@ -85,10 +72,6 @@ export default function Login() {
     password: ''
   });
 
-  useEffect(() => {
-    const currentUser = Parse.User.current();
-  }, []);
-
   const handleSubmit = e => {
     e.preventDefault();
     setLoading(true);
@@ -123,8 +106,6 @@ export default function Login() {
           onSubmit={handleSubmit}
         >
           <CardBody>
-            {/* <GridContainer>
-            <GridItem xs={12} sm={12} md={3}> */}
             <CustomInput
               labelText="Username"
               id="username"
@@ -168,71 +149,6 @@ export default function Login() {
           {loading && <CircularProgress className={classes.progress} />}
         </form>
       </Card>
-      {/* <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign in
-        </Typography>
-        <form className={classes.form} noValidate onSubmit={handleSubmit}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            value={formData.username}
-            onChange={e => setFormData({ ...formData, username: e.target.value })}
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={formData.password}
-            onChange={e => setFormData({ ...formData, password: e.target.value })}
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Sign In
-          </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid>
-        </form>
-      </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box> */}
     </Container>
   );
 }

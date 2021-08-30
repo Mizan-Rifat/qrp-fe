@@ -19,7 +19,7 @@ const PharmacyOwners = () => {
     }
   }, []);
 
-  return <Users type={type} title="Pharmacy Owners" users={pharmacyOwners} fetching={fetching} />;
+  return <Users title="Pharmacy Owners" users={pharmacyOwners} fetching={fetching} />;
 };
 
 export default PharmacyOwners;
