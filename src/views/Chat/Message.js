@@ -11,7 +11,6 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'flex-end'
   },
   listItemText: {
-    // marginRight: 16,
     textAlign: ({ isIncoming }) => (isIncoming ? 'left' : 'right')
   },
   listItemTextPrimary: {
@@ -58,10 +57,7 @@ const Message = ({ message, receiver }) => {
     <ListItem alignItems="flex-start" className={classNames({ [classes.listItem]: !isIncoming })}>
       {isIncoming && (
         <ListItemAvatar>
-          <Avatar
-            // src={receiver.get('profilePicture')}
-            online={checkOnline(message.messageFrom.id)}
-          />
+          <Avatar online={checkOnline(message.messageFrom.id)} />
         </ListItemAvatar>
       )}
       <div className="">

@@ -2,6 +2,7 @@ import GroupIcon from '@material-ui/icons/Group';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import EmailIcon from '@material-ui/icons/Email';
 import FlagIcon from '@material-ui/icons/Flag';
+import NotificationsIcon from '@material-ui/icons/Notifications';
 
 export const navMenu = [
   {
@@ -24,5 +25,10 @@ export const navMenu = [
     name: 'Messages',
     icon: EmailIcon,
     badge: true
+  },
+  {
+    path: '/push-notification',
+    name: 'Push Notification',
+    icon: NotificationsIcon
   }
 ];

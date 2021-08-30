@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
@@ -6,22 +6,10 @@ import CardBody from 'components/Card/CardBody.js';
 import MaterialTable from 'material-table';
 import Avatar from '../../components/Avatar/Avatar';
 import { Grid } from '@material-ui/core';
-import { useHistory } from 'react-router';
-import { sentenceCase } from 'utils';
+import Parse from 'parse';
+import MessageDialog from './MessageDialog';
 
 const useStyles = makeStyles(theme => ({
-  cardCategoryWhite: {
-    '&,& a,& a:hover,& a:focus': {
-      color: 'rgba(255,255,255,.62)',
-      margin: '0',
-      fontSize: '14px',
-      marginTop: '0',
-      marginBottom: '0'
-    },
-    '& a,& a:hover,& a:focus': {
-      color: '#FFFFFF'
-    }
-  },
   cardTitleWhite: {
     color: '#FFFFFF',
     marginTop: '0px',
@@ -38,10 +26,13 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-const Users = ({ title, users, fetching }) => {
+const PushNotifications = () => {
   const classes = useStyles();
 
-  const history = useHistory();
+  const [users, setUsers] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [fetching, setFetching] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const columns = [
     {
@@ -59,31 +50,37 @@ const Users = ({ title, users, fetching }) => {
       field: 'customEmail'
     },
     {
-      title: 'Phone',
-      field: 'phone'
+      title: 'Country',
+      field: 'country'
     },
     {
-      title: 'Type',
-      field: 'userType',
-      render: rowData => sentenceCase(rowData.userType)
-    },
-    {
-      title: 'Address',
-      field: 'city',
-      render: rowData => `${rowData.city},${rowData.country}`
-    },
-    {
-      title: 'Avg Ratings',
-      field: 'avgRatings',
-      align: 'center',
-      render: rowData => (rowData.avgRatings ? rowData.avgRatings : 0)
+      title: 'Province',
+      field: 'province'
     }
   ];
+
+  useEffect(async () => {
+    const User = new Parse.User();
+    const userQuery = new Parse.Query(User);
+    userQuery.equalTo('userType', 'pharmacyOwner');
+    userQuery.exists('deviceId');
+    const parseUsers = await userQuery.find().catch(err => {
+      console.log({ err });
+    });
+
+    const users = parseUsers.map(user => ({
+      id: user.id,
+      ...user.attributes,
+      name: `${user.get('firstName')} ${user.get('lastName')}`
+    }));
+    setFetching(false);
+    setUsers(users);
+  }, []);
 
   return (
     <Card>
       <CardHeader color="primary">
-        <h4 className={classes.cardTitleWhite}>{title}</h4>
+        <h4 className={classes.cardTitleWhite}>Custom Push Notifications to Owner</h4>
       </CardHeader>
       <CardBody>
         <MaterialTable
@@ -94,33 +91,27 @@ const Users = ({ title, users, fetching }) => {
           isLoading={fetching}
           actions={[
             {
-              icon: 'chat',
-              tooltip: 'Message',
-              onClick: (event, rowData) => {
-                history.push(`/messages?rid=${rowData.id}`);
-              },
-              position: 'row'
-            },
-            {
-              icon: 'list_alt',
-              tooltip: 'Details',
-              onClick: (event, rowData) => {
-                history.push(`/user/${rowData.id}`);
-              },
-              position: 'row'
+              tooltip: 'Sent push notification to the selected users',
+              icon: 'message',
+              onClick: (evt, data) => {
+                setOpenDialog(true);
+                setSelectedUsers(data);
+              }
             }
           ]}
           options={{
             actionsColumnIndex: -1,
             pageSize: 10,
-            selection: false
+            selection: true,
+            filtering: true
           }}
         />
       </CardBody>
+      <MessageDialog data={selectedUsers} open={openDialog} setOpen={setOpenDialog} />
     </Card>
   );
 };
 
-Users.propTypes = {};
+PushNotifications.propTypes = {};
 
-export default Users;
+export default PushNotifications;

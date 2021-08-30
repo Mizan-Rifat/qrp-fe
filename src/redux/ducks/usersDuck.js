@@ -1,5 +1,4 @@
 import Parse from 'parse';
-import { getParseObject } from 'utils';
 
 //Actions
 
@@ -91,38 +90,19 @@ export const userUpdated = user => {
 
 export const fetchUsers = (type, key) => async dispatch => {
   dispatch({ type: USERS_FETCHING_TRUE });
-  const roleQuery = new Parse.Query(Parse.Role);
-  roleQuery.containedIn('name', type);
-  const roles = await roleQuery.find().catch(err => {
-    dispatch({ type: USERS_FETCHING_FALSE });
+
+  const User = new Parse.User();
+  const userQuery = new Parse.Query(User);
+  userQuery.containedIn('userType', type);
+  const parseUsers = await userQuery.find().catch(err => {
+    dispatch({ type: USER_FETCHING_FALSE });
     return Promise.reject(err);
   });
-  const roleUsers = await roles.reduce(async (acc, role) => {
-    acc = await acc;
-    const usersQuery = role.relation('users').query();
-    const allUsers = await usersQuery.find();
 
-    allUsers.forEach(user => {
-      user.roleName = role.get('name');
-    });
-
-    return [...acc, ...allUsers];
-  }, Promise.resolve([]));
-
-  const dataFields = [
-    'firstName',
-    'lastName',
-    'customEmail',
-    'profilePicture',
-    'phone',
-    'city',
-    'country'
-  ];
-  const data = roleUsers.map(user => ({
+  const data = parseUsers.map(user => ({
     id: user.id,
     ...user.attributes,
-    name: `${user.get('firstName')} ${user.get('lastName')}`,
-    type: user.roleName
+    name: `${user.get('firstName')} ${user.get('lastName')}`
   }));
   dispatch(allUsersFetched(data, key));
 };

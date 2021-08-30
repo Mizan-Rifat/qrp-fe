@@ -1,7 +1,6 @@
 import Parse from 'parse';
 //actions
 const QUESTIONNAIRE_FETCHED = 'qrp/questionnaire/questionnaire_fetched';
-
 const LOADING_TRUE = 'qrp/questionnaire/loading_true';
 const LOADING_FALSE = 'qrp/questionnaire/loading_false';
 const FETCHING_TRUE = 'qrp/questionnaire/fetching_true';
