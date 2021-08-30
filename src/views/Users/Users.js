@@ -38,7 +38,7 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-const Users = ({ type, title, users, fetching }) => {
+const Users = ({ title, users, fetching }) => {
   const classes = useStyles();
 
   const history = useHistory();
@@ -64,8 +64,8 @@ const Users = ({ type, title, users, fetching }) => {
     },
     {
       title: 'Type',
-      field: 'type',
-      render: rowData => sentenceCase(rowData.type)
+      field: 'userType',
+      render: rowData => sentenceCase(rowData.userType)
     },
     {
       title: 'Address',

@@ -11,8 +11,6 @@ const PharmacyOwners = () => {
   const { pharmacyOwners, fetching } = useSelector(state => state.users);
   const dispatch = useDispatch();
 
-  console.log({ pharmacyOwners });
-
   useEffect(async () => {
     if (pharmacyOwners.length <= 0) {
       dispatch(fetchUsers(type, 'pharmacyOwners')).catch(err => {
@@ -21,7 +19,7 @@ const PharmacyOwners = () => {
     }
   }, []);
 
-  return <Users type={type} title="Pharmacy Owners" users={pharmacyOwners} fetching={fetching} />;
+  return <Users title="Pharmacy Owners" users={pharmacyOwners} fetching={fetching} />;
 };
 
 export default PharmacyOwners;

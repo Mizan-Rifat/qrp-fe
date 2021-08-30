@@ -102,8 +102,6 @@ const Messages = () => {
 export default Messages;
 
 export const Contacts = () => {
-  const classes = useStyles();
-
   const { currentUser } = useContext(MessageContext);
 
   return (

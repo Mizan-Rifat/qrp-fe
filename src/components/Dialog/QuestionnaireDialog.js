@@ -112,10 +112,10 @@ export default function QuestionnaireDialog({ user, parseUser, open, setOpen }) 
   useEffect(() => {
     if (questionnaire.length > 0) {
       let selectedQuestions;
-      if (user.roles.some(role => role.get('name') === 'Other')) {
+      if (user.userType === 'Other') {
         selectedQuestions = otherQuestions;
       }
-      if (user.roles.some(role => role.get('name') === 'Pharmacist')) {
+      if (user.userType === 'Pharmacist') {
         selectedQuestions = pharmacistQuestions;
       }
       const questions = selectedQuestions.map(question => {
