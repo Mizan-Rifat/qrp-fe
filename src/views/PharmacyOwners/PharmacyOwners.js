@@ -11,6 +11,8 @@ const PharmacyOwners = () => {
   const { pharmacyOwners, fetching } = useSelector(state => state.users);
   const dispatch = useDispatch();
 
+  console.log({ pharmacyOwners });
+
   useEffect(async () => {
     if (pharmacyOwners.length <= 0) {
       dispatch(fetchUsers(type, 'pharmacyOwners')).catch(err => {

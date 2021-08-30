@@ -109,15 +109,6 @@ export const fetchUsers = (type, key) => async dispatch => {
     return [...acc, ...allUsers];
   }, Promise.resolve([]));
 
-  const dataFields = [
-    'firstName',
-    'lastName',
-    'customEmail',
-    'profilePicture',
-    'phone',
-    'city',
-    'country'
-  ];
   const data = roleUsers.map(user => ({
     id: user.id,
     ...user.attributes,
