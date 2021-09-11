@@ -109,6 +109,8 @@ export const fetchContacts = () => async dispatch => {
     return Promise.reject(err);
   });
 
+  console.log({ contacts });
+
   dispatch(contactsFetched(contacts));
 };
 

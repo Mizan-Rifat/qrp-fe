@@ -47,10 +47,10 @@ const Test = () => {
     console.log({ cP });
   };
 
-  const retriveStripeAccount = async () => {
+  const retriveStripeAccount = async id => {
     console.log({ currentUser });
     const account = await Parse.Cloud.run('retriveStripeAccount', {
-      accountId: currentUser.get('stripeAccountId')
+      accountId: id
     }).catch(err => {
       console.log({ err });
     });
@@ -110,9 +110,9 @@ const Test = () => {
     }
   };
 
-  const getBalance = async () => {
+  const getBalance = async id => {
     const balance = await Parse.Cloud.run('getBalance', {
-      stripeAccountId: 'acct_1JRec1PrhCdnCK3u'
+      stripeAccountId: id
       // stripeAccountId: currentUser.get('stripeCustomerId')
     }).catch(err => {
       console.log({ err });
@@ -121,12 +121,12 @@ const Test = () => {
     console.log({ balance });
   };
 
-  const createPayout = async () => {
+  const createPayout = async id => {
     const payout = await Parse.Cloud.run('createPayout', {
-      amount: 5000,
+      amount: 1000,
       currency: 'cad',
       // stripeAccountId: currentUser.get('stripeCustomerId')
-      stripeAccountId: 'acct_1JRec1PrhCdnCK3u'
+      stripeAccountId: id
     }).catch(err => {
       console.log({ err });
     });
@@ -134,9 +134,9 @@ const Test = () => {
     console.log({ payout });
   };
 
-  const retrivePayout = async () => {
+  const retrivePayout = async id => {
     const payout = await Parse.Cloud.run('retrivePayout', {
-      payoutId: 'po_1JRgxQPrhCdnCK3u1OG0sjKv'
+      payoutId: id
     }).catch(err => {
       console.log({ err });
     });
@@ -152,6 +152,16 @@ const Test = () => {
     });
 
     console.log({ PaymentIntent });
+  };
+
+  const retrivePayoutList = async id => {
+    const payouts = await Parse.Cloud.run('retrivePayoutList', {
+      destination: id
+    }).catch(err => {
+      console.log({ err });
+    });
+
+    console.log({ payouts });
   };
 
   const getWorkingSummary = async id => {
@@ -176,12 +186,83 @@ const Test = () => {
   };
 
   useEffect(async () => {
-    const user = await Parse.Cloud.run('currentUser').catch(err => {
-      console.log({ err });
-    });
-    console.log({ user });
+    // const user = await Parse.Cloud.run('currentUser').catch(err => {
+    //   console.log({ err });
+    // });
+    // console.log({ user });
 
-    setCurrentUser(user);
+    const currentUser = Parse.User.current();
+    const uid = currentUser.id;
+    // setCurrentUser(user);
+
+    // const currentUser = Parse.User.current();
+    // const uid = currentUser.id;
+
+    // const LastMessage = Parse.Object.extend('LastMessage');
+
+    // const msgQuery1 = new Parse.Query(LastMessage);
+    // const msgQuery2 = new Parse.Query(LastMessage);
+
+    // msgQuery1.equalTo('receiver', currentUser);
+    // msgQuery2.equalTo('sender', currentUser);
+
+    // const messagesQuery = Parse.Query.or(msgQuery1, msgQuery2);
+    // messagesQuery.include('sender');
+    // messagesQuery.include('receiver');
+    // messagesQuery.ascending('updatedAt');
+    // const messages = await messagesQuery.find();
+
+    // const contacts = messages.map(
+    //   message =>
+    //     message.get('sender').id === uid ? message.get('receiver') : message.get('sender')
+    //   // message.get('sender')
+    // );
+
+    // console.log({ messages });
+    // console.log({ contacts });
+
+    const LastMessage = Parse.Object.extend('LastMessage');
+
+    const msgQuery1 = new Parse.Query(LastMessage);
+    const msgQuery2 = new Parse.Query(LastMessage);
+
+    msgQuery1.equalTo('receiver', currentUser);
+    msgQuery2.equalTo('sender', currentUser);
+
+    const messagesQuery = Parse.Query.or(msgQuery1, msgQuery2);
+    messagesQuery.include('sender');
+    messagesQuery.include('receiver');
+    messagesQuery.ascending('updatedAt');
+    const messages = await messagesQuery.find();
+
+    const contacts = messages.map(message => {
+      let channelName;
+      let rid;
+      let lastMessage;
+      if (message.get('sender').id === uid) {
+        rid = message.get('receiver').id;
+        channelName = uid > rid ? `private-${uid}-${rid}` : `private-${rid}-${uid}`;
+        lastMessage = messages.find(message => message.get('channelName') === channelName);
+        return {
+          id: message.get('receiver').id,
+          ...message.get('receiver').attributes,
+          lastMessage,
+          unseenCount: 0
+        };
+      } else {
+        rid = message.get('sender').id;
+        channelName = uid > rid ? `private-${uid}-${rid}` : `private-${rid}-${uid}`;
+        lastMessage = messages.find(message => message.get('channelName') === channelName);
+        return {
+          id: message.get('sender').id,
+          ...message.get('sender').attributes,
+          lastMessage,
+          unseenCount: lastMessage.get('unseenCount')
+        };
+      }
+    });
+
+    console.log({ contacts });
   }, []);
 
   return (
@@ -200,10 +281,14 @@ const Test = () => {
         <Button onClick={createStripeAccount} variant="outlined" style={{ marginBottom: 4 }}>
           Create Stripe Account
         </Button>
-        <Button onClick={retriveStripeAccount} variant="outlined" style={{ marginBottom: 4 }}>
-          Retrive Stripe Account
-        </Button>
-        <Box>
+        <Box mb={1}>
+          <TestTextField
+            placeholder="Account Id"
+            title="Retrive Stripe Account"
+            handleSubmit={retriveStripeAccount}
+          />
+        </Box>
+        <Box mb={1}>
           <TestTextField
             placeholder="Account Id"
             title="Delete account"
@@ -226,15 +311,34 @@ const Test = () => {
         <Button onClick={capturePayment} variant="outlined" style={{ marginBottom: 4 }}>
           Capture Payment
         </Button>
-        <Button onClick={getBalance} variant="outlined" style={{ marginBottom: 4 }}>
-          Get Balance
-        </Button>
-        <Button onClick={createPayout} variant="outlined" style={{ marginBottom: 4 }}>
-          Create Payout
-        </Button>
-        <Button onClick={retrivePayout} variant="outlined" style={{ marginBottom: 4 }}>
-          Retrive Payout
-        </Button>
+        <Box mb={1}>
+          <TestTextField placeholder="Account Id" title="Get Balance" handleSubmit={getBalance} />
+        </Box>
+
+        <Box mb={1}>
+          <TestTextField
+            placeholder="Account Id"
+            title="Create Payout"
+            handleSubmit={createPayout}
+          />
+        </Box>
+
+        <Box mb={1}>
+          <TestTextField
+            placeholder="Bank Account"
+            title="Retrive Payouts"
+            handleSubmit={retrivePayoutList}
+          />
+        </Box>
+
+        <Box mb={1}>
+          <TestTextField
+            placeholder="Account Id"
+            title="Retrive Payout"
+            handleSubmit={retrivePayout}
+          />
+        </Box>
+
         <Button onClick={deleteAllAccounts} variant="outlined" style={{ marginBottom: 4 }}>
           Delete All Account
         </Button>

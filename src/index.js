@@ -19,18 +19,20 @@ Parse.masterKey = '88C2DC1F2055381075ED07CF2E8032A86B4D35FC';
 Parse.serverURL = 'http://localhost:1337/parse';
 
 ReactDOM.render(
-  <SnackbarProvider>
-    <Provider store={store}>
-      <HashRouter>
-        <Switch>
-          {/* <Route path="/login" component={Login} /> */}
-          <GuestProtectedRoute path="/login" component={Login} />
-          <AdminProtectedRoute>
-            <Route path="/" component={Admin} />
-          </AdminProtectedRoute>
-        </Switch>
-      </HashRouter>
-    </Provider>
-  </SnackbarProvider>,
+  <React.StrictMode>
+    <SnackbarProvider>
+      <Provider store={store}>
+        <HashRouter>
+          <Switch>
+            {/* <Route path="/login" component={Login} /> */}
+            <GuestProtectedRoute path="/login" component={Login} />
+            <AdminProtectedRoute>
+              <Route path="/" component={Admin} />
+            </AdminProtectedRoute>
+          </Switch>
+        </HashRouter>
+      </Provider>
+    </SnackbarProvider>
+  </React.StrictMode>,
   document.getElementById('root')
 );
