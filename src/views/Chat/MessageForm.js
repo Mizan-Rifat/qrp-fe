@@ -9,6 +9,7 @@ import bgImage from 'assets/img/sidebar-2.jpg';
 import CloseIcon from '@material-ui/icons/Close';
 import useNotify from '../../hooks/useNotify';
 import classNames from 'classnames';
+import { sortContacts } from 'redux/ducks/contactsDuck';
 
 const useStyles = makeStyles(theme => ({
   closeButton: {
@@ -98,7 +99,9 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
 
         setMessage('');
         setAttachment(null);
+        console.log({ response });
         dispatch(receiveMessage({ id: response.id, ...response.attributes }));
+        dispatch(sortContacts());
       }
 
       setLoading(false);

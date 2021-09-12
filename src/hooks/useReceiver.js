@@ -9,18 +9,18 @@ import {
   loadMoreMessages,
   setMessagesState
 } from 'redux/ducks/messagesDuck';
-import { contactsUpdated, setPresenceStatus } from 'redux/ducks/contactsDuck';
 import { getChannelName } from 'utils';
 import { setSeen } from 'redux/ducks/contactsDuck';
+import { useLocation } from 'react-router';
 
 const useReciever = rid => {
   const currentUser = Parse.User.current();
-
+  const location = useLocation();
   const uid = currentUser.id;
 
   const pusher = new Pusher('6e894e9b27c3993c4068', {
-    authEndpoint: 'https://qrps.app/pusher/auth',
-    // authEndpoint: 'http://127.0.0.1:1337/pusher/auth',
+    // authEndpoint: 'https://qrps.app/pusher/auth',
+    authEndpoint: 'http://127.0.0.1:1337/pusher/auth',
     cluster: 'mt1',
     auth: {
       headers: {
@@ -58,10 +58,11 @@ const useReciever = rid => {
   useEffect(() => {
     if (channel?.name) {
       channel.bind('incomingMessage', async data => {
+        console.log({ location });
         if (data.messageFrom.objectId !== uid) {
           if (data.messageFrom.objectId === rid) {
             dispatch(setMessagesState('events', { ...events, newMessage: true }));
-            dispatch(setSeen(rid));
+            dispatch(setSeen(rid, { id: data.objectId, ...data }));
             dispatch(receiveMessage({ id: data.objectId, ...data }));
           }
         }
