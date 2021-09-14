@@ -1,4 +1,6 @@
 import Parse from 'parse';
+
+import { setMessageSeen } from './messagesDuck';
 //actions
 
 const CONTACTS_FETCHED = 'qrp/contacts/contacts_fetched';
@@ -38,16 +40,19 @@ export default (state = initState, action) => {
       };
     case SORT_CONTACTS:
       const sortedContacts = [...state.contacts].sort((a, b) => {
-        if (a.lastMessage.updatedAt > b.lastMessage.updatedAt) {
+        if (new Date(a.lastMessage.updatedAt) > new Date(b.lastMessage.updatedAt)) {
           return -1;
         } else {
           return 1;
         }
       });
-      console.log({ sortedContacts });
       return {
         ...state,
-        contacts: sortedContacts
+        contacts: sortedContacts,
+        unseenMessages: state.contacts.reduce(
+          (acc, contact) => (contact.unseenCount ? acc + 1 : acc),
+          0
+        )
       };
     case CONTACTS_UPDATED:
       return {
@@ -110,10 +115,10 @@ export const contactsFetched = data => {
     payload: data
   };
 };
-export const contactsUpdated = data => {
+export const contactsUpdated = contact => {
   return {
     type: CONTACTS_UPDATED,
-    payload: data
+    payload: contact
   };
 };
 export const setContactsError = error => {
@@ -153,7 +158,7 @@ export const setUnseenMessage = contacts => {
   };
 };
 
-export const updateContact = (rid, message) => async (dispatch, getState) => {
+export const updateContact = contact => async (dispatch, getState) => {
   dispatch({ type: LOADING_TRUE });
   const contact = getState().contacts.contacts.find(contact => contact.id === rid);
   if (contact) {
@@ -164,23 +169,22 @@ export const updateContact = (rid, message) => async (dispatch, getState) => {
   }
 };
 
-export const setSeen = (rid, message) => async (dispatch, getState) => {
+export const setSeen = rid => async (dispatch, getState) => {
+  console.log({ rid });
   dispatch({ type: LOADING_TRUE });
   const contact = getState().contacts.contacts.find(contact => contact.id === rid);
   console.log({ setSeen: contact });
   if (contact) {
     dispatch({
       type: CONTACTS_UPDATED,
-      payload: { ...contact, lastMessage: message, unseenCount: 0 }
+      payload: { ...contact, unseenCount: 0 }
     });
   }
   dispatch(setUnseenMessage(getState().contacts.contacts));
-  const messages = await Parse.Cloud.run('setSeen', {
-    rid
-  });
+  setMessageSeen(rid);
 };
 
-export const setUnseenCount = (rid, message) => async (dispatch, getState) => {
+export const setUnseenCount = rid => async (dispatch, getState) => {
   const contact = getState().contacts.contacts.find(contact => contact.id === rid);
   const recipient = getState().messages.recipient;
   if (contact) {
@@ -188,17 +192,11 @@ export const setUnseenCount = (rid, message) => async (dispatch, getState) => {
       type: CONTACTS_UPDATED,
       payload: {
         ...contact,
-        unseenCount: contact.id !== recipient.id ? contact.unseenCount + 1 : contact.unseenCount,
-        lastMessage: { id: message.id, ...message.attributes }
+        unseenCount: contact.id !== recipient.id ? contact.unseenCount + 1 : contact.unseenCount
       }
     });
-  } else {
-    // const contacts = await getContacts();
-    // console.log({ contacts });
-
-    dispatch(fetchContacts(false));
   }
-  dispatch(setUnseenMessage(getState().contacts.contacts));
+  // dispatch(setUnseenMessage(getState().contacts.contacts));
 };
 
 const getContacts = async () => {

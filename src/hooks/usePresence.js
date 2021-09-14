@@ -7,6 +7,7 @@ import { setUnseenCount } from 'redux/ducks/contactsDuck';
 import { fetchContacts } from 'redux/ducks/contactsDuck';
 import { setHasUnseenMessage } from 'redux/ducks/contactsDuck';
 import { sortContacts } from 'redux/ducks/contactsDuck';
+import { receiveMessage } from 'redux/ducks/messagesDuck';
 
 const usePresence = () => {
   const currentUser = Parse.User.current();
@@ -31,7 +32,8 @@ const usePresence = () => {
     dispatch(fetchContacts(true));
     myChannel.bind('incomingMessage', data => {
       if (data.messageFrom.objectId !== uid) {
-        dispatch(setUnseenCount(data.messageFrom.objectId, data));
+        dispatch(receiveMessage({ message: data, globally: true }));
+        // dispatch(setUnseenCount(data.messageFrom.objectId));
         // dispatch(fetchContacts(false));
         // dispatch(sortContacts());
       }

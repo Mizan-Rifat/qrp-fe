@@ -2,13 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import Parse from 'parse';
 import Pusher from 'pusher-js';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  fetchMessages,
-  receiveMessage,
-  resetMessagesState,
-  loadMoreMessages,
-  setMessagesState
-} from 'redux/ducks/messagesDuck';
+import { receiveMessage, resetMessagesState, setMessagesState } from 'redux/ducks/messagesDuck';
 import { getChannelName } from 'utils';
 import { setSeen } from 'redux/ducks/contactsDuck';
 import { useLocation } from 'react-router';
@@ -61,9 +55,9 @@ const useReciever = rid => {
         console.log({ location });
         if (data.messageFrom.objectId !== uid) {
           if (data.messageFrom.objectId === rid) {
-            dispatch(setMessagesState('events', { ...events, newMessage: true }));
-            dispatch(setSeen(rid, { id: data.objectId, ...data }));
-            dispatch(receiveMessage({ id: data.objectId, ...data }));
+            // dispatch(setMessagesState('events', { ...events, newMessage: true }));
+            // dispatch(setSeen(rid, { id: data.objectId, ...data }));
+            // dispatch(receiveMessage({ message: data, isChating: true }));
           }
         }
       });
