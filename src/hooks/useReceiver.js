@@ -2,14 +2,13 @@ import { useRef, useEffect, useState } from 'react';
 import Parse from 'parse';
 import Pusher from 'pusher-js';
 import { useDispatch, useSelector } from 'react-redux';
-import { receiveMessage, resetMessagesState, setMessagesState } from 'redux/ducks/messagesDuck';
+import { resetMessagesState, setMessagesState } from 'redux/ducks/messagesDuck';
 import { getChannelName } from 'utils';
 import { setSeen } from 'redux/ducks/contactsDuck';
-import { useLocation } from 'react-router';
+import { addContact } from 'redux/ducks/contactsDuck';
 
 const useReciever = rid => {
   const currentUser = Parse.User.current();
-  const location = useLocation();
   const uid = currentUser.id;
 
   const pusher = new Pusher('6e894e9b27c3993c4068', {
@@ -29,6 +28,7 @@ const useReciever = rid => {
   const channelName = getChannelName(uid, rid);
 
   const { channel, events, recipient } = useSelector(state => state.messages);
+  const { contacts } = useSelector(state => state.contacts);
 
   const dispatch = useDispatch();
 
@@ -36,7 +36,17 @@ const useReciever = rid => {
     if (rid !== '') {
       const cha = await pusher.subscribe(`private-${channelName}`);
       dispatch(setMessagesState('channel', cha));
-      const rec = await userQuery.get(rid);
+      let rec = {};
+      const contact = contacts.find(contact => contact.id === rid);
+      if (contact) {
+        rec = contact;
+      } else {
+        const user = await userQuery.get(rid);
+        rec = { id: user.id, ...user.attributes };
+        console.log({ user });
+        dispatch(addContact(rec));
+      }
+      console.log({ rec });
       dispatch(setMessagesState('recipient', rec));
     }
   }, [rid]);
@@ -50,17 +60,14 @@ const useReciever = rid => {
   }, [rid]);
 
   useEffect(() => {
+    const contact = contacts.find(contact => contact.id === rid);
+    if (contact) {
+      dispatch(setSeen(rid));
+    }
+  }, [rid]);
+
+  useEffect(() => {
     if (channel?.name) {
-      channel.bind('incomingMessage', async data => {
-        console.log({ location });
-        if (data.messageFrom.objectId !== uid) {
-          if (data.messageFrom.objectId === rid) {
-            // dispatch(setMessagesState('events', { ...events, newMessage: true }));
-            // dispatch(setSeen(rid, { id: data.objectId, ...data }));
-            // dispatch(receiveMessage({ message: data, isChating: true }));
-          }
-        }
-      });
       channel.bind('client-typing', function (data) {
         dispatch(setMessagesState('events', { ...events, typing: data.typing }));
       });
@@ -69,10 +76,6 @@ const useReciever = rid => {
       });
     }
   }, [channel]);
-
-  useEffect(() => {
-    dispatch(setSeen(rid));
-  }, [rid]);
 };
 
 export default useReciever;

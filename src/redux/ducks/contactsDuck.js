@@ -40,7 +40,7 @@ export default (state = initState, action) => {
       };
     case SORT_CONTACTS:
       const sortedContacts = [...state.contacts].sort((a, b) => {
-        if (new Date(a.lastMessage.updatedAt) > new Date(b.lastMessage.updatedAt)) {
+        if (new Date(a.lastMessage?.updatedAt) > new Date(b.lastMessage?.updatedAt)) {
           return -1;
         } else {
           return 1;
@@ -130,6 +130,12 @@ export const setContactsError = error => {
 export const sortContacts = () => {
   return {
     type: SORT_CONTACTS
+  };
+};
+export const addContact = contact => {
+  return {
+    type: CONTACTS_ADDED,
+    payload: contact
   };
 };
 

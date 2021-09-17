@@ -69,9 +69,9 @@ const Message = ({ message, receiver }) => {
             secondary: classes.listItemTextSecondary
           }}
           primary={message.message}
-          secondary={`${
-            isIncoming ? receiver.get('firstName') : currentUser.get('firstName')
-          }, ${dayjs(message.createdAt).format('hh:mm A, MMM DD')}`}
+          secondary={`${isIncoming ? receiver.firstName : currentUser.get('firstName')}, ${dayjs(
+            message.createdAt
+          ).format('hh:mm A, MMM DD')}`}
         />
       </div>
     </ListItem>

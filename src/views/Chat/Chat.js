@@ -138,9 +138,7 @@ const Chat = () => {
                     <ArrowBackIosIcon />
                   </ListItemIcon>
                   {recipient.id && (
-                    <ListItemText
-                      primary={`${recipient.get('firstName')} ${recipient.get('firstName')}`}
-                    />
+                    <ListItemText primary={`${recipient.firstName} ${recipient.lastName}`} />
                   )}
                 </ListItem>
                 <Divider />

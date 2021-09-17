@@ -185,9 +185,12 @@ export const receiveMessage = ({ message }) => async (dispatch, getState) => {
 export const messageSent = message => async (dispatch, getState) => {
   console.log({ message });
 
-  const contact = getState().contacts.contacts.find(contact => contact.id === message.messageTo.id);
+  const contact = getState().contacts.contacts.find(
+    contact => contact.id === message.messageTo.objectId
+  );
   let updatedContact = { ...contact };
 
+  console.log({ contact });
   if (contact) {
     dispatch({
       type: MESSAGE_ADDED,
