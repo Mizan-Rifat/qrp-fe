@@ -13,6 +13,8 @@ import loadable from '@loadable/component';
 import EmergencyShifts from 'views/EmergencyShifts/EmergencyShifts';
 import PushNotifications from 'views/PushNotifications/PushNotifications';
 import { useSelector } from 'react-redux';
+import { Box } from '@material-ui/core';
+import { Loading } from 'components/Loading/Loading';
 
 const Messages = loadable(() => import('views/Chat/Messages'));
 const UserDetails = loadable(() => import('views/UserDetails/UserDetails'));
@@ -52,7 +54,13 @@ export default function Admin({ ...rest }) {
         <div className={classes.content}>
           <div className={classes.container}>
             {fetching ? (
-              <p>laoding</p>
+              <Box
+                height="100%"
+                position="relative"
+                style={{ pointerEvents: 'none', opacity: 0.5 }}
+              >
+                <Loading position={{ top: '50%', left: '50%' }} />
+              </Box>
             ) : (
               <Switch>
                 <Route exact path="/staffs" component={Staffs} />
