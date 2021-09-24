@@ -104,8 +104,6 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
 
         setMessage('');
         setAttachment(null);
-        console.log({ response });
-        // dispatch(receiveMessage({ id: response.id, ...response.attributes }));
         dispatch(messageSent({ id: response.id, ...response.attributes }));
       }
 

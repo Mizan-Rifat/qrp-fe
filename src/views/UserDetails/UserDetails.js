@@ -113,7 +113,6 @@ const UserDetails = () => {
   };
 
   const handleStatus = user => {
-    console.log({ user });
     confirm({
       variant: 'danger',
       catchOnCancel: true,

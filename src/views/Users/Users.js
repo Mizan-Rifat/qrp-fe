@@ -63,7 +63,6 @@ const Users = ({ title, users, fetching, loading }) => {
           toast(res, 'success');
         })
         .catch(error => {
-          console.log({ error });
           toast(error.message, 'error');
         });
     });

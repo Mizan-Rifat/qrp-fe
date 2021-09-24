@@ -158,7 +158,6 @@ export const fetchMessages = (rid, page) => async dispatch => {
 };
 
 export const receiveMessage = ({ message }) => async (dispatch, getState) => {
-  console.log({ message });
   const rid = message.messageFrom.objectId;
   const contact = getState().contacts.contacts.find(contact => contact.id === rid);
   const isChating = getState().messages.recipient.id === message.messageFrom.objectId;
@@ -183,14 +182,11 @@ export const receiveMessage = ({ message }) => async (dispatch, getState) => {
 };
 
 export const messageSent = message => async (dispatch, getState) => {
-  console.log({ message });
-
   const contact = getState().contacts.contacts.find(
     contact => contact.id === message.messageTo.objectId
   );
   let updatedContact = { ...contact };
 
-  console.log({ contact });
   if (contact) {
     dispatch({
       type: MESSAGE_ADDED,

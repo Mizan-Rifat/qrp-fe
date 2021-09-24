@@ -43,10 +43,8 @@ const useReciever = rid => {
       } else {
         const user = await userQuery.get(rid);
         rec = { id: user.id, ...user.attributes };
-        console.log({ user });
         dispatch(addContact(rec));
       }
-      console.log({ rec });
       dispatch(setMessagesState('recipient', rec));
     }
   }, [rid]);

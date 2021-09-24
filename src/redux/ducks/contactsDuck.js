@@ -145,7 +145,6 @@ export const fetchContacts = fetching_true => async dispatch => {
   }
 
   const contacts = await getContacts();
-  console.log({ contacts });
 
   dispatch(contactsFetched(contacts));
 };
@@ -176,10 +175,8 @@ export const updateContact = contact => async (dispatch, getState) => {
 };
 
 export const setSeen = rid => async (dispatch, getState) => {
-  console.log({ rid });
   dispatch({ type: LOADING_TRUE });
   const contact = getState().contacts.contacts.find(contact => contact.id === rid);
-  console.log({ setSeen: contact });
   if (contact) {
     dispatch({
       type: CONTACTS_UPDATED,
