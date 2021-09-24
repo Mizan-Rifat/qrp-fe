@@ -20,8 +20,7 @@ import { Loading } from 'components/Loading/Loading';
 import { setUserLoadingTrue, setUserLoadingFalse } from 'redux/ducks/userDuck';
 import { userUpdated } from 'redux/ducks/userDuck';
 import Parse from 'parse';
-import AlertDialog from 'components/Alert/Alert';
-
+import { useConfirmation } from 'hooks/useConfirmation/ConfirmationService';
 import QuestionnaireDialog from 'components/Dialog/QuestionnaireDialog';
 import { resetQuestionnaireState } from 'redux/ducks/questionnaireDuck';
 import useNotify from 'hooks/useNotify';
@@ -63,10 +62,10 @@ const UserDetails = () => {
   const { id } = useParams();
   const history = useHistory();
 
+  const confirm = useConfirmation();
   const [tableData, setTableData] = useState([]);
   const toast = useNotify();
   const [openDialog, setOpenDialog] = useState(false);
-  const [statusAlertOpen, setStatusAlertOpen] = useState(false);
   const [openQuestionnaireDialog, setOpenQuestionnaireDialog] = useState(false);
   const [lightBox, setLightBox] = useState({
     open: false,
@@ -111,6 +110,19 @@ const UserDetails = () => {
         status: res.get('status') ? 'Approved' : 'Declined'
       });
     }
+  };
+
+  const handleStatus = user => {
+    console.log({ user });
+    confirm({
+      variant: 'danger',
+      catchOnCancel: true,
+      title: user.status
+        ? 'Are you sure to decline this user?'
+        : 'Are you sure to approve this user?'
+    }).then(() => {
+      handleApprove();
+    });
   };
 
   const columns = [
@@ -270,7 +282,7 @@ const UserDetails = () => {
                     <Box position="relative">
                       <Button
                         color={user.status ? 'danger' : 'success'}
-                        onClick={() => setStatusAlertOpen(true)}
+                        onClick={() => handleStatus(user)}
                         disabled={loading}
                       >
                         {user.status ? 'Decline' : 'Approve'}
@@ -364,16 +376,6 @@ const UserDetails = () => {
                     />
                   )}
                   {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
-                  <AlertDialog
-                    open={statusAlertOpen}
-                    setOpen={setStatusAlertOpen}
-                    handleAgree={handleApprove}
-                    message={
-                      user.status
-                        ? 'Are you sure to decline this user?'
-                        : 'Are you sure to approve this user?'
-                    }
-                  />
                 </>
               ) : (
                 <Box textAlign="center">

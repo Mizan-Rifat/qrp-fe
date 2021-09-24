@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
@@ -8,6 +8,10 @@ import Avatar from '../../components/Avatar/Avatar';
 import { Grid } from '@material-ui/core';
 import { useHistory } from 'react-router';
 import { sentenceCase } from 'utils';
+import { useConfirmation } from 'hooks/useConfirmation/ConfirmationService';
+import { deleteUser } from 'redux/ducks/usersDuck';
+import { useDispatch } from 'react-redux';
+import useNotify from 'hooks/useNotify';
 
 const useStyles = makeStyles(theme => ({
   cardCategoryWhite: {
@@ -38,10 +42,32 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-const Users = ({ title, users, fetching }) => {
+const Users = ({ title, users, fetching, loading }) => {
   const classes = useStyles();
 
   const history = useHistory();
+
+  const confirm = useConfirmation();
+  const dispatch = useDispatch();
+  const toast = useNotify();
+
+  const handleDelete = async user => {
+    const userType = user.userType === 'pharmacyOwner' ? 'pharmacyOwners' : 'staffs';
+    confirm({
+      variant: 'danger',
+      title: 'Are you sure you want to remove this user?',
+      description: 'The user will be permanently deleted.'
+    }).then(() => {
+      dispatch(deleteUser(user.id, userType))
+        .then(res => {
+          toast(res, 'success');
+        })
+        .catch(error => {
+          console.log({ error });
+          toast(error.message, 'error');
+        });
+    });
+  };
 
   const columns = [
     {
@@ -50,7 +76,7 @@ const Users = ({ title, users, fetching }) => {
       render: rowData => (
         <Grid container alignItems="center" spacing={0}>
           <Avatar size="small" src={rowData.profilePicture} />
-          <p style={{ margin: '0 0 0 8px' }}>{rowData.name}</p>
+          <p style={{ margin: '0 0 0 8px' }}>{rowData.firstName}</p>
         </Grid>
       )
     },
@@ -81,43 +107,53 @@ const Users = ({ title, users, fetching }) => {
   ];
 
   return (
-    <Card>
-      <CardHeader color="primary">
-        <h4 className={classes.cardTitleWhite}>{title}</h4>
-      </CardHeader>
-      <CardBody>
-        <MaterialTable
-          style={{ boxShadow: 'unset', background: 'unset' }}
-          title=""
-          columns={columns}
-          data={users}
-          isLoading={fetching}
-          actions={[
-            {
-              icon: 'chat',
-              tooltip: 'Message',
-              onClick: (event, rowData) => {
-                history.push(`/messages?rid=${rowData.id}`);
+    <>
+      <Card>
+        <CardHeader color="primary">
+          <h4 className={classes.cardTitleWhite}>{title}</h4>
+        </CardHeader>
+        <CardBody>
+          <MaterialTable
+            style={{ boxShadow: 'unset', background: 'unset' }}
+            title=""
+            columns={columns}
+            data={users}
+            isLoading={fetching || loading}
+            actions={[
+              {
+                icon: 'chat',
+                tooltip: 'Message',
+                onClick: (event, rowData) => {
+                  history.push(`/messages?rid=${rowData.id}`);
+                },
+                position: 'row'
               },
-              position: 'row'
-            },
-            {
-              icon: 'list_alt',
-              tooltip: 'Details',
-              onClick: (event, rowData) => {
-                history.push(`/user/${rowData.id}`);
+              {
+                icon: 'list_alt',
+                tooltip: 'Details',
+                onClick: (event, rowData) => {
+                  history.push(`/user/${rowData.id}`);
+                },
+                position: 'row'
               },
-              position: 'row'
-            }
-          ]}
-          options={{
-            actionsColumnIndex: -1,
-            pageSize: 10,
-            selection: false
-          }}
-        />
-      </CardBody>
-    </Card>
+              {
+                icon: 'delete',
+                tooltip: 'Delete',
+                onClick: (event, rowData) => {
+                  handleDelete(rowData);
+                },
+                position: 'row'
+              }
+            ]}
+            options={{
+              actionsColumnIndex: -1,
+              pageSize: 10,
+              selection: false
+            }}
+          />
+        </CardBody>
+      </Card>
+    </>
   );
 };
 
