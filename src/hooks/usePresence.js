@@ -6,14 +6,16 @@ import { setPresenceStatus } from 'redux/ducks/contactsDuck';
 import { setUnseenCount } from 'redux/ducks/contactsDuck';
 import { fetchContacts } from 'redux/ducks/contactsDuck';
 import { setHasUnseenMessage } from 'redux/ducks/contactsDuck';
+import { sortContacts } from 'redux/ducks/contactsDuck';
+import { receiveMessage } from 'redux/ducks/messagesDuck';
 
 const usePresence = () => {
   const currentUser = Parse.User.current();
   const uid = currentUser.id;
 
   const pusher = new Pusher('6e894e9b27c3993c4068', {
-    authEndpoint: 'https://qrps.app/pusher/auth',
-    // authEndpoint: 'http://127.0.0.1:1337/pusher/auth',
+    // authEndpoint: 'https://qrps.app/pusher/auth',
+    authEndpoint: 'http://127.0.0.1:1337/pusher/auth',
     cluster: 'mt1',
     auth: {
       headers: {
@@ -27,10 +29,13 @@ const usePresence = () => {
   useEffect(async () => {
     const myChannel = pusher.subscribe(`private-mychannel-${uid}`);
     const membersChannel = await pusher.subscribe(`chat-members`);
-    dispatch(fetchContacts());
+    dispatch(fetchContacts(true));
     myChannel.bind('incomingMessage', data => {
       if (data.messageFrom.objectId !== uid) {
-        dispatch(setUnseenCount(data.messageFrom.objectId, data));
+        dispatch(receiveMessage({ message: data, globally: true }));
+        // dispatch(setUnseenCount(data.messageFrom.objectId));
+        // dispatch(fetchContacts(false));
+        // dispatch(sortContacts());
       }
     });
     membersChannel.bind('member_added', data => {

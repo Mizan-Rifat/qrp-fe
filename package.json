@@ -26,7 +26,8 @@
     "react-scrollbars-custom": "^4.0.25",
     "react-visibility-sensor": "^5.1.1",
     "redux": "^4.1.0",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "stripe": "^8.168.0"
   },
   "scripts": {
     "start": "react-scripts start",

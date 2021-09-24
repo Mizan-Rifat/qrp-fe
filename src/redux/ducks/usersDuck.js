@@ -31,7 +31,9 @@ export default (state = initState, action) => {
       return {
         ...state,
         loading: false,
-        users: state.users.filter(user => user.id != action.payload)
+        [action.payload.userType]: state[action.payload.userType].filter(
+          user => user.id !== action.payload.id
+        )
       };
     case USER_UPDATED:
       return {
@@ -75,10 +77,10 @@ export const allUsersFetched = (users, key) => {
   };
 };
 
-export const userDeleted = id => {
+export const userDeleted = payload => {
   return {
     type: USER_DELETED,
-    payload: id
+    payload
   };
 };
 export const userUpdated = user => {
@@ -105,4 +107,19 @@ export const fetchUsers = (type, key) => async dispatch => {
     name: `${user.get('firstName')} ${user.get('lastName')}`
   }));
   dispatch(allUsersFetched(data, key));
+};
+
+export const deleteUser = (id, userType) => async dispatch => {
+  dispatch({ type: USERS_LOADING_TRUE });
+  const res = await Parse.Cloud.run('deleteUser', {
+    userId: id
+  }).catch(err => {
+    dispatch({ type: USERS_LOADING_FALSE });
+    return Promise.reject(err);
+  });
+
+  dispatch(userDeleted({ id, userType }));
+  dispatch({ type: USERS_LOADING_FALSE });
+
+  return Promise.resolve(res);
 };

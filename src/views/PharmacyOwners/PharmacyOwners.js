@@ -8,7 +8,7 @@ const PharmacyOwners = () => {
   const type = ['pharmacyOwner'];
   const toast = useNotify();
 
-  const { pharmacyOwners, fetching } = useSelector(state => state.users);
+  const { pharmacyOwners, fetching, loading } = useSelector(state => state.users);
   const dispatch = useDispatch();
 
   useEffect(async () => {
@@ -19,7 +19,9 @@ const PharmacyOwners = () => {
     }
   }, []);
 
-  return <Users title="Pharmacy Owners" users={pharmacyOwners} fetching={fetching} />;
+  return (
+    <Users title="Pharmacy Owners" users={pharmacyOwners} fetching={fetching} loading={loading} />
+  );
 };
 
 export default PharmacyOwners;

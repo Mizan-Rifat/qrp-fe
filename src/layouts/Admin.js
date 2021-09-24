@@ -12,6 +12,7 @@ import usePresence from 'hooks/usePresence';
 import loadable from '@loadable/component';
 import EmergencyShifts from 'views/EmergencyShifts/EmergencyShifts';
 import PushNotifications from 'views/PushNotifications/PushNotifications';
+import { useSelector } from 'react-redux';
 
 const Messages = loadable(() => import('views/Chat/Messages'));
 const UserDetails = loadable(() => import('views/UserDetails/UserDetails'));
@@ -29,6 +30,8 @@ export default function Admin({ ...rest }) {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  const { fetching } = useSelector(state => state.contacts);
 
   usePresence();
 
@@ -48,15 +51,19 @@ export default function Admin({ ...rest }) {
         <Navbar handleDrawerToggle={handleDrawerToggle} {...rest} />
         <div className={classes.content}>
           <div className={classes.container}>
-            <Switch>
-              <Route exact path="/staffs" component={Staffs} />
-              <Route exact path="/user/:id" component={UserDetails} />
-              <Route exact path="/pharmacy-owners" component={PharmacyOwners} />
-              <Route exact path="/messages" component={Messages} />
-              <Route exact path="/emergency-shift-requests" component={EmergencyShifts} />
-              <Route exact path="/push-notification" component={PushNotifications} />
-              <Redirect from="/" to="/staffs" />
-            </Switch>
+            {fetching ? (
+              <p>laoding</p>
+            ) : (
+              <Switch>
+                <Route exact path="/staffs" component={Staffs} />
+                <Route exact path="/user/:id" component={UserDetails} />
+                <Route exact path="/pharmacy-owners" component={PharmacyOwners} />
+                <Route exact path="/messages" component={Messages} />
+                <Route exact path="/emergency-shift-requests" component={EmergencyShifts} />
+                <Route exact path="/push-notification" component={PushNotifications} />
+                <Redirect from="/" to="/staffs" />
+              </Switch>
+            )}
           </div>
         </div>
       </div>

@@ -48,10 +48,17 @@ const Messages = () => {
 
   const currentUser = Parse.User.current();
 
+  const deleteMessage = async () => {
+    const messages = await Parse.Cloud.run('destroy-message', {
+      rid
+    });
+  };
+
   const { recipient } = useSelector(state => state.messages);
 
   return (
     <MessageContext.Provider value={{ rid, setRid, openDialog, setOpenDialog, currentUser }}>
+      <Button onClick={deleteMessage}>Delete</Button>
       <Grid container component={Paper} className={classes.chatSection}>
         <Hidden smDown>
           <Grid item xs={3} className={classes.borderRight500}>
