@@ -46,6 +46,16 @@ export default function MessageDialog({ data, open, setOpen }) {
       setLoading(false);
       setOpen(false);
       toast('Successfully sent.', 'success');
+      const Notifications = Parse.Object.extend('Notifications');
+      data.forEach(user => {
+        const notifications = new Notifications();
+        notifications.set('from', Parse.User.current());
+        notifications.set('to', { __type: 'Pointer', className: '_User', objectId: user.id });
+        notifications.set('type', ['manual']);
+        notifications.set('read', false);
+        notifications.set('notes', message);
+        notifications.save();
+      });
     }
   };
 
