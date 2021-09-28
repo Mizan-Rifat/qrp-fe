@@ -101,7 +101,7 @@ const Users = ({ title, users, fetching, loading }) => {
       title: 'Avg Ratings',
       field: 'avgRatings',
       align: 'center',
-      render: rowData => (rowData.avgRatings ? rowData.avgRatings : 0)
+      render: rowData => (rowData.avgRatings ? rowData.avgRatings.toFixed(2) : 0)
     }
   ];
 

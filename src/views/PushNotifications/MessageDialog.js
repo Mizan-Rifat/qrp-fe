@@ -35,7 +35,7 @@ export default function MessageDialog({ data, open, setOpen }) {
       include_player_ids,
       message,
       headings: 'Message from QRP Consulting',
-      type: 'manual'
+      type: 'adminPush'
     }).catch(err => {
       setLoading(false);
       toast(err.message, 'error');
@@ -51,7 +51,7 @@ export default function MessageDialog({ data, open, setOpen }) {
         const notifications = new Notifications();
         notifications.set('from', Parse.User.current());
         notifications.set('to', { __type: 'Pointer', className: '_User', objectId: user.id });
-        notifications.set('type', ['manual']);
+        notifications.set('type', ['adminPush']);
         notifications.set('read', false);
         notifications.set('notes', message);
         notifications.save();
