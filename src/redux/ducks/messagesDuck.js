@@ -1,5 +1,7 @@
 import Parse from 'parse';
 import { contactsUpdated, sortContacts, fetchContacts } from './contactsDuck';
+import sound1 from 'assets/audio/1.mp3';
+import sound2 from 'assets/audio/2.mp3';
 
 //actions
 
@@ -162,6 +164,9 @@ export const receiveMessage = ({ message }) => async (dispatch, getState) => {
   const contact = getState().contacts.contacts.find(contact => contact.id === rid);
   const isChating = getState().messages.recipient.id === message.messageFrom.objectId;
 
+  const audio1 = new Audio(sound1);
+  const audio2 = new Audio(sound2);
+
   if (contact) {
     let updatedContact = { ...contact };
     if (isChating) {
@@ -170,8 +175,10 @@ export const receiveMessage = ({ message }) => async (dispatch, getState) => {
         payload: message
       });
       setMessageSeen(rid);
+      audio1.play();
     } else {
       updatedContact.unseenCount = contact.unseenCount + 1;
+      audio2.play();
     }
     updatedContact.lastMessage = message;
     dispatch(contactsUpdated(updatedContact));
