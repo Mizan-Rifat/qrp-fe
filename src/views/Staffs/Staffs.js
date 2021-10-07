@@ -9,7 +9,7 @@ const Staffs = () => {
   const type = ['Pharmacist', 'Other'];
   const toast = useNotify();
 
-  const { staffs, fetching } = useSelector(state => state.users);
+  const { staffs, fetching, loading } = useSelector(state => state.users);
   const dispatch = useDispatch();
 
   useEffect(async () => {
@@ -20,7 +20,9 @@ const Staffs = () => {
       });
     }
   }, []);
-  return <Users type={type} title="Manage Staffs" users={staffs} fetching={fetching} />;
+  return (
+    <Users type={type} title="Manage Staffs" users={staffs} fetching={fetching} loading={loading} />
+  );
 };
 
 export default Staffs;

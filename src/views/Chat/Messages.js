@@ -16,7 +16,6 @@ import ContactsList from './ContactsList';
 import Chat from './Chat';
 import Parse from 'parse';
 import { Button, Hidden, Slide } from '@material-ui/core';
-import { useSelector } from 'react-redux';
 import Scrollbar from 'react-scrollbars-custom';
 import ContactListDrawer from './ContactListDrawer';
 
@@ -47,8 +46,6 @@ const Messages = () => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const currentUser = Parse.User.current();
-
-  const { recipient } = useSelector(state => state.messages);
 
   return (
     <MessageContext.Provider value={{ rid, setRid, openDialog, setOpenDialog, currentUser }}>

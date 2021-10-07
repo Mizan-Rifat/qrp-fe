@@ -9,6 +9,8 @@ import bgImage from 'assets/img/sidebar-2.jpg';
 import CloseIcon from '@material-ui/icons/Close';
 import useNotify from '../../hooks/useNotify';
 import classNames from 'classnames';
+import { sortContacts } from 'redux/ducks/contactsDuck';
+import { messageSent } from 'redux/ducks/messagesDuck';
 
 const useStyles = makeStyles(theme => ({
   closeButton: {
@@ -38,7 +40,11 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
     const Messages = Parse.Object.extend('Messages');
     const msg = new Messages();
 
-    msg.set('messageTo', receiver);
+    msg.set('messageTo', {
+      __type: 'Pointer',
+      className: '_User',
+      objectId: receiver.id
+    });
     msg.set('messageFrom', currentUser);
     msg.set('message', message);
     msg.set('seen', false);
@@ -85,9 +91,9 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
       });
 
       if (response) {
-        if (!receiver.get('online') && receiver.get('deviceId')) {
+        if (!receiver.online && receiver.deviceId) {
           const messages = Parse.Cloud.run('sendPush', {
-            include_player_ids: receiver.get('deviceId'),
+            include_player_ids: receiver.deviceId,
             heading: `${currentUser.get('firstName')} ${currentUser.get(
               'lastName'
             )} send you a message.`,
@@ -98,7 +104,7 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
 
         setMessage('');
         setAttachment(null);
-        dispatch(receiveMessage({ id: response.id, ...response.attributes }));
+        dispatch(messageSent({ id: response.id, ...response.attributes }));
       }
 
       setLoading(false);

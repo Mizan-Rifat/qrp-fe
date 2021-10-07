@@ -1,8 +1,12 @@
 import Parse from 'parse';
+
+import { setMessageSeen } from './messagesDuck';
 //actions
 
 const CONTACTS_FETCHED = 'qrp/contacts/contacts_fetched';
+const CONTACTS_ADDED = 'qrp/contacts/contacts_added';
 const CONTACTS_UPDATED = 'qrp/contacts/contacts_updated';
+const SORT_CONTACTS = 'qrp/contacts/sort_contacts';
 const SET_UNSEEN_MESSAGE = 'qrp/contacts/has_unseen_message';
 
 const LOADING_TRUE = 'qrp/contacts/loading_true';
@@ -34,12 +38,35 @@ export default (state = initState, action) => {
           0
         )
       };
+    case SORT_CONTACTS:
+      const sortedContacts = [...state.contacts].sort((a, b) => {
+        if (new Date(a.lastMessage?.updatedAt) > new Date(b.lastMessage?.updatedAt)) {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
+      return {
+        ...state,
+        contacts: sortedContacts,
+        unseenMessages: state.contacts.reduce(
+          (acc, contact) => (contact.unseenCount ? acc + 1 : acc),
+          0
+        )
+      };
     case CONTACTS_UPDATED:
       return {
         ...state,
         fetching: false,
         loading: false,
         contacts: state.contacts.map(item => (item.id == action.payload.id ? action.payload : item))
+      };
+    case CONTACTS_ADDED:
+      return {
+        ...state,
+        fetching: false,
+        loading: false,
+        contacts: [action.payload, ...state.contacts]
       };
     case SET_UNSEEN_MESSAGE:
       return {
@@ -88,10 +115,10 @@ export const contactsFetched = data => {
     payload: data
   };
 };
-export const contactsUpdated = data => {
+export const contactsUpdated = contact => {
   return {
     type: CONTACTS_UPDATED,
-    payload: data
+    payload: contact
   };
 };
 export const setContactsError = error => {
@@ -100,14 +127,24 @@ export const setContactsError = error => {
     payload: error
   };
 };
+export const sortContacts = () => {
+  return {
+    type: SORT_CONTACTS
+  };
+};
+export const addContact = contact => {
+  return {
+    type: CONTACTS_ADDED,
+    payload: contact
+  };
+};
 
-export const fetchContacts = () => async dispatch => {
-  dispatch({ type: FETCHING_TRUE });
+export const fetchContacts = fetching_true => async dispatch => {
+  if (fetching_true) {
+    dispatch({ type: FETCHING_TRUE });
+  }
 
-  const contacts = await Parse.Cloud.run('contacts').catch(err => {
-    dispatch(setContactsError(err));
-    return Promise.reject(err);
-  });
+  const contacts = await getContacts();
 
   dispatch(contactsFetched(contacts));
 };
@@ -126,19 +163,31 @@ export const setUnseenMessage = contacts => {
   };
 };
 
+export const updateContact = contact => async (dispatch, getState) => {
+  dispatch({ type: LOADING_TRUE });
+  const contact = getState().contacts.contacts.find(contact => contact.id === rid);
+  if (contact) {
+    dispatch({
+      type: CONTACTS_UPDATED,
+      payload: { ...contact, lastMessage: message, unseenCount: 0 }
+    });
+  }
+};
+
 export const setSeen = rid => async (dispatch, getState) => {
   dispatch({ type: LOADING_TRUE });
   const contact = getState().contacts.contacts.find(contact => contact.id === rid);
   if (contact) {
-    dispatch({ type: CONTACTS_UPDATED, payload: { ...contact, unseenCount: 0 } });
+    dispatch({
+      type: CONTACTS_UPDATED,
+      payload: { ...contact, unseenCount: 0 }
+    });
   }
   dispatch(setUnseenMessage(getState().contacts.contacts));
-  const messages = await Parse.Cloud.run('setSeen', {
-    rid
-  });
+  setMessageSeen(rid);
 };
 
-export const setUnseenCount = (rid, message) => async (dispatch, getState) => {
+export const setUnseenCount = rid => async (dispatch, getState) => {
   const contact = getState().contacts.contacts.find(contact => contact.id === rid);
   const recipient = getState().messages.recipient;
   if (contact) {
@@ -146,10 +195,14 @@ export const setUnseenCount = (rid, message) => async (dispatch, getState) => {
       type: CONTACTS_UPDATED,
       payload: {
         ...contact,
-        unseenCount: contact.id !== recipient.id ? contact.unseenCount + 1 : contact.unseenCount,
-        lastMessage: message
+        unseenCount: contact.id !== recipient.id ? contact.unseenCount + 1 : contact.unseenCount
       }
     });
   }
-  dispatch(setUnseenMessage(getState().contacts.contacts));
+  // dispatch(setUnseenMessage(getState().contacts.contacts));
+};
+
+const getContacts = async () => {
+  const contacts = await Parse.Cloud.run('contacts');
+  return contacts;
 };

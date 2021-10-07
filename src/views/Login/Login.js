@@ -77,6 +77,8 @@ export default function Login() {
     setLoading(true);
     Parse.User.logIn(formData.username, formData.password)
       .then(async res => {
+        setLoading(false);
+        history.push('/admin');
         const roles = await new Parse.Query(Parse.Role).equalTo('users', res).find();
 
         if (roles.some(role => role.get('name') === 'Administrator')) {

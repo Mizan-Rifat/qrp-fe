@@ -1,4 +1,7 @@
 import Parse from 'parse';
+import { contactsUpdated, sortContacts, fetchContacts } from './contactsDuck';
+import sound1 from 'assets/audio/1.mp3';
+import sound2 from 'assets/audio/2.mp3';
 
 //actions
 
@@ -120,12 +123,6 @@ export const messagesFetched = data => {
   };
 };
 
-export const receiveMessage = message => {
-  return {
-    type: MESSAGE_ADDED,
-    payload: message
-  };
-};
 export const moreMessageLoaded = data => {
   return {
     type: MORE_MESSAGES_LOADED,
@@ -162,6 +159,52 @@ export const fetchMessages = (rid, page) => async dispatch => {
   dispatch(messagesFetched(messages));
 };
 
+export const receiveMessage = ({ message }) => async (dispatch, getState) => {
+  const rid = message.messageFrom.objectId;
+  const contact = getState().contacts.contacts.find(contact => contact.id === rid);
+  const isChating = getState().messages.recipient.id === message.messageFrom.objectId;
+
+  const audio1 = new Audio(sound1);
+  const audio2 = new Audio(sound2);
+
+  if (contact) {
+    let updatedContact = { ...contact };
+    if (isChating) {
+      dispatch({
+        type: MESSAGE_ADDED,
+        payload: message
+      });
+      setMessageSeen(rid);
+      audio1.play();
+    } else {
+      updatedContact.unseenCount = contact.unseenCount + 1;
+      audio2.play();
+    }
+    updatedContact.lastMessage = message;
+    dispatch(contactsUpdated(updatedContact));
+    dispatch(sortContacts());
+  } else {
+    dispatch(fetchContacts(false));
+  }
+};
+
+export const messageSent = message => async (dispatch, getState) => {
+  const contact = getState().contacts.contacts.find(
+    contact => contact.id === message.messageTo.objectId
+  );
+  let updatedContact = { ...contact };
+
+  if (contact) {
+    dispatch({
+      type: MESSAGE_ADDED,
+      payload: message
+    });
+    updatedContact.lastMessage = message;
+    dispatch(contactsUpdated(updatedContact));
+    dispatch(sortContacts());
+  }
+};
+
 export const loadMoreMessages = (rid, page) => async dispatch => {
   dispatch({ type: LOADING_TRUE });
   const messages = await Parse.Cloud.run('messages', {
@@ -173,4 +216,10 @@ export const loadMoreMessages = (rid, page) => async dispatch => {
     return Promise.reject(err);
   });
   dispatch(moreMessageLoaded(messages));
+};
+
+export const setMessageSeen = async rid => {
+  await Parse.Cloud.run('setSeen', {
+    rid
+  });
 };
