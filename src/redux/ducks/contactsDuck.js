@@ -204,5 +204,6 @@ export const setUnseenCount = rid => async (dispatch, getState) => {
 
 const getContacts = async () => {
   const contacts = await Parse.Cloud.run('contacts');
+  console.log({ contacts });
   return contacts;
 };

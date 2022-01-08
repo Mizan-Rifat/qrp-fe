@@ -11,6 +11,7 @@
     "axios": "^0.21.1",
     "classnames": "2.3.1",
     "dayjs": "^1.10.5",
+    "google-distance-matrix": "^1.1.1",
     "material-table": "^1.69.3",
     "notistack": "^1.0.10",
     "parse": "^3.2.0",
