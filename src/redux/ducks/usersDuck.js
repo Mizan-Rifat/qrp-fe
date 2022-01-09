@@ -96,6 +96,7 @@ export const fetchUsers = (type, key) => async dispatch => {
   const User = new Parse.User();
   const userQuery = new Parse.Query(User);
   userQuery.containedIn('userType', type);
+  userQuery.descending('createdAt');
   const parseUsers = await userQuery.find().catch(err => {
     dispatch({ type: USER_FETCHING_FALSE });
     return Promise.reject(err);

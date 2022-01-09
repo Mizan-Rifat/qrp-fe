@@ -171,7 +171,6 @@ const UserDetails = () => {
       const fields = [
         'username',
         'phone',
-        'softwareSystem',
         'typeOfShifts',
         'currentJobTitle',
         'skills',
@@ -300,7 +299,7 @@ const UserDetails = () => {
                         style={{ boxShadow: 'unset', background: 'unset' }}
                         title=""
                         columns={columns}
-                        data={tableData.slice(0, 11)}
+                        data={tableData.slice(0, 10)}
                         isLoading={fetching}
                         options={{
                           paging: false,
@@ -315,7 +314,7 @@ const UserDetails = () => {
                         style={{ boxShadow: 'unset', background: 'unset' }}
                         title=""
                         columns={columns}
-                        data={tableData.slice(11, tableData.length)}
+                        data={tableData.slice(10, tableData.length)}
                         isLoading={fetching}
                         options={{
                           paging: false,
