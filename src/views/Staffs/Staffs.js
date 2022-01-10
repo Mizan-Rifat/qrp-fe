@@ -21,15 +21,28 @@ const Staffs = () => {
   const dispatch = useDispatch();
 
   useEffect(async () => {
-    const shifts = await Parse.Cloud.run('getShifts');
-    shifts.forEach(shift => {
-      console.log({
-        id: shift.id,
-        candidate: shift.get('shifter').get('candidate')?.get('province')
-      });
-    });
+    // const customer = await Parse.Cloud.run('retriveStripeCustomer', {
+    //   customerId: 'cus_KpK88KVYuyQhTy'
+    // });
+    // console.log({ customer });
 
-    console.log({ shifts });
+    const Shifts = Parse.Object.extend('Shifts');
+    const shiftQuery = new Parse.Query(Shifts);
+    // shiftQuery.get('DUqED1a2TD');
+    shiftQuery.equalTo('objectId', 'yItUBvqns5');
+    // const shift = await shiftQuery.get('DUqED1a2TD');
+    shiftQuery.include('pharmacyId');
+    shiftQuery.include('shifter.candidate');
+    const shift = await shiftQuery.first();
+
+    const shiftTime = shift.get('startTime').split(':');
+    const shiftDate = dayjs(shift.get('shiftDate'))
+      .set('hour', shiftTime[0])
+      .set('minute', shiftTime[1]);
+
+    console.log(shiftDate.format('HH:MM a'));
+
+    console.log({ shift });
   }, []);
   return (
     <Users type={type} title="Manage Staffs" users={staffs} fetching={fetching} loading={loading} />
