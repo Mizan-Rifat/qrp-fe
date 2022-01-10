@@ -172,7 +172,6 @@ const UserDetails = () => {
         'username',
         'phone',
         'typeOfShifts',
-        'currentJobTitle',
         'skills',
         'pharmacyExperience',
         'licenseNumber',

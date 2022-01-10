@@ -12,8 +12,8 @@ const useReciever = rid => {
   const uid = currentUser.id;
 
   const pusher = new Pusher('6e894e9b27c3993c4068', {
-    // authEndpoint: 'https://qrps.app/pusher/auth',
-    authEndpoint: 'http://127.0.0.1:1337/pusher/auth',
+    authEndpoint: 'https://qrps.app/pusher/auth',
+    // authEndpoint: 'http://127.0.0.1:1337/pusher/auth',
     cluster: 'mt1',
     auth: {
       headers: {
