@@ -15,6 +15,7 @@ import PushNotifications from 'views/PushNotifications/PushNotifications';
 import { useSelector } from 'react-redux';
 import { Box } from '@material-ui/core';
 import { Loading } from 'components/Loading/Loading';
+import SmsNotifications from 'views/SmsNotifications/SmsNotifications';
 
 const Messages = loadable(() => import('views/Chat/Messages'));
 const UserDetails = loadable(() => import('views/UserDetails/UserDetails'));
@@ -69,6 +70,7 @@ export default function Admin({ ...rest }) {
                 <Route exact path="/messages" component={Messages} />
                 <Route exact path="/emergency-shift-requests" component={EmergencyShifts} />
                 <Route exact path="/push-notification" component={PushNotifications} />
+                <Route exact path="/sms-notification" component={SmsNotifications} />
                 <Redirect from="/" to="/staffs" />
               </Switch>
             )}

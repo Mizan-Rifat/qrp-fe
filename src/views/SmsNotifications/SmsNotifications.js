@@ -7,7 +7,7 @@ import MaterialTable from 'material-table';
 import Avatar from '../../components/Avatar/Avatar';
 import { Grid } from '@material-ui/core';
 import Parse from 'parse';
-import MessageDialog from './MessageDialog';
+import MessageDialog from 'components/Dialog/MessageDialog';
 
 const useStyles = makeStyles(theme => ({
   cardTitleWhite: {
@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-const PushNotifications = () => {
+const SmsNotifications = () => {
   const classes = useStyles();
 
   const [users, setUsers] = useState([]);
@@ -59,11 +59,23 @@ const PushNotifications = () => {
     }
   ];
 
+  const handleSend = async message => {
+    const phoneNumbers = selectedUsers.map(item => item.phone);
+    const res = await Parse.Cloud.run('sendMessageToPharmacists', {
+      phoneNumbers,
+      message
+    }).catch(err => {
+      console.log({ err });
+      return Promise.reject(err);
+    });
+    return res;
+  };
+
   useEffect(async () => {
     const User = new Parse.User();
     const userQuery = new Parse.Query(User);
-    userQuery.equalTo('userType', 'pharmacyOwner');
-    userQuery.exists('deviceId');
+    userQuery.equalTo('userType', 'Pharmacist');
+    userQuery.equalTo('smsVerified', true);
     const parseUsers = await userQuery.find().catch(err => {});
 
     const users = parseUsers.map(user => ({
@@ -71,6 +83,9 @@ const PushNotifications = () => {
       ...user.attributes,
       name: `${user.get('firstName')} ${user.get('lastName')}`
     }));
+    users.forEach(user => {
+      console.log(user.phone);
+    });
     console.log({ users });
     setFetching(false);
     setUsers(users);
@@ -79,7 +94,7 @@ const PushNotifications = () => {
   return (
     <Card>
       <CardHeader color="primary">
-        <h4 className={classes.cardTitleWhite}>Custom Push Notifications to Owner</h4>
+        <h4 className={classes.cardTitleWhite}>Send SMS to Pharmacists</h4>
       </CardHeader>
       <CardBody>
         <MaterialTable
@@ -106,11 +121,17 @@ const PushNotifications = () => {
           }}
         />
       </CardBody>
-      <MessageDialog data={selectedUsers} open={openDialog} setOpen={setOpenDialog} />
+      <MessageDialog
+        open={openDialog}
+        setOpen={setOpenDialog}
+        handleSend={handleSend}
+        title="Send SMS"
+        textFieldProps={{ maxLength: 160 }}
+      />
     </Card>
   );
 };
 
-PushNotifications.propTypes = {};
+SmsNotifications.propTypes = {};
 
-export default PushNotifications;
+export default SmsNotifications;

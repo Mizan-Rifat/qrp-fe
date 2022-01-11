@@ -3,6 +3,7 @@ import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import EmailIcon from '@material-ui/icons/Email';
 import FlagIcon from '@material-ui/icons/Flag';
 import NotificationsIcon from '@material-ui/icons/Notifications';
+import SmsIcon from '@material-ui/icons/Sms';
 
 export const navMenu = [
   {
@@ -28,7 +29,12 @@ export const navMenu = [
   },
   {
     path: '/push-notification',
-    name: 'Push Notification',
+    name: 'Push Notification to Owners',
     icon: NotificationsIcon
+  },
+  {
+    path: '/sms-notification',
+    name: 'SMS Notification to Pharmacists',
+    icon: SmsIcon
   }
 ];
