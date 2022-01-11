@@ -122,7 +122,6 @@ const SmsNotifications = () => {
         />
       </CardBody>
       <MessageDialog
-        data={selectedUsers}
         open={openDialog}
         setOpen={setOpenDialog}
         handleSend={handleSend}

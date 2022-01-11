@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function MessageDialog({ data, open, setOpen, handleSend, title, textFieldProps }) {
+export default function MessageDialog({ open, setOpen, handleSend, title, textFieldProps }) {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
