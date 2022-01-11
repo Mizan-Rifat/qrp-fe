@@ -28,7 +28,7 @@ export const navMenu = [
   },
   {
     path: '/push-notification',
-    name: 'Push Notification',
+    name: 'Push Notification to Owners',
     icon: NotificationsIcon
   }
 ];

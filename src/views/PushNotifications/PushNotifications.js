@@ -50,12 +50,12 @@ const PushNotifications = () => {
       field: 'customEmail'
     },
     {
-      title: 'Country',
-      field: 'country'
-    },
-    {
       title: 'Province',
       field: 'province'
+    },
+    {
+      title: 'City',
+      field: 'city'
     }
   ];
 
@@ -71,6 +71,7 @@ const PushNotifications = () => {
       ...user.attributes,
       name: `${user.get('firstName')} ${user.get('lastName')}`
     }));
+    console.log({ users });
     setFetching(false);
     setUsers(users);
   }, []);
