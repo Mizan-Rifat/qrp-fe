@@ -95,7 +95,7 @@ const Users = ({ title, users, fetching, loading }) => {
     {
       title: 'Address',
       field: 'city',
-      render: rowData => `${rowData.city},${rowData.country}`
+      render: rowData => [rowData.city, rowData.country].filter(item => item).join(',')
     },
     {
       title: 'Status',
