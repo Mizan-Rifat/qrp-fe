@@ -84,11 +84,11 @@ const UserDetails = () => {
     });
   };
 
-  const handleApprove = async () => {
+  const handleApprove = async status => {
     dispatch(setUserLoadingTrue());
     const res = await Parse.Cloud.run('user-status', {
       uid: id,
-      status: !user.status
+      status
     }).catch(err => {
       dispatch(setUserLoadingFalse());
       toast(err.message, 'error');
@@ -103,24 +103,31 @@ const UserDetails = () => {
         })
       );
 
+      if (user.waiting) {
+        dispatch(
+          userUpdated({
+            key: 'waiting',
+            value: false
+          })
+        );
+      }
+
       //send email to user
       Parse.Cloud.run('statusUpdateByQRP', {
         email: user.username,
         name: user.firstName,
-        status: res.get('status') ? 'Approved' : 'Declined'
+        status: status ? 'Approved' : 'Declined'
       });
     }
   };
 
-  const handleStatus = user => {
+  const handleStatus = status => {
     confirm({
       variant: 'danger',
       catchOnCancel: true,
-      title: user.status
-        ? 'Are you sure to decline this user?'
-        : 'Are you sure to approve this user?'
+      title: status ? 'Are you sure to approve this user?' : 'Are you sure to decline this user?'
     }).then(() => {
-      handleApprove();
+      handleApprove(status);
     });
   };
 
@@ -284,18 +291,24 @@ const UserDetails = () => {
                     )}
 
                     <Box position="relative">
-                      <Button
-                        color={user.status ? 'danger' : 'success'}
-                        onClick={() => handleStatus(user)}
-                        disabled={loading}
-                      >
-                        {user.status ? 'Decline' : 'Approve'}
-                      </Button>
-
-                      {loading && (
-                        <Box position="absolute" top="33%" left="39%">
-                          <CircularProgress size={16} />
-                        </Box>
+                      {(user.waiting || !user.status) && (
+                        <Button
+                          color="success"
+                          onClick={() => handleStatus(true)}
+                          disabled={loading}
+                          style={{ marginRight: 4 }}
+                        >
+                          Approve
+                        </Button>
+                      )}
+                      {(user.waiting || user.status) && (
+                        <Button
+                          color="danger"
+                          onClick={() => handleStatus(false)}
+                          disabled={loading}
+                        >
+                          Decline
+                        </Button>
                       )}
                     </Box>
                   </Box>
