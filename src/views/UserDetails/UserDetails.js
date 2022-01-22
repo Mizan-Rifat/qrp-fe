@@ -206,9 +206,16 @@ const UserDetails = () => {
         })),
         {
           label: 'Address',
-          value: `${user.addressOne}${user.addressTwo && ', ' + user.addressTwo}, ${user.city}, ${
-            user.province
-          }, ${user.postalCode}, ${user.country}`
+          value: [
+            user.addressOne,
+            user.addressTwo,
+            user.city,
+            user.province,
+            user.postalCode,
+            user.country
+          ]
+            .filter(item => item)
+            .join(',')
         },
         {
           label: 'Joined',
