@@ -98,10 +98,17 @@ const Users = ({ title, users, fetching, loading }) => {
       render: rowData => `${rowData.city},${rowData.country}`
     },
     {
-      title: 'Avg Ratings',
-      field: 'avgRatings',
+      title: 'Status',
+      field: 'status',
       align: 'center',
-      render: rowData => (rowData.avgRatings ? rowData.avgRatings.toFixed(2) : 0)
+      render: rowData => (rowData.waiting ? 'Waiting' : rowData.status ? 'Approved' : 'Declined'),
+      customFilterAndSearch: (term, rowData) => {
+        return (
+          (rowData.waiting ? 'Waiting' : rowData.status ? 'Approved' : 'Declined')
+            .toLowerCase()
+            .indexOf(term.toLowerCase()) != -1
+        );
+      }
     }
   ];
 

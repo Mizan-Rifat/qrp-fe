@@ -92,17 +92,26 @@ export const userUpdated = user => {
 
 export const fetchUsers = (type, key) => async dispatch => {
   dispatch({ type: USERS_FETCHING_TRUE });
-
+  let users = [];
   const User = new Parse.User();
   const userQuery = new Parse.Query(User);
   userQuery.containedIn('userType', type);
+  userQuery.limit(1000);
   userQuery.descending('createdAt');
-  const parseUsers = await userQuery.find().catch(err => {
-    dispatch({ type: USER_FETCHING_FALSE });
-    return Promise.reject(err);
-  });
-
-  const data = parseUsers.map(user => ({
+  userQuery.withCount();
+  const getUsers = async () => {
+    userQuery.skip(users.length);
+    const result = await userQuery.find().catch(err => {
+      dispatch({ type: USER_FETCHING_FALSE });
+      return Promise.reject(err);
+    });
+    users = [...users, ...result.results];
+    if (result && result.count > users.length) {
+      await getUsers();
+    }
+  };
+  await getUsers();
+  const data = users.map(user => ({
     id: user.id,
     ...user.attributes,
     name: `${user.get('firstName')} ${user.get('lastName')}`
