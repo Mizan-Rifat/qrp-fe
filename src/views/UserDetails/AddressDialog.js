@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import Autocomplete from 'react-google-autocomplete';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -7,6 +8,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import LocationOnOutlinedIcon from '@material-ui/icons/LocationOnOutlined';
+import Test from './Test';
+
+import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import {
   Box,
   CircularProgress,
@@ -33,6 +37,10 @@ const useStyles = makeStyles(theme => ({
 
 export default function AddressDialog({ user, open, setOpen }) {
   const classes = useStyles();
+
+  const [value, setValue] = useState('');
+
+  console.log({ value });
 
   const [formData, setFormData] = useState({
     streetAddress: '',
@@ -100,6 +108,7 @@ export default function AddressDialog({ user, open, setOpen }) {
       open={open}
       onClose={handleClose}
       aria-labelledby="max-width-dialog-title"
+      style={{ zIndex: 120 }}
     >
       {loading && (
         <Box position="absolute" top="45%" left="47%">
@@ -108,7 +117,22 @@ export default function AddressDialog({ user, open, setOpen }) {
       )}
       <DialogTitle id="max-width-dialog-title">Update Address</DialogTitle>
       <DialogContent className={loading && classes.formDisable}>
-        <TextField
+        <Test />
+        {/* <GooglePlacesAutocomplete
+          apiKey="AIzaSyDQlMDmtfECBU455cekml_oYMnKkd3DBKA"
+          selectProps={{
+            value,
+            onChange: setValue
+          }}
+        /> */}
+        {/* <Autocomplete
+          apiKey="AIzaSyDQlMDmtfECBU455cekml_oYMnKkd3DBKA"
+          onPlaceSelected={place => {
+            console.log(place);
+          }}
+        /> */}
+
+        {/* <TextField
           label="Search Location"
           className={classes.textField}
           size="small"
@@ -121,7 +145,7 @@ export default function AddressDialog({ user, open, setOpen }) {
               </InputAdornment>
             )
           }}
-        />
+        /> */}
         <TextField
           label="Street Address"
           value={formData.streetAddress}
