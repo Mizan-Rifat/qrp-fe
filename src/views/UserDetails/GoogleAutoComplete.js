@@ -1,13 +1,12 @@
-import React, { useRef, useState } from 'react';
-import { Input, InputAdornment, TextField } from '@material-ui/core';
-import Autocomplete, { usePlacesWidget } from 'react-google-autocomplete';
+import React from 'react';
+import { InputAdornment, TextField } from '@material-ui/core';
+import { usePlacesWidget } from 'react-google-autocomplete';
 import LocationOnOutlinedIcon from '@material-ui/icons/LocationOnOutlined';
 
-function App({ setFormData }) {
+const GoogleAutoComplete = ({ setFormData }) => {
   const { ref } = usePlacesWidget({
     apiKey: 'AIzaSyDQlMDmtfECBU455cekml_oYMnKkd3DBKA',
     onPlaceSelected: place => {
-      console.log({ place });
       const addressComponents = {
         locality: 'city',
         administrative_area_level_1: 'province',
@@ -30,7 +29,6 @@ function App({ setFormData }) {
       address.addressOne = place.name;
       address.latitude = place.geometry.location.lat();
       address.longitude = place.geometry.location.lng();
-      console.log({ address });
       setFormData(address);
     },
     options: {
@@ -43,7 +41,6 @@ function App({ setFormData }) {
   return (
     <TextField
       label="Search Location"
-      // className={classes.textField}
       style={{ marginBottom: 16 }}
       size="small"
       variant="outlined"
@@ -58,6 +55,6 @@ function App({ setFormData }) {
       }}
     />
   );
-}
+};
 
-export default App;
+export default GoogleAutoComplete;

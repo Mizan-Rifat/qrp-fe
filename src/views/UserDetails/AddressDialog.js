@@ -1,27 +1,12 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Autocomplete from 'react-google-autocomplete';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
-import LocationOnOutlinedIcon from '@material-ui/icons/LocationOnOutlined';
-import Test from './Test';
-
-import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
-import {
-  Box,
-  CircularProgress,
-  FormControl,
-  Icon,
-  InputAdornment,
-  InputLabel,
-  OutlinedInput,
-  TextField
-} from '@material-ui/core';
-import Parse from 'parse';
+import GoogleAutoComplete from './GoogleAutoComplete';
+import { Box, CircularProgress, TextField } from '@material-ui/core';
 import useNotify from 'hooks/useNotify';
 import { useEffect } from 'react';
 import { updateUser } from 'redux/ducks/userDuck';
@@ -37,7 +22,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function AddressDialog({ user, open, setOpen, userId }) {
+export default function AddressDialog({ user, open, setOpen }) {
   const classes = useStyles();
   const dispatch = useDispatch();
 
@@ -53,18 +38,26 @@ export default function AddressDialog({ user, open, setOpen, userId }) {
 
   const [addressTwo, setAddressTwo] = useState(user.addressTwo);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
 
   const toast = useNotify();
 
   const handleClose = () => {
-    setMessage('');
     setLoading(false);
     setOpen(false);
   };
   const handleSubmit = async () => {
     setLoading(true);
-    dispatch(updateUser(userId, { ...formData, addressTwo }));
+    dispatch(updateUser(user.id, { ...formData, addressTwo }))
+      .then(() => {
+        setLoading(false);
+        setOpen(false);
+        toast('Successfully updated.', 'success');
+      })
+      .catch(err => {
+        setLoading(false);
+        setOpen(false);
+        toast(err.message, 'error');
+      });
   };
 
   useEffect(() => {
@@ -97,7 +90,7 @@ export default function AddressDialog({ user, open, setOpen, userId }) {
       )}
       <DialogTitle id="max-width-dialog-title">Update Address</DialogTitle>
       <DialogContent className={loading && classes.formDisable}>
-        <Test formData={formData} setFormData={setFormData} />
+        <GoogleAutoComplete setFormData={setFormData} />
         <TextField
           label="Apt/Suite #"
           value={addressTwo}

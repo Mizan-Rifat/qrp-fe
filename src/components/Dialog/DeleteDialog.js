@@ -11,7 +11,6 @@ import Parse from 'parse';
 import { makeStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
 import { useDispatch } from 'react-redux';
-import { userUpdated } from 'redux/ducks/userDuck';
 import useNotify from 'hooks/useNotify';
 
 const useStyles = makeStyles({
@@ -21,7 +20,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function DeleteDialog({ open, setOpen}) {
+export default function DeleteDialog({ open, setOpen }) {
   const classes = useStyles();
   const handleClickOpen = () => {
     setOpen(true);
@@ -35,7 +34,6 @@ export default function DeleteDialog({ open, setOpen}) {
 
   const dispatch = useDispatch();
   const toast = useNotify();
-
 
   return (
     <>

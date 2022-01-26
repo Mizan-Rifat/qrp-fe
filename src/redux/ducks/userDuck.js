@@ -22,7 +22,7 @@ export default (state = initState, action) => {
     case USER_FETCHED:
       return {
         ...state,
-        user: action.payload,
+        user: { ...state.user, ...action.payload },
         loading: false,
         fetching: false
       };
@@ -129,23 +129,18 @@ export const fetchUser = id => async dispatch => {
 };
 
 export const updateUser = (id, data) => async dispatch => {
-  const { addressOne, addressTwo, city, province, postalCode, country, latitude, longitude } = data;
-
-  console.log({ data });
   const updatedUser = await Parse.Cloud.run('updateUser', {
     userId: id,
     data
+  }).catch(err => {
+    console.log({ err });
+    return Promise.reject(err);
   });
-
-  console.log({ updatedUser });
-
-  // dispatch(
-  //   userFetched(
-  //     {
-  //       ...user,
-  //       ...parseUser.attributes
-  //     },
-  //     parseUser
-  //   )
-  // );
+  dispatch(
+    userFetched({
+      id: updatedUser.id,
+      ...updatedUser.attributes
+    })
+  );
+  return Promise.resolve();
 };

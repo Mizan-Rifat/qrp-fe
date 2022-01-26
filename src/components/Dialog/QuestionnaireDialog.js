@@ -99,7 +99,6 @@ let pharmacistQuestions = [
 ];
 
 export default function QuestionnaireDialog({ user, open, setOpen }) {
-  console.log({ user });
   const handleClose = () => {
     setOpen(false);
   };

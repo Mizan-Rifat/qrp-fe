@@ -1,27 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useHistory, useParams } from 'react-router';
+import React, { useState } from 'react';
+import { useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUser, resetUserState } from 'redux/ducks/userDuck';
-import Card from 'components/Card/Card.js';
-import CardHeader from 'components/Card/CardHeader.js';
-import CardBody from 'components/Card/CardBody.js';
-import { Box, Button as MButton, CircularProgress, Grid, makeStyles } from '@material-ui/core';
-import { ucFirst, sentenceCase } from '../../utils';
-import dayjs from 'dayjs';
-import MaterialTable from 'material-table';
+import { Box } from '@material-ui/core';
 import Button from 'components/CustomButtons/Button.js';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import MLightBox from 'components/Lightbox/MLightBox';
-import image from '../../assets/img/no-image.png';
-import ManagerDetails from './ManagerDetails';
 import FormDialog from 'components/Dialog/FormDialog';
-import { Loading } from 'components/Loading/Loading';
 import { setUserLoadingTrue, setUserLoadingFalse } from 'redux/ducks/userDuck';
 import { userUpdated } from 'redux/ducks/userDuck';
 import Parse from 'parse';
 import { useConfirmation } from 'hooks/useConfirmation/ConfirmationService';
 import QuestionnaireDialog from 'components/Dialog/QuestionnaireDialog';
-import { resetQuestionnaireState } from 'redux/ducks/questionnaireDuck';
 import useNotify from 'hooks/useNotify';
 import AddressDialog from './AddressDialog';
 
@@ -33,7 +20,7 @@ const ActionButtons = () => {
   const [openQuestionnaireDialog, setOpenQuestionnaireDialog] = useState(false);
   const [openAddressDialog, setOpenAddressDialog] = useState(false);
 
-  const { fetching, user, loading } = useSelector(state => state.user);
+  const { user, loading } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const handleApprove = async status => {
@@ -132,12 +119,7 @@ const ActionButtons = () => {
 
       <FormDialog open={openDialog} setOpen={setOpenDialog} uid={id} value={user.commission} />
 
-      <AddressDialog
-        open={openAddressDialog}
-        setOpen={setOpenAddressDialog}
-        user={user}
-        userId={id}
-      />
+      <AddressDialog open={openAddressDialog} setOpen={setOpenAddressDialog} user={user} />
 
       <QuestionnaireDialog
         open={openQuestionnaireDialog}
