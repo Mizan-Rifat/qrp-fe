@@ -134,3 +134,48 @@ export const fetchUser = id => async dispatch => {
     )
   );
 };
+
+export const updateUser = (id, data) => async dispatch => {
+  const { addressOne, addressTwo, city, province, postalCode, country, latitude, longitude } = data;
+
+  const messages = await Parse.Cloud.run('updateUser', {
+    userId: id,
+    data
+  });
+
+  console.log({ messages });
+
+  // console.log({ data });
+
+  // const User = Parse.Object.extend('User');
+  // const user = new User();
+  // user.id = id;
+  // // const user = await userQuery.get(id);
+
+  // const location = new Parse.GeoPoint({
+  //   latitude: parseFloat(latitude),
+  //   longitude: parseFloat(longitude)
+  // });
+
+  // user.set('location', location);
+  // user.set('addressOne', addressOne);
+  // user.set('addressTwo', addressTwo);
+  // user.set('city', city);
+  // user.set('province', province);
+  // user.set('postalCode', postalCode);
+  // user.set('country', country);
+
+  // const updatedUser = user.save();
+
+  // console.log({ updatedUser });
+
+  // dispatch(
+  //   userFetched(
+  //     {
+  //       ...user,
+  //       ...parseUser.attributes
+  //     },
+  //     parseUser
+  //   )
+  // );
+};

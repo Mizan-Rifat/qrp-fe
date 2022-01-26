@@ -3,33 +3,69 @@ import { Input, InputAdornment, TextField } from '@material-ui/core';
 import Autocomplete, { usePlacesWidget } from 'react-google-autocomplete';
 import LocationOnOutlinedIcon from '@material-ui/icons/LocationOnOutlined';
 
-function App() {
-  const inputRef = useRef(null);
-  const antInputRef = useRef(null);
-  const [country, setCountry] = useState('ca');
-  const { ref: materialRef } = usePlacesWidget({
+function App({ formData, setFormData }) {
+  const { ref } = usePlacesWidget({
     apiKey: 'AIzaSyDQlMDmtfECBU455cekml_oYMnKkd3DBKA',
     onPlaceSelected: place => {
-      console.log(place);
-      console.log(place.geometry.location.lat());
-      console.log(place.geometry.location.lng());
-      // place.address_components.reduce(())
+      console.log({ place });
+      const addressComponents = {
+        locality: 'city',
+        administrative_area_level_1: 'province',
+        postal_code: 'postalCode',
+        country: 'country'
+      };
+      const address = place.address_components.reduce((acc, val) => {
+        Object.keys(addressComponents).forEach(item => {
+          const founds = [];
+          if (val.types.indexOf(item) !== -1) {
+            acc[addressComponents[item]] = val.long_name;
+            founds.push(item);
+          } else {
+            if (!founds.includes('item')) {
+              acc[addressComponents[item]] = '';
+            }
+          }
+        });
+        return acc;
+      }, {});
+      // const address = addressComponents.reduce((acc, val) => {
+      //   place.address_components.forEach(component => {
+      //     if (component.types.indexOf(val) !== -1) {
+      //       acc[addressComponents[item]] = val.long_name;
+      //     } else {
+      //       acc[addressComponents[val]] = '';
+      //     }
+      //   });
+      //   return acc;
+      // }, {});
+
+      // const address = {};
+
+      // place.address_components.forEach(val => {
+      //   Object.keys(addressComponents).forEach(item => {
+      //     if (val.types.indexOf(item) !== -1) {
+      //       address = val.long_name;
+      //     } else {
+      //       acc[addressComponents[val]] = '';
+      //     }
+      //   });
+      //   return acc;
+      // }, {});
+
+      address.addressOne = place.name;
+      address.latitude = place.geometry.location.lat();
+      address.longitude = place.geometry.location.lng();
+      console.log({ address });
+      setFormData({ ...formData, ...address });
     },
-    // inputAutocompleteValue: 'country',
-    // options: {
-    //   componentRestrictions: { country },
-    //   fields: ['formatted_address', 'geometry', 'name']
-    // }
     options: {
       fields: ['address_components', 'formatted_address', 'geometry.location', 'name'],
-      // fields: ['ALL'],
       types: ['address'],
       componentRestrictions: { country: 'ca' }
     }
   });
 
   return (
-    // <div style={{ width: '250px', marginTop: '20px' }}>
     <TextField
       label="Search Location"
       // className={classes.textField}
@@ -37,7 +73,7 @@ function App() {
       size="small"
       variant="outlined"
       fullWidth
-      inputRef={materialRef}
+      inputRef={ref}
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
@@ -46,7 +82,6 @@ function App() {
         )
       }}
     />
-    // </div>
   );
 }
 

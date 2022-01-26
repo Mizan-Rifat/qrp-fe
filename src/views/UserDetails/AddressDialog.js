@@ -24,6 +24,8 @@ import {
 import Parse from 'parse';
 import useNotify from 'hooks/useNotify';
 import { useEffect } from 'react';
+import { updateUser } from 'redux/ducks/userDuck';
+import { useDispatch } from 'react-redux';
 
 const useStyles = makeStyles(theme => ({
   formDisable: {
@@ -35,19 +37,19 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function AddressDialog({ user, open, setOpen }) {
+export default function AddressDialog({ user, open, setOpen, userId }) {
   const classes = useStyles();
-
-  const [value, setValue] = useState('');
-
-  console.log({ value });
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
-    streetAddress: '',
+    addressOne: '',
+    addressTwo: '',
     city: '',
     province: '',
     postalCode: '',
-    country: ''
+    country: '',
+    latitude: '',
+    longitude: ''
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -59,45 +61,22 @@ export default function AddressDialog({ user, open, setOpen }) {
     setLoading(false);
     setOpen(false);
   };
-  const handleSend = async () => {
-    const include_player_ids = data.map(item => item.deviceId);
+  const handleSubmit = async () => {
     setLoading(true);
-    const res = await Parse.Cloud.run('sendPush', {
-      include_player_ids,
-      message,
-      headings: 'Message from QRP Consulting',
-      type: 'adminPush'
-    }).catch(err => {
-      setLoading(false);
-      toast(err.message, 'error');
-    });
-
-    if (res) {
-      setMessage('');
-      setLoading(false);
-      setOpen(false);
-      toast('Successfully sent.', 'success');
-      const Notifications = Parse.Object.extend('Notifications');
-      data.forEach(user => {
-        const notifications = new Notifications();
-        notifications.set('from', Parse.User.current());
-        notifications.set('to', { __type: 'Pointer', className: '_User', objectId: user.id });
-        notifications.set('type', ['adminPush']);
-        notifications.set('read', false);
-        notifications.set('notes', message);
-        notifications.save();
-      });
-    }
+    dispatch(updateUser(userId, formData));
   };
 
   useEffect(() => {
     setFormData({
       ...formData,
-      streetAddress: user.addressOne,
+      addressOne: user.addressOne,
+      addressTwo: user.addressTwo,
       city: user.city,
       province: user.province,
       postalCode: user.postalCode,
-      country: user.country
+      country: user.country,
+      latitude: user.location._latitude,
+      longitude: user.location.longitude
     });
   }, [user]);
 
@@ -117,86 +96,72 @@ export default function AddressDialog({ user, open, setOpen }) {
       )}
       <DialogTitle id="max-width-dialog-title">Update Address</DialogTitle>
       <DialogContent className={loading && classes.formDisable}>
-        <Test />
-        {/* <GooglePlacesAutocomplete
-          apiKey="AIzaSyDQlMDmtfECBU455cekml_oYMnKkd3DBKA"
-          selectProps={{
-            value,
-            onChange: setValue
-          }}
-        /> */}
-        {/* <Autocomplete
-          apiKey="AIzaSyDQlMDmtfECBU455cekml_oYMnKkd3DBKA"
-          onPlaceSelected={place => {
-            console.log(place);
-          }}
-        /> */}
-
-        {/* <TextField
-          label="Search Location"
-          className={classes.textField}
-          size="small"
+        <Test formData={formData} setFormData={setFormData} />
+        <TextField
+          label="Apt/Suite #"
+          value={formData.addressTwo}
           variant="outlined"
           fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <LocationOnOutlinedIcon />
-              </InputAdornment>
-            )
+          size="small"
+          className={classes.textField}
+          onChange={e => {
+            setFormData({
+              ...formData,
+              addressTwo: e.target.value
+            });
           }}
-        /> */}
+        />
         <TextField
           label="Street Address"
-          value={formData.streetAddress}
-          onChange={e => setMessage(e.target.value)}
+          value={formData.addressOne}
           variant="outlined"
           fullWidth
           size="small"
           className={classes.textField}
+          inputProps={{ readOnly: true }}
         />
         <TextField
           label="City"
           value={formData.city}
-          onChange={e => setMessage(e.target.value)}
           variant="outlined"
           fullWidth
           size="small"
           className={classes.textField}
+          inputProps={{ readOnly: true }}
         />
         <TextField
           label="Province"
           value={formData.province}
-          onChange={e => setMessage(e.target.value)}
           variant="outlined"
           fullWidth
           size="small"
           className={classes.textField}
+          inputProps={{ readOnly: true }}
         />
         <TextField
           label="Postal Code"
           value={formData.postalCode}
-          onChange={e => setMessage(e.target.value)}
           variant="outlined"
           fullWidth
           size="small"
           className={classes.textField}
+          inputProps={{ readOnly: true }}
         />
         <TextField
           label="Country"
           value={formData.country}
-          onChange={e => setMessage(e.target.value)}
           variant="outlined"
           fullWidth
           size="small"
           className={classes.textField}
+          inputProps={{ readOnly: true }}
         />
       </DialogContent>
       <DialogActions style={{ padding: '8px 24px 16px 24px' }}>
         <Button onClick={handleClose} color="secondary" disabled={loading}>
           Cancel
         </Button>
-        <Button type="submit" variant="contained" color="primary" onClick={handleSend}>
+        <Button type="submit" variant="contained" color="primary" onClick={handleSubmit}>
           Update
         </Button>
       </DialogActions>

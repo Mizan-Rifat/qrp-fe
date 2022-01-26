@@ -36,8 +36,6 @@ const ActionButtons = () => {
   const { fetching, user, parseUser, loading } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
-  console.log({ user });
-
   const handleApprove = async status => {
     dispatch(setUserLoadingTrue());
     const res = await Parse.Cloud.run('user-status', {
@@ -134,7 +132,12 @@ const ActionButtons = () => {
 
       <FormDialog open={openDialog} setOpen={setOpenDialog} uid={id} value={user.commission} />
 
-      <AddressDialog open={openAddressDialog} setOpen={setOpenAddressDialog} user={user} />
+      <AddressDialog
+        open={openAddressDialog}
+        setOpen={setOpenAddressDialog}
+        user={user}
+        userId={id}
+      />
 
       <QuestionnaireDialog
         open={openQuestionnaireDialog}
