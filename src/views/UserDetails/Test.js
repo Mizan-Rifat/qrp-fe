@@ -8,49 +8,30 @@ function App({ formData, setFormData }) {
     apiKey: 'AIzaSyDQlMDmtfECBU455cekml_oYMnKkd3DBKA',
     onPlaceSelected: place => {
       console.log({ place });
-      const addressComponents = {
-        locality: 'city',
-        administrative_area_level_1: 'province',
-        postal_code: 'postalCode',
-        country: 'country'
-      };
-      const address = place.address_components.reduce((acc, val) => {
-        Object.keys(addressComponents).forEach(item => {
-          const founds = [];
-          if (val.types.indexOf(item) !== -1) {
-            acc[addressComponents[item]] = val.long_name;
-            founds.push(item);
-          } else {
-            if (!founds.includes('item')) {
-              acc[addressComponents[item]] = '';
-            }
-          }
-        });
-        return acc;
-      }, {});
-      // const address = addressComponents.reduce((acc, val) => {
-      //   place.address_components.forEach(component => {
-      //     if (component.types.indexOf(val) !== -1) {
-      //       acc[addressComponents[item]] = val.long_name;
-      //     } else {
-      //       acc[addressComponents[val]] = '';
-      //     }
-      //   });
-      //   return acc;
-      // }, {});
 
-      // const address = {};
-
-      // place.address_components.forEach(val => {
-      //   Object.keys(addressComponents).forEach(item => {
-      //     if (val.types.indexOf(item) !== -1) {
-      //       address = val.long_name;
-      //     } else {
-      //       acc[addressComponents[val]] = '';
-      //     }
-      //   });
-      //   return acc;
-      // }, {});
+      const address = {};
+      place.address_components.forEach(component => {
+        if (component.types.includes('locality')) {
+          address.city = place.address_components.long_name;
+        } else {
+          address.city = '';
+        }
+        if (component.types.includes('administrative_area_level_1')) {
+          address.province = place.address_components.long_name;
+        } else {
+          address.province = '';
+        }
+        if (component.types.includes('postal_code')) {
+          address.postalCode = place.address_components.long_name;
+        } else {
+          address.postalCode = '';
+        }
+        if (component.types.includes('locality')) {
+          address.country = place.address_components.long_name;
+        } else {
+          address.country = '';
+        }
+      });
 
       address.addressOne = place.name;
       address.latitude = place.geometry.location.lat();
