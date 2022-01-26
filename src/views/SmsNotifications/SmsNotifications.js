@@ -83,10 +83,6 @@ const SmsNotifications = () => {
       ...user.attributes,
       name: `${user.get('firstName')} ${user.get('lastName')}`
     }));
-    users.forEach(user => {
-      console.log(user.phone);
-    });
-    console.log({ users });
     setFetching(false);
     setUsers(users);
   }, []);

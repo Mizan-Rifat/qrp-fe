@@ -10,20 +10,14 @@ import { Box, Button as MButton, CircularProgress, Grid, makeStyles } from '@mat
 import { ucFirst, sentenceCase } from '../../utils';
 import dayjs from 'dayjs';
 import MaterialTable from 'material-table';
-import Button from 'components/CustomButtons/Button.js';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import MLightBox from 'components/Lightbox/MLightBox';
 import image from '../../assets/img/no-image.png';
 import ManagerDetails from './ManagerDetails';
-import FormDialog from 'components/Dialog/FormDialog';
 import { Loading } from 'components/Loading/Loading';
-import { setUserLoadingTrue, setUserLoadingFalse } from 'redux/ducks/userDuck';
-import { userUpdated } from 'redux/ducks/userDuck';
-import Parse from 'parse';
-import { useConfirmation } from 'hooks/useConfirmation/ConfirmationService';
-import QuestionnaireDialog from 'components/Dialog/QuestionnaireDialog';
 import { resetQuestionnaireState } from 'redux/ducks/questionnaireDuck';
 import useNotify from 'hooks/useNotify';
+import ActionButtons from './ActionButtons';
 
 const styles = {
   cardCategoryWhite: {
@@ -62,18 +56,15 @@ const UserDetails = () => {
   const { id } = useParams();
   const history = useHistory();
 
-  const confirm = useConfirmation();
   const [tableData, setTableData] = useState([]);
   const toast = useNotify();
-  const [openDialog, setOpenDialog] = useState(false);
-  const [openQuestionnaireDialog, setOpenQuestionnaireDialog] = useState(false);
   const [lightBox, setLightBox] = useState({
     open: false,
     images: [],
     selectedindex: ''
   });
 
-  const { fetching, user, parseUser, loading } = useSelector(state => state.user);
+  const { fetching, user } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const handleImageClick = image => {
@@ -81,53 +72,6 @@ const UserDetails = () => {
       open: true,
       images: [image],
       selectedindex: 0
-    });
-  };
-
-  const handleApprove = async status => {
-    dispatch(setUserLoadingTrue());
-    const res = await Parse.Cloud.run('user-status', {
-      uid: id,
-      status
-    }).catch(err => {
-      dispatch(setUserLoadingFalse());
-      toast(err.message, 'error');
-      return;
-    });
-    if (res) {
-      toast('Successfully updated.', 'success');
-      dispatch(
-        userUpdated({
-          key: 'status',
-          value: res.get('status')
-        })
-      );
-
-      if (user.waiting) {
-        dispatch(
-          userUpdated({
-            key: 'waiting',
-            value: false
-          })
-        );
-      }
-
-      //send email to user
-      Parse.Cloud.run('statusUpdateByQRP', {
-        email: user.username,
-        name: user.firstName,
-        status: status ? 'Approved' : 'Declined'
-      });
-    }
-  };
-
-  const handleStatus = status => {
-    confirm({
-      variant: 'danger',
-      catchOnCancel: true,
-      title: status ? 'Are you sure to approve this user?' : 'Are you sure to decline this user?'
-    }).then(() => {
-      handleApprove(status);
     });
   };
 
@@ -205,7 +149,7 @@ const UserDetails = () => {
         },
         {
           label: 'Avg Ratings',
-          value: user.avgRatings ? user.avgRatings : '0'
+          value: user.avgRatings ? user.avgRatings.toFixed(2) : '0'
         },
         ...fields.map(field => ({
           label: sentenceCase(field),
@@ -271,47 +215,7 @@ const UserDetails = () => {
             <CardBody>
               {Object.keys(user).length > 0 ? (
                 <>
-                  <Box display="flex" justifyContent="flex-end" my={5}>
-                    {user.userType === 'pharmacyOwner' ? (
-                      <Button
-                        color="success"
-                        onClick={() => setOpenDialog(!openDialog)}
-                        style={{ marginRight: 10 }}
-                      >
-                        Set Commission
-                      </Button>
-                    ) : (
-                      <Button
-                        color="primary"
-                        onClick={() => setOpenQuestionnaireDialog(!openQuestionnaireDialog)}
-                        style={{ marginRight: 10 }}
-                      >
-                        View Questionnaire
-                      </Button>
-                    )}
-
-                    <Box position="relative">
-                      {(user.waiting || !user.status) && (
-                        <Button
-                          color="success"
-                          onClick={() => handleStatus(true)}
-                          disabled={loading}
-                          style={{ marginRight: 4 }}
-                        >
-                          Approve
-                        </Button>
-                      )}
-                      {(user.waiting || user.status) && (
-                        <Button
-                          color="danger"
-                          onClick={() => handleStatus(false)}
-                          disabled={loading}
-                        >
-                          Decline
-                        </Button>
-                      )}
-                    </Box>
-                  </Box>
+                  <ActionButtons />
                   <Grid container>
                     <Grid item xs={12} md={6}>
                       <MaterialTable
@@ -374,23 +278,6 @@ const UserDetails = () => {
 
                   {user.hasOwnProperty('manager') && (
                     <ManagerDetails fetching={fetching} manager={user.manager} />
-                  )}
-
-                  <FormDialog
-                    open={openDialog}
-                    setOpen={setOpenDialog}
-                    uid={id}
-                    value={user.commission}
-                  />
-
-                  {openQuestionnaireDialog && (
-                    <QuestionnaireDialog
-                      open={openQuestionnaireDialog}
-                      setOpen={setOpenQuestionnaireDialog}
-                      user={user}
-                      parseUser={parseUser}
-                      value={user.commission}
-                    />
                   )}
                   {lightBox.open && <MLightBox lightBox={lightBox} setLightBox={setLightBox} />}
                 </>

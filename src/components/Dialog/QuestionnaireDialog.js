@@ -98,7 +98,7 @@ let pharmacistQuestions = [
   }
 ];
 
-export default function QuestionnaireDialog({ user, parseUser, open, setOpen }) {
+export default function QuestionnaireDialog({ user, open, setOpen }) {
   const handleClose = () => {
     setOpen(false);
   };
@@ -131,7 +131,7 @@ export default function QuestionnaireDialog({ user, parseUser, open, setOpen }) 
   }, [questionnaire]);
 
   useEffect(() => {
-    dispatch(fetchQuestionnaire(parseUser));
+    dispatch(fetchQuestionnaire(user.id));
   }, []);
 
   return (

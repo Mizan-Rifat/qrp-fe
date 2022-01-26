@@ -66,11 +66,15 @@ export const resetQuestionnaireState = () => {
   };
 };
 
-export const fetchQuestionnaire = user => async dispatch => {
+export const fetchQuestionnaire = userId => async dispatch => {
   const Questionnaires = Parse.Object.extend('Questionnaires');
   const questionnairesQuery = new Parse.Query(Questionnaires);
 
-  questionnairesQuery.equalTo('userId', user);
+  questionnairesQuery.equalTo('userId', {
+    __type: 'Pointer',
+    className: '_User',
+    objectId: userId
+  });
   const questionnaires = await questionnairesQuery.find().catch(err => {
     dispatch({ type: FETCHING_FALSE });
     return Promise.reject(err);

@@ -71,7 +71,6 @@ const PushNotifications = () => {
       ...user.attributes,
       name: `${user.get('firstName')} ${user.get('lastName')}`
     }));
-    console.log({ users });
     setFetching(false);
     setUsers(users);
   }, []);
