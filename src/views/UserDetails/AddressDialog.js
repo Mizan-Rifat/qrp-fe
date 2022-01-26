@@ -43,7 +43,6 @@ export default function AddressDialog({ user, open, setOpen, userId }) {
 
   const [formData, setFormData] = useState({
     addressOne: '',
-    addressTwo: '',
     city: '',
     province: '',
     postalCode: '',
@@ -51,6 +50,8 @@ export default function AddressDialog({ user, open, setOpen, userId }) {
     latitude: '',
     longitude: ''
   });
+
+  const [addressTwo, setAddressTwo] = useState(user.addressTwo);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -63,7 +64,7 @@ export default function AddressDialog({ user, open, setOpen, userId }) {
   };
   const handleSubmit = async () => {
     setLoading(true);
-    dispatch(updateUser(userId, formData));
+    dispatch(updateUser(userId, { ...formData, addressTwo }));
   };
 
   useEffect(() => {
@@ -99,16 +100,13 @@ export default function AddressDialog({ user, open, setOpen, userId }) {
         <Test formData={formData} setFormData={setFormData} />
         <TextField
           label="Apt/Suite #"
-          value={formData.addressTwo}
+          value={addressTwo}
           variant="outlined"
           fullWidth
           size="small"
           className={classes.textField}
           onChange={e => {
-            setFormData({
-              ...formData,
-              addressTwo: e.target.value
-            });
+            setAddressTwo(e.target.value);
           }}
         />
         <TextField
