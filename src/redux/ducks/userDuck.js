@@ -14,8 +14,7 @@ const RESET = 'pes/user/reset';
 const initState = {
   fetching: true,
   loading: true,
-  user: {},
-  parseUser: {}
+  user: {}
 };
 
 export default (state = initState, action) => {
@@ -23,8 +22,7 @@ export default (state = initState, action) => {
     case USER_FETCHED:
       return {
         ...state,
-        user: action.payload.user,
-        parseUser: action.payload.parseUser,
+        user: { ...state.user, ...action.payload },
         loading: false,
         fetching: false
       };
@@ -69,10 +67,10 @@ export default (state = initState, action) => {
   }
 };
 
-export const userFetched = (user, parseUser) => {
+export const userFetched = user => {
   return {
     type: USER_FETCHED,
-    payload: { user, parseUser }
+    payload: user
   };
 };
 
@@ -106,7 +104,10 @@ export const fetchUser = id => async dispatch => {
     dispatch({ type: USER_FETCHING_FALSE });
     return Promise.reject(err);
   });
-  let user = {};
+  let user = {
+    id: parseUser.id,
+    ...parseUser.attributes
+  };
 
   if (!parseUser.get('managerAsOwner') && parseUser.get('userType') === 'pharmacyOwner') {
     const Manager = Parse.Object.extend('pharmacyManagers');
@@ -124,13 +125,22 @@ export const fetchUser = id => async dispatch => {
     user.manager = manager;
   }
 
+  dispatch(userFetched(user));
+};
+
+export const updateUser = (id, data) => async dispatch => {
+  const updatedUser = await Parse.Cloud.run('updateUser', {
+    userId: id,
+    data
+  }).catch(err => {
+    console.log({ err });
+    return Promise.reject(err);
+  });
   dispatch(
-    userFetched(
-      {
-        ...user,
-        ...parseUser.attributes
-      },
-      parseUser
-    )
+    userFetched({
+      id: updatedUser.id,
+      ...updatedUser.attributes
+    })
   );
+  return Promise.resolve();
 };
