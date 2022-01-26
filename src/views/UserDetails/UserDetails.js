@@ -64,7 +64,7 @@ const UserDetails = () => {
     selectedindex: ''
   });
 
-  const { fetching, user, parseUser, loading } = useSelector(state => state.user);
+  const { fetching, user } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const handleImageClick = image => {

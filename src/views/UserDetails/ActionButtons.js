@@ -33,7 +33,7 @@ const ActionButtons = () => {
   const [openQuestionnaireDialog, setOpenQuestionnaireDialog] = useState(false);
   const [openAddressDialog, setOpenAddressDialog] = useState(false);
 
-  const { fetching, user, parseUser, loading } = useSelector(state => state.user);
+  const { fetching, user, loading } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const handleApprove = async status => {
@@ -143,7 +143,6 @@ const ActionButtons = () => {
         open={openQuestionnaireDialog}
         setOpen={setOpenQuestionnaireDialog}
         user={user}
-        parseUser={parseUser}
         value={user.commission}
       />
     </>
