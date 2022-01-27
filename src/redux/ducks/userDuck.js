@@ -129,7 +129,7 @@ export const fetchUser = id => async dispatch => {
 };
 
 export const updateUser = (id, data) => async dispatch => {
-  const updatedUser = await Parse.Cloud.run('updateUser', {
+  const updatedUser = await Parse.Cloud.run('updateUserLocation', {
     userId: id,
     data
   }).catch(err => {
