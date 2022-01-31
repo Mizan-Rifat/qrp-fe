@@ -5,6 +5,8 @@ import messagesReducer from '../ducks/messagesDuck';
 import contactsReducer from '../ducks/contactsDuck';
 import questionnaireReducer from '../ducks/questionnaireDuck';
 import emergencyShiftsReducer from 'redux/ducks/emergencyShiftsDuck';
+import shiftsReducer from 'redux/ducks/shiftsDuck';
+import shiftReducer from 'redux/ducks/shiftDuck';
 
 export const reducers = combineReducers({
   users: usersReducer,
@@ -12,5 +14,7 @@ export const reducers = combineReducers({
   contacts: contactsReducer,
   messages: messagesReducer,
   questionnaire: questionnaireReducer,
-  emergencyShifts: emergencyShiftsReducer
+  emergencyShifts: emergencyShiftsReducer,
+  shifts: shiftsReducer,
+  shift: shiftReducer
 });

@@ -4,6 +4,7 @@ import EmailIcon from '@material-ui/icons/Email';
 import FlagIcon from '@material-ui/icons/Flag';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import SmsIcon from '@material-ui/icons/Sms';
+import AcUnitIcon from '@material-ui/icons/AcUnit';
 
 export const navMenu = [
   {
@@ -15,6 +16,11 @@ export const navMenu = [
     path: '/pharmacy-owners',
     name: 'Pharmacy Owners',
     icon: GroupIcon
+  },
+  {
+    path: '/shifts',
+    name: 'Shifts',
+    icon: AcUnitIcon
   },
   {
     path: '/emergency-shift-requests',
