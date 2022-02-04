@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Grid, makeStyles } from '@material-ui/core';
 import DetailsLayout from 'layouts/DetailsLayout';
-import MaterialTable from 'material-table';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
@@ -168,7 +167,7 @@ const ShiftDetails = () => {
   return (
     <DetailsLayout title="Shift Deatils">
       <LoadingLayout loading={fetching || loading} position={{ left: '45%', top: '20%' }}>
-        <ShiftActionButtons shiftId={shift.id} shiftCandidatesId={shift.shifter?.id} />
+        <ShiftActionButtons shift={shift} />
         <Grid container spacing={3}>
           {data.map((item, index) => (
             <Grid

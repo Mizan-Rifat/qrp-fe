@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Card from 'components/Card/Card.js';
-import CardHeader from 'components/Card/CardHeader.js';
-import CardBody from 'components/Card/CardBody.js';
 import MaterialTable from 'material-table';
-import Avatar from '../../components/Avatar/Avatar';
-import { Box, Button, Grid, Icon, TextField } from '@material-ui/core';
+import { Box, Button, TextField } from '@material-ui/core';
 import { useHistory } from 'react-router';
-import { sentenceCase } from 'utils';
-import { useConfirmation } from 'hooks/useConfirmation/ConfirmationService';
-import { deleteUser } from 'redux/ducks/usersDuck';
 import { useDispatch } from 'react-redux';
-import useNotify from 'hooks/useNotify';
 import TableLayout from 'layouts/TableLayout';
 import { fetchShifts } from 'redux/ducks/shiftsDuck';
 import { useSelector } from 'react-redux';
@@ -50,15 +42,10 @@ const useStyles = makeStyles(theme => ({
 const Shifts = () => {
   const classes = useStyles();
   const history = useHistory();
-  const confirm = useConfirmation();
   const { shifts, fetching, loading } = useSelector(state => state.shifts);
   const dispatch = useDispatch();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-
-  console.log({ shifts });
-
-  const toast = useNotify();
 
   const columns = [
     {
@@ -73,9 +60,6 @@ const Shifts = () => {
           </p>
         </>
       )
-      // `${dayjs(rowData.shiftDate).format('DD MMM, YYYY')} <br> (${dayjs(
-      //   rowData.formattedStartTime
-      // ).format('hh:mm a')} - ${dayjs(rowData.formattedEndTime).format('hh:mm a')})`
     },
 
     {
@@ -143,7 +127,6 @@ const Shifts = () => {
           className={classes.button}
           onClick={handleFilter}
           disabled={!startDate || !endDate}
-          // endIcon={<Icon>send</Icon>}
         >
           <SearchIcon />
         </Button>

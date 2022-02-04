@@ -194,91 +194,42 @@ export const fetchShift = id => async dispatch => {
   dispatch(shiftFetched(shift, parseShift));
 };
 
-export const cancelShift = () => async (dispatch, getState) => {
+export const cancelShift = shiftId => async dispatch => {
   dispatch({ type: LOADING_TRUE });
-  const shift = getState().shift.parseShift;
-  const shiftCandidates = getState().shift.parseShift.get('shifter');
-  const paymentIntentId = shiftCandidates.get('paymentIntentId');
 
-  const paymentIntent = await Parse.Cloud.run('cancelPaymentIntent', {
-    paymentIntentId
+  const updatedShift = await Parse.Cloud.run('cancelShift', {
+    shiftId
   }).catch(err => {
     console.log({ err });
     dispatch({ type: LOADING_FALSE });
     return Promise.reject(err);
   });
 
-  if (!paymentIntent) {
-    shift.set('status', false);
-    shiftCandidates.set('shiftStatus', 'Admin Cancelled');
-    const updatedShift = await shift.save().catch(err => {
-      console.log({ err });
-      dispatch({ type: LOADING_FALSE });
-      // return Promise.reject(err);
-    });
-    if (updatedShift) {
-      dispatch(
-        shiftUpdated(
-          {
-            status: false,
-            shifter: updatedShift.get('shifter') && {
-              id: updatedShift.get('shifter')?.id,
-              ...updatedShift.get('shifter')?.attributes
-            }
-          },
-          updatedShift
-        )
-      );
-      return Promise.resolve();
-    }
+  console.log({ updatedShift });
+  if (updatedShift) {
+    dispatch(
+      shiftUpdated(
+        {
+          status: false,
+          shifter: null
+        },
+        updatedShift
+      )
+    );
+    return Promise.resolve();
   }
 };
 
-export const deleteShift = () => async (dispatch, getState) => {
+export const deleteShift = shiftId => async dispatch => {
   dispatch({ type: LOADING_TRUE });
-  // const shift = getState().shift.parseShift;
+  await Parse.Cloud.run('deleteShift', {
+    shiftId
+  }).catch(err => {
+    console.log({ err });
+    dispatch({ type: LOADING_FALSE });
+    return Promise.reject(err);
+  });
 
-  // const destroyedShift = await shift.destroy();
-
-  if (true) {
-    const ShiftCandidates = Parse.Object.extend('shiftCandidates');
-    const shiftCandidatesQuery = new Parse.Query(ShiftCandidates);
-
-    // shiftCandidatesQuery.equalTo('shiftId', shift);
-    shiftCandidatesQuery.equalTo('shiftId', {
-      __type: 'Pointer',
-      className: 'Shifts',
-      objectId: 'mby7yR0EYa'
-    });
-
-    const shiftCandidates = await shiftCandidatesQuery.find();
-    console.log({ shiftCandidates });
-    shiftCandidates.forEach(async shiftCandidate => {
-      const paymentIntentId = shiftCandidate.get('paymentIntentId');
-      if (paymentIntentId) {
-        const paymentIntent = await Parse.Cloud.run('cancelPaymentIntent', {
-          paymentIntentId
-        }).catch(err => {
-          console.log({ err });
-        });
-      }
-      await shiftCandidate.destroy();
-    });
-
-    const Notifications = Parse.Object.extend('Notifications');
-    const notificationsQuery = new Parse.Query(Notifications);
-
-    // notificationsQuery.equalTo('shiftId', shift);
-    notificationsQuery.equalTo('shiftId', {
-      __type: 'Pointer',
-      className: 'Shifts',
-      objectId: 'mby7yR0EYa'
-    });
-
-    const notifications = await notificationsQuery.find();
-    console.log({ notifications });
-    notifications.forEach(async notification => {
-      await notification.destroy();
-    });
-  }
+  dispatch({ type: LOADING_FALSE });
+  return Promise.resolve();
 };
