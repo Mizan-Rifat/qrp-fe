@@ -3,8 +3,6 @@ import Parse from 'parse';
 //actions
 
 const SHIFT_FETCHED = 'qrp/shift/shift_fetched';
-const SHIFT_ADDED = 'qrp/shift/shift_added';
-const SHIFT_DELETED = 'qrp/shift/shift_deleted';
 const SHIFT_UPDATED = 'qrp/shift/shift_updated';
 
 const LOADING_TRUE = 'qrp/shift/loading_true';
@@ -35,12 +33,6 @@ export default (state = initState, action) => {
         parseShift: action.payload.parseShift
       };
 
-    // case SHIFT_ADDED:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     shift: [...state.shift, action.payload]
-    //   };
     case SHIFT_UPDATED:
       return {
         ...state,
@@ -51,12 +43,6 @@ export default (state = initState, action) => {
         },
         parseShift: action.payload.parseShift
       };
-    // case SHIFT_DELETED:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     shift: state.shift.filter(item => item.id != action.payload)
-    //   };
     case LOADING_TRUE:
       return {
         ...state,
@@ -116,25 +102,6 @@ export const shiftUpdated = (updatedShift, parseShift) => {
     }
   };
 };
-// export const shiftDeleted = id => {
-//   return {
-//     type: SHIFT_DELETED,
-//     payload: id
-//   };
-// };
-// export const shiftAdded = data => {
-//   return {
-//     type: SHIFT_ADDED,
-//     payload: data
-//   };
-// };
-
-// export const setErrors = error => {
-//   return {
-//     type: SET_ERRORS,
-//     payload: error
-//   };
-// };
 
 export const fetchShift = id => async dispatch => {
   dispatch({ type: FETCHING_TRUE });

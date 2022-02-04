@@ -3,9 +3,6 @@ import Parse from 'parse';
 //actions
 
 const SHIFTS_FETCHED = 'qrp/shifts/shifts_fetched';
-const SHIFTS_ADDED = 'qrp/shifts/shifts_added';
-const SHIFTS_DELETED = 'qrp/shifts/shifts_deleted';
-const SHIFTS_UPDATED = 'qrp/shifts/shifts_updated';
 
 const LOADING_TRUE = 'qrp/shifts/loading_true';
 const LOADING_FALSE = 'qrp/shifts/loading_false';
@@ -32,26 +29,6 @@ export default (state = initState, action) => {
         shifts: action.payload
       };
 
-    // case SHIFTS_ADDED:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     shifts: [...state.shifts, action.payload]
-    //   };
-    // case SHIFTS_UPDATED:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     shifts: state.shifts.map(item =>
-    //       item.id == action.payload.id ? action.payload : item
-    //     )
-    //   };
-    // case SHIFTS_DELETED:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     shifts: state.shifts.filter(item => item.id != action.payload)
-    //   };
     case LOADING_TRUE:
       return {
         ...state,
@@ -93,32 +70,6 @@ export const shiftsFetched = data => {
     payload: data
   };
 };
-
-// export const shiftsUpdated = data => {
-//   return {
-//     type: SHIFTS_UPDATED,
-//     payload: data
-//   };
-// };
-// export const shiftsDeleted = id => {
-//   return {
-//     type: SHIFTS_DELETED,
-//     payload: id
-//   };
-// };
-// export const shiftsAdded = data => {
-//   return {
-//     type: SHIFTS_ADDED,
-//     payload: data
-//   };
-// };
-
-// export const setErrors = error => {
-//   return {
-//     type: SET_ERRORS,
-//     payload: error
-//   };
-// };
 
 export const fetchShifts = (startDate, endDate) => async dispatch => {
   dispatch({ type: FETCHING_TRUE });
