@@ -9,7 +9,8 @@ import { fetchShift } from 'redux/ducks/shiftDuck';
 import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
 import { resetShiftState } from 'redux/ducks/shiftDuck';
-import { Loading } from 'components/Loading/Loading';
+import ShiftActionButtons from './ShiftActionsButtons';
+import { LoadingLayout } from 'layouts/LoadingLayout';
 
 const styles = {
   gridItem: {
@@ -34,54 +35,11 @@ const getManagerInfo = shift => {
   return `Name : ${name} <br> Phone : ${phone} <br> Rating : ${rating}`;
 };
 
-// const getShiftStatus = shift => {
-//   if (
-//     new Date().getTime() <= new Date(shift.shiftDate).getTime() &&
-//     shift.status &&
-//     shift.shifter
-//   ) {
-//     if (['pharmacyOwner'].includes(this.userType)) {
-//       return { status: 'Pending', color: 'orange' };
-//     } else if (
-//       !this.shift.get('status') &&
-//       this.shift.get('createdByAdmin') &&
-//       this.shift.jobStatus !== 'Cancelled'
-//     ) {
-//       return { status: 'Emergency', color: 'red' };
-//     } else {
-//       return {
-//         status: this.shift.jobStatus && this.shift.jobStatus,
-//         color:
-//           this.shift.jobStatus && this.shift.jobStatus === 'Cancelled'
-//             ? 'red'
-//             : this.shift.jobStatus === 'Requested'
-//             ? 'orange'
-//             : 'green darken-4'
-//       };
-//     }
-//   } else if (
-//     this.shift.get('shifter') &&
-//     (this.shift.get('shifter').get('jobStatus') || this.shift.jobStatus) &&
-//     this.shift.get('status')
-//   ) {
-//     return {
-//       status: this.shift.get('shifter').get('jobStatus') || this.shift.jobStatus,
-//       color: this.shift.get('shifter').get('jobStatus') === 'Completed' ? 'grey darken-1' : 'green'
-//     };
-//   } else if (
-//     new Date(this.$moment(this.shift.get('shiftDate'))).getTime() <= new Date().getTime()
-//   ) {
-//     return { status: 'Expired', color: 'secondary' };
-//   } else {
-//     return { status: 'No status', color: '' };
-//   }
-// };
-
 const ShiftDetails = () => {
   const { id } = useParams();
   const classes = useStyles();
   const [data, setData] = useState([]);
-  const { fetching, shift } = useSelector(state => state.shift);
+  const { fetching, loading, shift } = useSelector(state => state.shift);
   const dispatch = useDispatch();
 
   console.log({ shift });
@@ -106,6 +64,10 @@ const ShiftDetails = () => {
           )
         },
         {
+          label: 'Status',
+          value: shift.status ? shift.shifter?.shiftStatus : 'Pending'
+        },
+        shift.notes && {
           label: 'Notes',
           value: shift.notes
         },
@@ -116,6 +78,10 @@ const ShiftDetails = () => {
         {
           label: 'Required Skills',
           value: shift.skills.join(', ')
+        },
+        {
+          label: 'Date',
+          value: dayjs(shift.shiftDate).format('DD MMM, YYYY')
         },
         {
           label: 'Time',
@@ -201,11 +167,8 @@ const ShiftDetails = () => {
 
   return (
     <DetailsLayout title="Shift Deatils">
-      {fetching ? (
-        <Box height="100%" style={{ pointerEvents: 'none', opacity: 0.5 }}>
-          <Loading position={{ top: '50%', left: '50%' }} />
-        </Box>
-      ) : (
+      <LoadingLayout loading={fetching || loading} position={{ left: '45%', top: '20%' }}>
+        <ShiftActionButtons shiftId={shift.id} shiftCandidatesId={shift.shifter?.id} />
         <Grid container spacing={3}>
           {data.map((item, index) => (
             <Grid
@@ -229,7 +192,7 @@ const ShiftDetails = () => {
             </Grid>
           ))}
         </Grid>
-      )}
+      </LoadingLayout>
     </DetailsLayout>
   );
 };

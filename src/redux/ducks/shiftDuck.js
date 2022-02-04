@@ -20,6 +20,7 @@ const initState = {
   fetching: true,
   loading: false,
   shift: [],
+  parseShift: [],
   error: {}
 };
 
@@ -30,7 +31,8 @@ export default (state = initState, action) => {
         ...state,
         fetching: false,
         loading: false,
-        shift: action.payload
+        shift: action.payload.shift,
+        parseShift: action.payload.parseShift
       };
 
     // case SHIFT_ADDED:
@@ -39,14 +41,16 @@ export default (state = initState, action) => {
     //     loading: false,
     //     shift: [...state.shift, action.payload]
     //   };
-    // case SHIFT_UPDATED:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     shift: state.shift.map(item =>
-    //       item.id == action.payload.id ? action.payload : item
-    //     )
-    //   };
+    case SHIFT_UPDATED:
+      return {
+        ...state,
+        loading: false,
+        shift: {
+          ...state.shift,
+          ...action.payload.updatedShift
+        },
+        parseShift: action.payload.parseShift
+      };
     // case SHIFT_DELETED:
     //   return {
     //     ...state,
@@ -90,10 +94,10 @@ export default (state = initState, action) => {
 
 // action_creators
 
-export const shiftFetched = data => {
+export const shiftFetched = (shift, parseShift) => {
   return {
     type: SHIFT_FETCHED,
-    payload: data
+    payload: { shift, parseShift }
   };
 };
 
@@ -103,12 +107,15 @@ export const resetShiftState = () => {
   };
 };
 
-// export const shiftUpdated = data => {
-//   return {
-//     type: SHIFT_UPDATED,
-//     payload: data
-//   };
-// };
+export const shiftUpdated = (updatedShift, parseShift) => {
+  return {
+    type: SHIFT_UPDATED,
+    payload: {
+      updatedShift,
+      parseShift
+    }
+  };
+};
 // export const shiftDeleted = id => {
 //   return {
 //     type: SHIFT_DELETED,
@@ -184,5 +191,94 @@ export const fetchShift = id => async dispatch => {
     }
   };
 
-  dispatch(shiftFetched(shift));
+  dispatch(shiftFetched(shift, parseShift));
+};
+
+export const cancelShift = () => async (dispatch, getState) => {
+  dispatch({ type: LOADING_TRUE });
+  const shift = getState().shift.parseShift;
+  const shiftCandidates = getState().shift.parseShift.get('shifter');
+  const paymentIntentId = shiftCandidates.get('paymentIntentId');
+
+  const paymentIntent = await Parse.Cloud.run('cancelPaymentIntent', {
+    paymentIntentId
+  }).catch(err => {
+    console.log({ err });
+    dispatch({ type: LOADING_FALSE });
+    return Promise.reject(err);
+  });
+
+  if (!paymentIntent) {
+    shift.set('status', false);
+    shiftCandidates.set('shiftStatus', 'Admin Cancelled');
+    const updatedShift = await shift.save().catch(err => {
+      console.log({ err });
+      dispatch({ type: LOADING_FALSE });
+      // return Promise.reject(err);
+    });
+    if (updatedShift) {
+      dispatch(
+        shiftUpdated(
+          {
+            status: false,
+            shifter: updatedShift.get('shifter') && {
+              id: updatedShift.get('shifter')?.id,
+              ...updatedShift.get('shifter')?.attributes
+            }
+          },
+          updatedShift
+        )
+      );
+      return Promise.resolve();
+    }
+  }
+};
+
+export const deleteShift = () => async (dispatch, getState) => {
+  dispatch({ type: LOADING_TRUE });
+  // const shift = getState().shift.parseShift;
+
+  // const destroyedShift = await shift.destroy();
+
+  if (true) {
+    const ShiftCandidates = Parse.Object.extend('shiftCandidates');
+    const shiftCandidatesQuery = new Parse.Query(ShiftCandidates);
+
+    // shiftCandidatesQuery.equalTo('shiftId', shift);
+    shiftCandidatesQuery.equalTo('shiftId', {
+      __type: 'Pointer',
+      className: 'Shifts',
+      objectId: 'mby7yR0EYa'
+    });
+
+    const shiftCandidates = await shiftCandidatesQuery.find();
+    console.log({ shiftCandidates });
+    shiftCandidates.forEach(async shiftCandidate => {
+      const paymentIntentId = shiftCandidate.get('paymentIntentId');
+      if (paymentIntentId) {
+        const paymentIntent = await Parse.Cloud.run('cancelPaymentIntent', {
+          paymentIntentId
+        }).catch(err => {
+          console.log({ err });
+        });
+      }
+      await shiftCandidate.destroy();
+    });
+
+    const Notifications = Parse.Object.extend('Notifications');
+    const notificationsQuery = new Parse.Query(Notifications);
+
+    // notificationsQuery.equalTo('shiftId', shift);
+    notificationsQuery.equalTo('shiftId', {
+      __type: 'Pointer',
+      className: 'Shifts',
+      objectId: 'mby7yR0EYa'
+    });
+
+    const notifications = await notificationsQuery.find();
+    console.log({ notifications });
+    notifications.forEach(async notification => {
+      await notification.destroy();
+    });
+  }
 };
