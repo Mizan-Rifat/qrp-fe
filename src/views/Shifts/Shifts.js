@@ -9,6 +9,7 @@ import { fetchShifts } from 'redux/ducks/shiftsDuck';
 import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 import SearchIcon from '@material-ui/icons/Search';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles(theme => ({
   cardCategoryWhite: {
@@ -42,7 +43,7 @@ const useStyles = makeStyles(theme => ({
 const Shifts = () => {
   const classes = useStyles();
   const history = useHistory();
-  const { shifts, fetching, loading } = useSelector(state => state.shifts);
+  const { shifts, filtered, fetching, loading } = useSelector(state => state.shifts);
   const dispatch = useDispatch();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -88,6 +89,15 @@ const Shifts = () => {
     dispatch(fetchShifts(dayjs(startDate), dayjs(endDate).hour(23).minute(59)));
   };
 
+  const handleClear = () => {
+    console.log({ startDate, endDate });
+    setStartDate('');
+    setEndDate('');
+    if (filtered) {
+      dispatch(fetchShifts());
+    }
+  };
+
   useEffect(() => {
     if (shifts.length <= 0) {
       dispatch(fetchShifts());
@@ -129,6 +139,16 @@ const Shifts = () => {
           disabled={!startDate || !endDate}
         >
           <SearchIcon />
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          className={classes.button}
+          style={{ marginLeft: 8 }}
+          onClick={handleClear}
+          disabled={!startDate && !endDate}
+        >
+          <CloseIcon />
         </Button>
       </Box>
       <MaterialTable

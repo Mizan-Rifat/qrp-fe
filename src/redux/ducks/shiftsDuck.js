@@ -16,6 +16,7 @@ const initState = {
   fetching: true,
   loading: false,
   shifts: [],
+  filtered: false,
   error: {}
 };
 
@@ -26,7 +27,8 @@ export default (state = initState, action) => {
         ...state,
         fetching: false,
         loading: false,
-        shifts: action.payload
+        filtered: action.payload.filtered,
+        shifts: action.payload.data
       };
 
     case LOADING_TRUE:
@@ -64,10 +66,10 @@ export default (state = initState, action) => {
 
 // action_creators
 
-export const shiftsFetched = data => {
+export const shiftsFetched = (data, filtered) => {
   return {
     type: SHIFTS_FETCHED,
-    payload: data
+    payload: { data, filtered }
   };
 };
 
@@ -76,10 +78,12 @@ export const fetchShifts = (startDate, endDate) => async dispatch => {
 
   const Shifts = Parse.Object.extend('Shifts');
   const shiftsQuery = new Parse.Query(Shifts);
+  let filtered = false;
 
   if (startDate && endDate) {
     shiftsQuery.greaterThanOrEqualTo('shiftDate', new Date(startDate));
     shiftsQuery.lessThanOrEqualTo('shiftDate', new Date(endDate));
+    filtered = true;
   } else {
     shiftsQuery.greaterThanOrEqualTo('shiftDate', new Date());
   }
@@ -118,5 +122,5 @@ export const fetchShifts = (startDate, endDate) => async dispatch => {
     };
   });
 
-  dispatch(shiftsFetched(shifts));
+  dispatch(shiftsFetched(shifts, filtered));
 };
