@@ -60,7 +60,15 @@ const Shifts = () => {
             {dayjs(rowData.formattedEndTime).format('hh:mm a')}
           </p>
         </>
-      )
+      ),
+      customFilterAndSearch: (term, rowData) => {
+        return (
+          dayjs(rowData.shiftDate)
+            .format('DD MMM, YYYY')
+            .toLowerCase()
+            .indexOf(term.toLowerCase()) != -1
+        );
+      }
     },
 
     {
@@ -80,7 +88,14 @@ const Shifts = () => {
     {
       title: 'Shift Status',
       field: 'status',
-      render: rowData => (rowData.status ? rowData.shifter?.shiftStatus : 'Pending')
+      render: rowData => (rowData.status ? rowData.shifter?.shiftStatus : 'Pending'),
+      customFilterAndSearch: (term, rowData) => {
+        return (
+          (rowData.status ? rowData.shifter?.shiftStatus : 'Pending')
+            .toLowerCase()
+            .indexOf(term.toLowerCase()) != -1
+        );
+      }
     }
   ];
 
