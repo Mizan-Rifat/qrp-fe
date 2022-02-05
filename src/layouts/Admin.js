@@ -16,6 +16,8 @@ import { useSelector } from 'react-redux';
 import { Box } from '@material-ui/core';
 import { Loading } from 'components/Loading/Loading';
 import SmsNotifications from 'views/SmsNotifications/SmsNotifications';
+import Shifts from 'views/Shifts/Shifts';
+import ShiftDetails from 'views/Shifts/ShiftDetails';
 
 const Messages = loadable(() => import('views/Chat/Messages'));
 const UserDetails = loadable(() => import('views/UserDetails/UserDetails'));
@@ -68,6 +70,8 @@ export default function Admin({ ...rest }) {
                 <Route exact path="/user/:id" component={UserDetails} />
                 <Route exact path="/pharmacy-owners" component={PharmacyOwners} />
                 <Route exact path="/messages" component={Messages} />
+                <Route exact path="/shifts" component={Shifts} />
+                <Route exact path="/shifts/:id" component={ShiftDetails} />
                 <Route exact path="/emergency-shift-requests" component={EmergencyShifts} />
                 <Route exact path="/push-notification" component={PushNotifications} />
                 <Route exact path="/sms-notification" component={SmsNotifications} />
