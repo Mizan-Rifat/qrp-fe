@@ -1,6 +1,6 @@
 import Parse from 'parse';
 
-import { setMessageSeen } from './messagesDuck';
+import { setMessageSeen, setMessagesState } from './messagesDuck';
 //actions
 
 const CONTACTS_FETCHED = 'qrp/contacts/contacts_fetched';
@@ -153,6 +153,9 @@ export const setPresenceStatus = (id, status) => (dispatch, getState) => {
   const contact = getState().contacts.contacts.find(contact => contact.id === id);
   if (contact) {
     dispatch({ type: CONTACTS_UPDATED, payload: { ...contact, online: status } });
+    if (id === getState().messages.recipient.id) {
+      dispatch(setMessagesState('recipient', { ...getState().messages.recipient, online: status }));
+    }
   }
 };
 
