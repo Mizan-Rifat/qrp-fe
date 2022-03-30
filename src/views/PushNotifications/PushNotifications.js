@@ -64,6 +64,7 @@ const PushNotifications = () => {
     const userQuery = new Parse.Query(User);
     userQuery.equalTo('userType', 'pharmacyOwner');
     userQuery.exists('deviceId');
+    userQuery.descending('createdAt');
     const parseUsers = await userQuery.find().catch(err => {});
 
     const users = parseUsers.map(user => ({

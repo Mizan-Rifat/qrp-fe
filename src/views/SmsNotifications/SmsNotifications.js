@@ -76,6 +76,7 @@ const SmsNotifications = () => {
     const userQuery = new Parse.Query(User);
     userQuery.equalTo('userType', 'Pharmacist');
     userQuery.equalTo('smsVerified', true);
+    userQuery.descending('createdAt');
     const parseUsers = await userQuery.find().catch(err => {});
 
     const users = parseUsers.map(user => ({
