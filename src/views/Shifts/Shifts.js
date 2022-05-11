@@ -100,12 +100,10 @@ const Shifts = () => {
   ];
 
   const handleFilter = () => {
-    console.log({ startDate, endDate });
     dispatch(fetchShifts(dayjs(startDate), dayjs(endDate).hour(23).minute(59)));
   };
 
   const handleClear = () => {
-    console.log({ startDate, endDate });
     setStartDate('');
     setEndDate('');
     if (filtered) {

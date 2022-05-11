@@ -44,7 +44,6 @@ const ShiftActionButtons = ({ shift }) => {
         history.push('/shifts');
       })
       .catch(err => {
-        console.log('No');
         if (err) {
           toast(err.message, 'error');
         }
