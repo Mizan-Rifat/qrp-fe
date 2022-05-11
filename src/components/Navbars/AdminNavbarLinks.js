@@ -111,6 +111,12 @@ export default function AdminNavbarLinks() {
               <Paper>
                 <ClickAwayListener onClickAway={handleCloseProfile}>
                   <MenuList role="menu">
+                    <MenuItem
+                      onClick={() => history.push('/update-password')}
+                      className={classes.dropdownItem}
+                    >
+                      Change password
+                    </MenuItem>
                     <MenuItem onClick={handleLogout} className={classes.dropdownItem}>
                       Logout
                     </MenuItem>

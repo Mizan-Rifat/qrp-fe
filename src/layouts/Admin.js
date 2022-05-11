@@ -18,6 +18,7 @@ import { Loading } from 'components/Loading/Loading';
 import SmsNotifications from 'views/SmsNotifications/SmsNotifications';
 import Shifts from 'views/Shifts/Shifts';
 import ShiftDetails from 'views/Shifts/ShiftDetails';
+import UpdatePassword from 'views/UpdatePassword';
 
 const Messages = loadable(() => import('views/Chat/Messages'));
 const UserDetails = loadable(() => import('views/UserDetails/UserDetails'));
@@ -75,6 +76,7 @@ export default function Admin({ ...rest }) {
                 <Route exact path="/emergency-shift-requests" component={EmergencyShifts} />
                 <Route exact path="/push-notification" component={PushNotifications} />
                 <Route exact path="/sms-notification" component={SmsNotifications} />
+                <Route exact path="/update-password" component={UpdatePassword} />
                 <Redirect from="/" to="/staffs" />
               </Switch>
             )}
