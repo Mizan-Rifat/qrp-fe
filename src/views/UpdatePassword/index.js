@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Parse from 'parse';
 import { useHistory } from 'react-router';
-import CustomInput from 'components/CustomInput/CustomInput.js';
 import Button from 'components/CustomButtons/Button.js';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
@@ -23,10 +20,6 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center'
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main
   },
   form: {
     position: 'relative'
@@ -86,7 +79,6 @@ export const PasswordTextField = ({ label, errors, register, name, validation })
         error={!!errors[name]}
         helperText={errors[name]?.message}
         {...register(name, validation)}
-        // {...rest}
       />
     </>
   );
@@ -105,31 +97,26 @@ export default function UpdatePassword() {
   } = useForm();
 
   const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState('');
-
-  console.log({ errors });
 
   const onSubmit = async data => {
-    console.log({ data });
     setLoading(true);
-    const username = Parse.User.current().get('username');
+    const currentUser = Parse.User.current();
 
-    const user = await Parse.User.logIn(username, data.currentPassword).catch(error => {
-      setError('currentPassword', { type: 'custom', message: 'Current Password is incorrect' });
-      toast('Current Password is incorrect', 'error');
-      setLoading(false);
-      console.log({ error });
-    });
+    const user = await Parse.User.logIn(currentUser.get('username'), data.currentPassword).catch(
+      error => {
+        setError('currentPassword', { type: 'custom', message: 'Current Password is incorrect' });
+        toast('Current Password is incorrect', 'error');
+        setLoading(false);
+      }
+    );
 
     if (user) {
-      const res = await Parse.Cloud.run('deleteUser', {
-        password: data.newPassword
-      }).catch(error => {
+      currentUser.set('password', data.newPassword);
+      const res = await currentUser.save().catch(error => {
         toast(error.message, 'error');
-        console.log({ error });
       });
       if (res) {
-        toast(res.message, 'success');
+        toast('Password updated', 'success');
         await Parse.User.logOut();
         history.push('/admin/login');
       }
@@ -188,16 +175,6 @@ export default function UpdatePassword() {
                       value: 8,
                       message: 'At least 8 characters'
                     },
-                    // validate: {
-                    //   lowerCase: value =>
-                    //     /^(?=.*[a-z])+/.test(value) || 'At least 1 lower case letter (a-z)',
-                    //   upperCase: value =>
-                    //     /^(?=.*[A-Z])+/.test(value) || 'At least 1 upper case letter (A-Z)',
-                    //   number: value => /^(?=.*\d)+/.test(value) || 'At least 1 number (0-9)',
-                    //   symbol: value =>
-                    //     /^(?=.*[@$!%*?&])+/.test(value) ||
-                    //     'At least 1 special characters ( @$!%*?& )'
-                    // }
                     validate: value => {
                       let index = 0;
                       if (/^(?=.*[a-z])+/.test(value)) {
