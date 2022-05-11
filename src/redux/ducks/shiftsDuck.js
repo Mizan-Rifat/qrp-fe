@@ -95,8 +95,6 @@ export const fetchShifts = (startDate, endDate) => async dispatch => {
     return Promise.reject(err);
   });
 
-  console.log({ parseShifts });
-
   const shifts = parseShifts.map(shift => {
     const startTime = shift.get('startTime').split(':');
     const endTime = shift.get('endTime').split(':');
