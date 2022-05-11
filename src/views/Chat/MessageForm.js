@@ -91,7 +91,6 @@ export const MessageForm = ({ currentUser, receiver, channel }) => {
       });
 
       if (response) {
-        console.log({ response });
         if (!receiver.online && receiver.deviceId) {
           const messages = Parse.Cloud.run('sendPush', {
             include_player_ids: receiver.deviceId,

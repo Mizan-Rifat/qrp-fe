@@ -41,7 +41,6 @@ const ShiftDetails = () => {
   const { fetching, loading, shift } = useSelector(state => state.shift);
   const dispatch = useDispatch();
 
-  console.log({ shift });
   useEffect(() => {
     dispatch(fetchShift(id));
     return () => {
